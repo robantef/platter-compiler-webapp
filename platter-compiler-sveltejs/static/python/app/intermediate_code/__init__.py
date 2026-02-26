@@ -27,6 +27,7 @@ from .propagation import ConstantPropagationPass, CopyPropagationPass
 from .dead_code_elimination import DeadCodeEliminationPass, UnreachableCodeEliminationPass
 from .algebraic_simplification import AlgebraicSimplificationPass, StrengthReductionPass
 from .optimizer_manager import OptimizerManager, OptimizationLevel, optimize_ir
+from .ir_interpreter import TACInterpreter, run_tac
 
 __all__ = [
     # TAC Instructions

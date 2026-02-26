@@ -19,12 +19,35 @@ class SymbolTableBuilder:
         self._register_builtin_functions()
     
     def _register_builtin_functions(self):
-        """Register built-in type conversion functions"""
-        # Built-in type conversion functions: topiece, tosip, toflag, tochars
+        """Register Platter built-in functions (reserved words that act as functions)"""
         builtin_functions = [
-            ("topiece", "piece"),  # Converts to piece (integer)
-            ("tosip", "sip"),      # Converts to sip (float)
-            ("tochars", "chars"),  # Converts to chars (string)
+            # Type conversions
+            ("topiece", "piece"),  # topiece(any) → piece
+            ("tosip",   "sip"),    # tosip(any)   → sip
+            ("tochars", "chars"),  # tochars(any) → chars
+
+            # Math, Formatting, Random
+            ("pow",     "piece"),  # pow(piece, piece) → piece
+            ("sqrt",    "sip"),    # sqrt(piece)       → sip (7 fractional digits)
+            ("fact",    "piece"),  # fact(piece)        → piece (factorial)
+            ("cut",     "chars"),  # cut(sip, sip)      → chars (formatted numeric)
+            ("rand",    "sip"),    # rand()              → sip (0.0–0.9999999, no args)
+
+            # String operation
+            ("copy",    "chars"),  # copy(chars, piece, piece) → chars (substring)
+
+            # Collection built-ins — all serve NEW arrays/tables
+            ("size",    "piece"),  # size(array)          → piece
+            ("sort",    "array"),  # sort(array)          → new sorted array
+            ("reverse", "array"),  # reverse(array)       → new reversed array
+            ("append",  "array"),  # append(array, val)   → new array with val
+            ("remove",  "array"),  # remove(array, piece) → new array without element at index
+            ("search",  "piece"),  # search(array, val)   → piece (first matching index, -1 if not found)
+            ("matches", "flag"),   # matches(arr|tbl, arr|tbl) → flag (deep equality)
+
+            # I/O built-ins
+            ("bill",    "chars"),  # bill(chars) → chars (outputs text, serves "")
+            ("take",    "chars"),  # take()      → chars (awaits input, no args)
         ]
         
         for func_name, return_type in builtin_functions:

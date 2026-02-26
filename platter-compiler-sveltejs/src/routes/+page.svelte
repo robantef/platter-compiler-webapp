@@ -273,6 +273,7 @@ start() {
 			'/python/app/intermediate_code/dead_code_elimination.py',
 			'/python/app/intermediate_code/algebraic_simplification.py',
 			'/python/app/intermediate_code/optimizer_manager.py',
+			'/python/app/intermediate_code/ir_interpreter.py',
 		];
 
 		// Fetch and write Python files to Pyodide's virtual filesystem
@@ -610,6 +611,8 @@ if 'app.intermediate_code.algebraic_simplification' in sys.modules:
     importlib.reload(sys.modules['app.intermediate_code.algebraic_simplification'])
 if 'app.intermediate_code.optimizer_manager' in sys.modules:
     importlib.reload(sys.modules['app.intermediate_code.optimizer_manager'])
+if 'app.intermediate_code.ir_interpreter' in sys.modules:
+    importlib.reload(sys.modules['app.intermediate_code.ir_interpreter'])
 
 from app.lexer.lexer import Lexer
 from app.semantic_analyzer.ast.ast_parser_program import ASTParser
@@ -620,6 +623,7 @@ from app.semantic_analyzer.symbol_table.symbol_table_output import format_symbol
 from app.intermediate_code.ir_generator import IRGenerator
 from app.intermediate_code.output_formatter import IRFormatter
 from app.intermediate_code.optimizer_manager import OptimizerManager, OptimizationLevel
+from app.intermediate_code.ir_interpreter import run_tac
 
 result = None
 try:
@@ -657,6 +661,10 @@ try:
     ir_tac_text = ""
     ir_quads_text = ""
     ir_tac_optimized_text = ""
+    execution_output = ""
+    execution_success = False
+    execution_error = ""
+    execution_globals = {}
     try:
         ir_gen = IRGenerator()
         tac_instructions, quad_table = ir_gen.generate(ast)
@@ -686,8 +694,33 @@ try:
         print("Optimized IR (Three Address Code - Standard Level)")
         print("="*80)
         print(ir_tac_optimized_text)
+        
+        # Execute the optimized TAC directly in Python
+        print("")
+        print("="*80)
+        print("Program Execution (IR Interpreter)")
+        print("="*80)
+        exec_result = run_tac(optimized_tac)
+        execution_output = exec_result.get("output", "")
+        execution_success = exec_result.get("success", False)
+        execution_error = exec_result.get("error", "")
+        execution_globals = exec_result.get("globals", {})
+        if execution_success:
+            print("[Execution OK]")
+            if execution_output:
+                print(execution_output)
+            else:
+                print("(no output)")
+        else:
+            print(f"[Execution Error] {execution_error}")
     except Exception as ir_err:
+        import traceback
         print(f"IR generation error: {str(ir_err)}")
+        traceback.print_exc()
+        execution_output = ""
+        execution_success = False
+        execution_error = str(ir_err)
+        execution_globals = {}
     
     # Check for semantic errors from error handler
     if error_handler.has_errors():
@@ -756,6 +789,10 @@ try:
             "ir_tac": ir_tac_text,
             "ir_quads": ir_quads_text,
             "ir_tac_optimized": ir_tac_optimized_text,
+            "execution_output": execution_output,
+            "execution_success": execution_success,
+            "execution_error": execution_error,
+            "execution_globals": json.dumps(execution_globals),
             "errors": error_list,
             "semantic_errors": json.dumps(error_messages),
             "semantic_warnings": json.dumps(warning_messages),
@@ -787,6 +824,10 @@ try:
             "ir_tac": ir_tac_text,
             "ir_quads": ir_quads_text,
             "ir_tac_optimized": ir_tac_optimized_text,
+            "execution_output": execution_output,
+            "execution_success": execution_success,
+            "execution_error": execution_error,
+            "execution_globals": json.dumps(execution_globals),
             "semantic_warnings": json.dumps(warning_messages_success),
             "error_markers": json.dumps(warning_markers_success)
         }
@@ -813,13 +854,23 @@ result
 					const semWarningsSuccess: string[] = data.semantic_warnings ? JSON.parse(data.semantic_warnings) : [];
 					const warningMarkers = data.error_markers ? JSON.parse(data.error_markers) : [];
 					if (warningMarkers.length > 0) addErrorMarkers(warningMarkers);
-					const okMessage = `AST, Symbol Table, and IR generated successfully! Check browser console for details.`;
 					const successMsgs: { icon: any; text: string }[] = [];
-					successMsgs.push({ icon: check, text: okMessage });
 					for (const msg of semWarningsSuccess) successMsgs.push({ icon: errorIcon, text: `Warning: ${msg}` });
+
+					// Show only program output on success, runtime error on failure
+					if (data.execution_success) {
+						if (data.execution_output) {
+							for (const line of data.execution_output.split('\n')) {
+								successMsgs.push({ icon: check, text: line });
+							}
+						}
+					} else if (data.execution_error) {
+						successMsgs.push({ icon: errorIcon, text: `Runtime Error: ${data.execution_error}` });
+					}
+
 					termMessages = successMsgs;
 					analysisStatus = 'success';
-					terminalOutput = okMessage;
+					terminalOutput = data.execution_output || '';
 					
 					// Log AST to browser console
 					if (data.ast) {
@@ -875,6 +926,29 @@ result
 						console.log(data.ir_tac_optimized);
 						console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #80cbc4');
 					}
+
+					// Log Execution Output
+					const execColor = data.execution_success ? '#69f0ae' : '#ff5252';
+					console.log('\n%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${execColor}`);
+					console.log(`%c▶  Program Execution (IR Interpreter)`, `color: ${execColor}; font-size: 16px; font-weight: bold`);
+					console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${execColor}`);
+					if (data.execution_success) {
+						console.log('%cStatus: OK ✓', 'color: #69f0ae; font-weight: bold');
+						console.log(data.execution_output || '(no output)');
+						if (data.execution_globals) {
+							try {
+								const globals = JSON.parse(data.execution_globals);
+								if (Object.keys(globals).length > 0) {
+									console.log('%cFinal variable state:', 'color: #69f0ae; font-weight: bold');
+									console.table(globals);
+								}
+							} catch (_) {}
+						}
+					} else {
+						console.log('%cStatus: Runtime Error ✗', 'color: #ff5252; font-weight: bold');
+						console.log(data.execution_error || 'Unknown error');
+					}
+					console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${execColor}`);
 				} else {
 					// Log error markers received from backend
 					console.log('\n=== SEMANTIC ERROR MARKERS DEBUG ===');
@@ -970,6 +1044,22 @@ result
 							console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #80cbc4');
 							console.log(data.ir_tac_optimized);
 							console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #80cbc4');
+						}
+
+						// Log Execution Output (even with semantic errors, may still partially run)
+						if (data.execution_output !== undefined || data.execution_error) {
+							const execColor2 = data.execution_success ? '#69f0ae' : '#ff5252';
+							console.log('\n%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${execColor2}`);
+							console.log('%c▶  Program Execution (IR Interpreter)', `color: ${execColor2}; font-size: 16px; font-weight: bold`);
+							console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${execColor2}`);
+							if (data.execution_success) {
+								console.log('%cStatus: OK ✓', 'color: #69f0ae; font-weight: bold');
+								console.log(data.execution_output || '(no output)');
+							} else {
+								console.log('%cStatus: Runtime Error ✗', 'color: #ff5252; font-weight: bold');
+								console.log(data.execution_error || 'Unknown error');
+							}
+							console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', `color: ${execColor2}`);
 						}
 					}
 					// Handle syntax errors with line/col information
