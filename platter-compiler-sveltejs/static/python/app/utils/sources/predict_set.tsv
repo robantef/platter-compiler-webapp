@@ -408,6 +408,7 @@
 <flag_expr_tail>	{ ,, ;, ), ==, !=, and, or }
 <simple_flag>	{ ( }
 <simple_flag>	{ matches, flag_lit }
+<simple_flag>	{ id }
 <flag_operand>	{ topiece, size, search, fact, pow, piece_lit }
 <flag_operand>	{ sqrt, rand, tosip, sip_lit }
 <flag_operand>	{ matches, flag_lit }

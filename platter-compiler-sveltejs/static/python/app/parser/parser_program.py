@@ -3720,6 +3720,11 @@ class Parser():
         elif self.tokens[self.pos].type in PREDICT_SET["<simple_flag>_1"]:
             self.ret_flag()
 
+            """    411 <simple_flag>	=>	<id>    """
+        elif self.tokens[self.pos].type in PREDICT_SET["<simple_flag>_2"]:
+            self.id_()
+
+
         else: self.parse_token(self.error_arr)
 
         log.info("Exit: " + self.tokens[self.pos].type) # J
