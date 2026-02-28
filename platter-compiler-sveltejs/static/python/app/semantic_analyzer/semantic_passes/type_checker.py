@@ -581,7 +581,9 @@ class TypeChecker:
     def _get_array_literal_type(self, node: ArrayLiteral) -> Optional[TypeInfo]:
         """Get type of array literal"""
         if not node.elements:
-            return None
+            # Empty array literal - treat as 1D array of unknown base type
+            # This allows dimension checking for nested empty arrays like [[],[]]
+            return TypeInfo("unknown", 1)
         
         # Get type of first element
         first_type = self._get_expression_type(node.elements[0])

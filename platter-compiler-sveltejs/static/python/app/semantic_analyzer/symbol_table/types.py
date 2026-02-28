@@ -45,6 +45,9 @@ class TypeInfo:
             return True
         if self.dimensions != other.dimensions:
             return False
+        # Allow unknown base type to match any base type (for empty array inference)
+        if self.base_type == "unknown" or other.base_type == "unknown":
+            return True
         if self.base_type != other.base_type:
             # piece and sip are compatible
             if {self.base_type, other.base_type} == {"piece", "sip"}:
