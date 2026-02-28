@@ -31,6 +31,41 @@ class SymbolTableBuilder:
     
     def __init__(self):
         self.symbol_table = SymbolTable()
+    
+    def _create_default_value(self, data_type: str, dimensions: int = 0):
+        """Create default value for uninitialized declarations"""
+        if dimensions > 0:
+            # Create nested empty array literal
+            return ArrayLiteral([])
+        else:
+            # Primitive types
+            if data_type == "chars":
+                return Literal("chars", "")
+            elif data_type == "piece":
+                return Literal("piece", 0)
+            elif data_type == "sip":
+                return Literal("sip", 0.0)
+            elif data_type == "flag":
+                return Literal("flag", False)  # down = False
+            else:
+                # For unknown types, return None
+                return None
+    
+    def _create_default_table_value(self, table_type_info: TypeInfo):
+        """Create default table value with all fields initialized to their defaults"""
+        if not table_type_info or not table_type_info.table_fields:
+            return None
+        
+        field_inits = []
+        for field_name, field_type in table_type_info.table_fields.items():
+            default_value = self._create_default_value(field_type.base_type, field_type.dimensions)
+            if default_value:
+                # TableLiteral expects 4-tuple: (field_name, value, line, col)
+                field_inits.append((field_name, default_value, None, None))
+        
+        if field_inits:
+            return TableLiteral(field_inits)
+        return None
         self.built = False
         self._register_builtin_recipes()
     
@@ -179,6 +214,10 @@ class SymbolTableBuilder:
         """Process an ingredient declaration"""
         type_info = self._create_type_info(node.data_type, 0)
         
+        # Add default value if not initialized
+        if not node.init_value:
+            node.init_value = self._create_default_value(node.data_type, 0)
+        
         self.symbol_table.define_symbol(
             node.identifier,
             SymbolKind.VARIABLE,
@@ -194,6 +233,10 @@ class SymbolTableBuilder:
         """Process an array declaration"""
         dims = node.dimensions if node.dimensions is not None else 0
         type_info = self._create_type_info(node.data_type, dims)
+        
+        # Add default value if not initialized
+        if not node.init_value:
+            node.init_value = self._create_default_value(node.data_type, dims)
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -222,6 +265,10 @@ class SymbolTableBuilder:
             if dims > 0:
                 type_info.is_table = True
                 type_info.table_fields = table_type.table_fields
+            
+            # Add default value if not initialized (only for non-array table instances)
+            if not node.init_value and dims == 0:
+                node.init_value = self._create_default_table_value(table_type)
         else:
             type_info = TypeInfo(node.table_type, dims)
         

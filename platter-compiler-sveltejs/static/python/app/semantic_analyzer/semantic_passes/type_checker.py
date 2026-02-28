@@ -52,7 +52,7 @@ class TypeChecker:
             init_type = self._get_expression_type(node.init_value)
             if init_type:
                 ingredient_type = TypeInfo(node.data_type, 0)
-                if not ingredient_type.is_compatible_with(init_type):
+                if not ingredient_type.is_exact_match(init_type):
                     self.error_handler.add_error(
                         f"Type mismatch in ingredient '{node.identifier}' initialization: "
                         f"expected {ingredient_type}, got {init_type}",
@@ -74,7 +74,7 @@ class TypeChecker:
             if init_type:
                 dims = node.dimensions if node.dimensions is not None else 0
                 array_type = TypeInfo(node.data_type, dims)
-                if not array_type.is_compatible_with(init_type):
+                if not array_type.is_exact_match(init_type):
                     self.error_handler.add_error(
                         f"Type mismatch in array '{node.identifier}' initialization: "
                         f"expected {array_type}, got {init_type}",
@@ -202,7 +202,7 @@ class TypeChecker:
         value_type = self._get_expression_type(node.value)
         
         if target_type and value_type:
-            if not target_type.is_compatible_with(value_type):
+            if not target_type.is_exact_match(value_type):
                 self.error_handler.add_error(
                     f"Type mismatch in assignment: cannot assign {value_type} to {target_type}",
                     node,
