@@ -536,7 +536,7 @@ if __name__ == "__main__":
     program = Program()
     
     # Add a variable
-    var_decl = VarDecl("piece", "testVar", Literal("piece", 42))
+    var_decl = IngrDecl("piece", "testVar", Literal("piece", 42))
     program.add_global_decl(var_decl)
     
     # Add a function

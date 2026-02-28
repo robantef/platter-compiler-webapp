@@ -22,8 +22,8 @@ class TypeChecker:
         """Run type checking pass"""
         # Check global declarations
         for decl in ast_root.global_decl:
-            if isinstance(decl, VarDecl):
-                self._check_var_decl(decl)
+            if isinstance(decl, IngrDecl):
+                self._check_ingr_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._check_array_decl(decl)
             elif isinstance(decl, TableDecl):
@@ -39,7 +39,7 @@ class TypeChecker:
                 self._check_platter(ast_root.start_platter)
                 self.symbol_table.exit_scope()
     
-    def _check_var_decl(self, node: VarDecl):
+    def _check_ingr_decl(self, node: IngrDecl):
         """Check ingredient declaration type consistency"""
         if node.init_value:
             init_type = self._get_expression_type(node.init_value)
@@ -118,8 +118,8 @@ class TypeChecker:
         """Check block/compound statement"""
         # Check local declarations
         for decl in node.local_decls:
-            if isinstance(decl, VarDecl):
-                self._check_var_decl(decl)
+            if isinstance(decl, IngrDecl):
+                self._check_ingr_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._check_array_decl(decl)
             elif isinstance(decl, TableDecl):
@@ -133,18 +133,18 @@ class TypeChecker:
         """Check a statement"""
         if isinstance(node, Assignment):
             self._check_assignment(node)
-        elif isinstance(node, ReturnStatement):
-            self._check_return_statement(node)
-        elif isinstance(node, IfStatement):
-            self._check_if_statement(node)
-        elif isinstance(node, SwitchStatement):
-            self._check_switch_statement(node)
-        elif isinstance(node, WhileLoop):
-            self._check_while_loop(node)
-        elif isinstance(node, DoWhileLoop):
-            self._check_do_while_loop(node)
-        elif isinstance(node, ForLoop):
-            self._check_for_loop(node)
+        elif isinstance(node, ServeStatement):
+            self._check_serve_statement(node)
+        elif isinstance(node, CheckStatement):
+            self._check_check_statement(node)
+        elif isinstance(node, MenuStatement):
+            self._check_menu_statement(node)
+        elif isinstance(node, RepeatLoop):
+            self._check_repeat_loop(node)
+        elif isinstance(node, OrderRepeatLoop):
+            self._check_order_repeat_loop(node)
+        elif isinstance(node, PassLoop):
+            self._check_pass_loop(node)
         elif isinstance(node, Platter):
             self._check_platter(node)
         elif isinstance(node, ExpressionStatement):
@@ -163,7 +163,7 @@ class TypeChecker:
                     ErrorCodes.TYPE_MISMATCH
                 )
     
-    def _check_return_statement(self, node: ReturnStatement):
+    def _check_serve_statement(self, node: ServeStatement):
         """Check serve statement type compatibility"""
         if not self.symbol_table.current_function:
             return  # Error will be caught by control_flow_checker
@@ -187,8 +187,8 @@ class TypeChecker:
                     ErrorCodes.INVALID_SERVE_TYPE
                 )
     
-    def _check_if_statement(self, node: IfStatement):
-        """Check check statement (if/alt/instead)"""
+    def _check_check_statement(self, node: CheckStatement):
+        """Check check statement (check/alt/instead)"""
         # Check condition is flag-compatible
         cond_type = self._get_expression_type(node.condition)
         if cond_type and cond_type.base_type not in ["flag", "piece", "sip"]:
@@ -205,7 +205,7 @@ class TypeChecker:
         if node.else_block:
             self._check_platter(node.else_block)
     
-    def _check_switch_statement(self, node: SwitchStatement):
+    def _check_menu_statement(self, node: MenuStatement):
         """Check menu statement (menu/choice/usual)"""
         # Get menu expression type
         menu_type = self._get_expression_type(node.expr)
@@ -231,7 +231,7 @@ class TypeChecker:
             for stmt in node.default:
                 self._check_statement(stmt)
     
-    def _check_while_loop(self, node: WhileLoop):
+    def _check_repeat_loop(self, node: RepeatLoop):
         """Check repeat loop"""
         cond_type = self._get_expression_type(node.condition)
         if cond_type and cond_type.base_type not in ["flag", "piece", "sip"]:
@@ -241,7 +241,7 @@ class TypeChecker:
             )
         self._check_platter(node.body)
     
-    def _check_do_while_loop(self, node: DoWhileLoop):
+    def _check_order_repeat_loop(self, node: OrderRepeatLoop):
         """Check order-repeat loop"""
         self._check_platter(node.body)
         cond_type = self._get_expression_type(node.condition)
@@ -251,7 +251,7 @@ class TypeChecker:
                 node.condition
             )
     
-    def _check_for_loop(self, node: ForLoop):
+    def _check_pass_loop(self, node: PassLoop):
         """Check pass loop"""
         if node.init:
             if isinstance(node.init, Assignment):
@@ -285,8 +285,8 @@ class TypeChecker:
             return self._get_array_access_type(expr)
         elif isinstance(expr, TableAccess):
             return self._get_table_access_type(expr)
-        elif isinstance(expr, FunctionCall):
-            return self._get_function_call_type(expr)
+        elif isinstance(expr, RecipeCall):
+            return self._get_recipe_call_type(expr)
         elif isinstance(expr, CastExpr):
             return self._get_cast_type(expr)
         elif isinstance(expr, ArrayLiteral):
@@ -425,7 +425,7 @@ class TypeChecker:
         
         return field_type
     
-    def _get_function_call_type(self, node: FunctionCall) -> Optional[TypeInfo]:
+    def _get_recipe_call_type(self, node: RecipeCall) -> Optional[TypeInfo]:
         """Get type of recipe call (serve type)"""
         # Check if it's a built-in recipe
         if is_builtin_recipe(node.name):
