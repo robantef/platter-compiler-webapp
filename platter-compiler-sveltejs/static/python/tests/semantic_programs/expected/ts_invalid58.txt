@@ -1,0 +1,1 @@
+[ERROR] [E206] Recursive type not allowed: table prototype 'Data' cannot contain field of type 'Data' at line 2, column 10

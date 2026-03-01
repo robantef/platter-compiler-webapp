@@ -1,0 +1,9 @@
+table of Data = [
+    LatePrototype of y;
+    piece of z;
+];
+table of LatePrototype = [
+    piece of x;
+];
+
+start() {}

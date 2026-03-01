@@ -1277,7 +1277,13 @@ class ASTParser:
             node_3 = self.element_value_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1373,7 +1379,13 @@ class ASTParser:
             node_3 = self.element_piece_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1459,7 +1471,13 @@ class ASTParser:
             node_3 = self.element_sip_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1545,7 +1563,13 @@ class ASTParser:
             node_3 = self.element_chars_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1631,7 +1655,13 @@ class ASTParser:
             node_3 = self.element_flag_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)

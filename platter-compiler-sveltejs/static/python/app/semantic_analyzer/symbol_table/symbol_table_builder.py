@@ -129,9 +129,45 @@ class SymbolTableBuilder:
     def _process_table_prototype(self, node: TablePrototype):
         """Process a table type definition"""
         field_types = {}
+        seen_fields = set()
+        
         for field in node.fields:
+            # Check for duplicate field names
+            if field.identifier in seen_fields:
+                if self.symbol_table.error_handler:
+                    self.symbol_table.error_handler.add_error(
+                        f"Duplicate field '{field.identifier}' in table prototype '{node.name}'",
+                        field,
+                        "E205"
+                    )
+                continue
+            seen_fields.add(field.identifier)
+            
             dims = field.dimensions if field.dimensions is not None else 0
             field_type_info = self._create_type_info(field.data_type, dims)
+            
+            # Check for recursive type (field type is same as table being defined)
+            if field.data_type == node.name:
+                if self.symbol_table.error_handler:
+                    self.symbol_table.error_handler.add_error(
+                        f"Recursive type not allowed: table prototype '{node.name}' cannot contain field of type '{field.data_type}'",
+                        field,
+                        "E206"
+                    )
+                continue
+            
+            # Check for forward reference (table type not yet defined)
+            # Only check if it's a table type (not primitive)
+            if field.data_type not in ["piece", "sip", "chars", "flag"]:
+                if not self.symbol_table.lookup_table_type(field.data_type):
+                    if self.symbol_table.error_handler:
+                        self.symbol_table.error_handler.add_error(
+                            f"Forward reference not allowed: table prototype '{field.data_type}' must be defined before use in '{node.name}'",
+                            field,
+                            "E207"
+                        )
+                    continue
+            
             field_types[field.identifier] = field_type_info
         
         table_type_info = TypeInfo(node.name, 0, field_types)

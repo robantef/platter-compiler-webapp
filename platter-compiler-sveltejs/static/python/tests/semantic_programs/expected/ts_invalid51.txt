@@ -1,0 +1,2 @@
+[WARNING] [W102] Unused ingredient 'x'
+[ERROR] [E101] Field 'x' type mismatch: expected piece[], got sip[]

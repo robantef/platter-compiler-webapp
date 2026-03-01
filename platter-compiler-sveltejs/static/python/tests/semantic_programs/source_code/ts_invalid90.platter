@@ -1,0 +1,8 @@
+table of Student = [
+    piece of age;
+    piece of age;
+];
+
+start(){
+    bill("done");
+}

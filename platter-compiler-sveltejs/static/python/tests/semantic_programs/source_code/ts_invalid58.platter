@@ -1,0 +1,5 @@
+table of Data = [
+    Data of x;
+];
+
+start() {}

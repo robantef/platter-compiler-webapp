@@ -1,0 +1,1 @@
+[ERROR] [E205] Duplicate field 'age' in table prototype 'Student' at line 3, column 11

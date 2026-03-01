@@ -1,0 +1,1 @@
+[ERROR] [E207] Forward reference not allowed: table prototype 'LatePrototype' must be defined before use in 'Data' at line 2, column 19

@@ -112,7 +112,7 @@ class TypeChecker:
                     expected_field_type = table_type.table_fields[field_name]
                     actual_field_type = self._get_expression_type(value, expected_field_type)
                     
-                    if actual_field_type and not expected_field_type.is_compatible_with(actual_field_type):
+                    if actual_field_type and not expected_field_type.is_exact_match(actual_field_type):
                         self.error_handler.add_error(
                             f"Field '{field_name}' type mismatch: expected {expected_field_type}, got {actual_field_type}",
                             node,
@@ -388,7 +388,7 @@ class TypeChecker:
         elif isinstance(expr, CastExpr):
             return self._get_cast_type(expr)
         elif isinstance(expr, ArrayLiteral):
-            return self._get_array_literal_type(expr)
+            return self._get_array_literal_type(expr, expected_type)
         elif isinstance(expr, TableLiteral):
             return self._get_table_literal_type(expr, expected_type)
         
@@ -624,21 +624,31 @@ class TypeChecker:
         
         return target_type
     
-    def _get_array_literal_type(self, node: ArrayLiteral) -> Optional[TypeInfo]:
-        """Get type of array literal"""
+    def _get_array_literal_type(self, node: ArrayLiteral, expected_type: Optional[TypeInfo] = None) -> Optional[TypeInfo]:
+        """Get type of array literal
+        
+        Args:
+            node: The array literal node
+            expected_type: Optional expected array type for context-aware inference
+        """
         if not node.elements:
             # Empty array literal - treat as 1D array of unknown base type
             # This allows dimension checking for nested empty arrays like [[],[]]
             return TypeInfo("unknown", 1)
         
-        # Get type of first element
-        first_type = self._get_expression_type(node.elements[0])
+        # Determine expected element type if we have an expected array type
+        expected_element_type = None
+        if expected_type and expected_type.dimensions > 0:
+            expected_element_type = expected_type.get_element_type()
+        
+        # Get type of first element with expected type context
+        first_type = self._get_expression_type(node.elements[0], expected_element_type)
         if not first_type:
             return None
         
         # Check all elements have same type
         for elem in node.elements[1:]:
-            elem_type = self._get_expression_type(elem)
+            elem_type = self._get_expression_type(elem, expected_element_type)
             if elem_type and not first_type.is_compatible_with(elem_type):
                 self.error_handler.add_error(
                     f"Array literal has inconsistent element types: {first_type} and {elem_type}",
