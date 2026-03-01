@@ -1,0 +1,18 @@
+table of Nested1 = [
+    piece of x;
+];
+table of Data = [
+    Nested1 of y;
+    piece of z;
+];
+
+start() {
+    Data of a = [
+        y = [
+            x = 1;
+        ];
+    ];
+    a:z = 0;
+    a:y = [x = 1;];
+    a:y:x = 1;
+}

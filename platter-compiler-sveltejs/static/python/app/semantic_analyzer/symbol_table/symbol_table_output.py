@@ -386,10 +386,19 @@ def format_symbol_table_for_console(symbol_table: SymbolTable) -> List[dict]:
             # Get the actual scope name where declared
             declared_scope_name = symbol.declared_scope.name if symbol.declared_scope else ""
             
+            # Format type display
+            type_display = symbol.type_info.base_type
+            if symbol.kind == SymbolKind.TABLE_TYPE:
+                # Show as table prototype
+                type_display = f"table<{symbol.type_info.base_type}>"
+            elif symbol.type_info.is_table:
+                # Show table instance with arrow
+                type_display = f"→{symbol.type_info.base_type}"
+            
             # Create dictionary with all symbol info
             symbol_dict = {
                 'ID': symbol.name,
-                'Type': symbol.type_info.base_type,
+                'Type': type_display,
                 'Dims': str(symbol.type_info.dimensions) if symbol.type_info.dimensions > 0 else "-",
                 'Declared': declared_scope_name if declared_scope_name else "-",
                 'Accessed': symbol.accessed_in_scopes if symbol.accessed_in_scopes else [],

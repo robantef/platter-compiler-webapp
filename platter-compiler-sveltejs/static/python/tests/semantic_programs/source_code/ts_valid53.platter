@@ -1,0 +1,19 @@
+table of Data = [
+    piece[] of x;
+    chars[] of y;
+    sip[] of z;
+    flag[] of f;
+];
+
+start() {
+    Data of x = [
+        x = [1, 2];
+        y = ["Raphael", "James"];
+        z = [1.1, 2.2];
+        f = [up, down];
+    ];
+    x:x[0] = 1;
+    x:y[0] = "Raphael";
+    x:z[0] = 1.1;
+    x:f[0] = up;
+}
