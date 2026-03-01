@@ -1,0 +1,2 @@
+[WARNING] [W102] Unused ingredient 'cls' at line 7, column 18
+[ERROR] [E101] Type mismatch in table literal: field 'age' expects piece, got chars at line 12, column 9

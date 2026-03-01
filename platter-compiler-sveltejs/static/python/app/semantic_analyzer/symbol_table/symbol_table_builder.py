@@ -265,14 +265,35 @@ class SymbolTableBuilder:
         if node.init_value:
             self._track_expression_usage(node.init_value)
     
+    def _calculate_array_sizes(self, node, dimensions: int) -> list:
+        """Calculate array sizes from ArrayLiteral initialization"""
+        sizes = []
+        current = node
+        
+        for dim in range(dimensions):
+            if isinstance(current, ArrayLiteral) and current.elements:
+                sizes.append(len(current.elements))
+                # Go deeper for next dimension
+                if current.elements:
+                    current = current.elements[0]
+            else:
+                break
+        
+        return sizes
+    
     def _process_array_decl(self, node: ArrayDecl):
         """Process an array declaration"""
         dims = node.dimensions if node.dimensions is not None else 0
         type_info = self._create_type_info(node.data_type, dims)
         
+        # Calculate array sizes from initialization if present
+        if node.init_value and isinstance(node.init_value, ArrayLiteral):
+            type_info.array_sizes = self._calculate_array_sizes(node.init_value, dims)
+        
         # Add default value if not initialized
         if not node.init_value:
             node.init_value = self._create_default_value(node.data_type, dims)
+
         
         self.symbol_table.define_symbol(
             node.identifier,

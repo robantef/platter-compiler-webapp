@@ -20,11 +20,12 @@ class SymbolKind(Enum):
 class TypeInfo:
     """Represents type information including arrays and nested structures"""
     
-    def __init__(self, base_type: str, dimensions: int = 0, table_fields: Optional[Dict[str, 'TypeInfo']] = None):
+    def __init__(self, base_type: str, dimensions: int = 0, table_fields: Optional[Dict[str, 'TypeInfo']] = None, array_sizes: Optional[List[int]] = None):
         self.base_type = base_type
         self.dimensions = dimensions if dimensions is not None else 0
         self.table_fields = table_fields or {}
         self.is_table = table_fields is not None
+        self.array_sizes = array_sizes or []  # List of sizes for each dimension (outermost first)
     
     def __repr__(self):
         dims = f"{'[]' * self.dimensions}" if self.dimensions > 0 else ""

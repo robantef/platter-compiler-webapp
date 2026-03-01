@@ -169,6 +169,7 @@ class ErrorCodes:
     INVALID_TABLE_ACCESS = "E202"
     UNDEFINED_FIELD = "E203"
     INVALID_DIMENSION = "E204"
+    ARRAY_OUT_OF_BOUNDS = "E205"
     
     # Recipe errors (functions)
     UNDEFINED_RECIPE = "E301"
