@@ -22,7 +22,7 @@ class FunctionChecker:
         """Run recipe checking pass"""
         # Check global declarations
         for decl in ast_root.global_decl:
-            if isinstance(decl, VarDecl) and decl.init_value:
+            if isinstance(decl, IngrDecl) and decl.init_value:
                 self._check_expression(decl.init_value)
             elif isinstance(decl, ArrayDecl) and decl.init_value:
                 self._check_expression(decl.init_value)
@@ -52,7 +52,7 @@ class FunctionChecker:
         """Check block/compound statement"""
         # Check local declarations
         for decl in node.local_decls:
-            if isinstance(decl, VarDecl) and decl.init_value:
+            if isinstance(decl, IngrDecl) and decl.init_value:
                 self._check_expression(decl.init_value)
             elif isinstance(decl, ArrayDecl) and decl.init_value:
                 self._check_expression(decl.init_value)
@@ -68,10 +68,10 @@ class FunctionChecker:
         if isinstance(node, Assignment):
             self._check_expression(node.target)
             self._check_expression(node.value)
-        elif isinstance(node, ReturnStatement):
+        elif isinstance(node, ServeStatement):
             if node.value:
                 self._check_expression(node.value)
-        elif isinstance(node, IfStatement):
+        elif isinstance(node, CheckStatement):
             self._check_expression(node.condition)
             self._check_platter(node.then_block)
             for elif_cond, elif_block in node.elif_clauses:
@@ -79,7 +79,7 @@ class FunctionChecker:
                 self._check_platter(elif_block)
             if node.else_block:
                 self._check_platter(node.else_block)
-        elif isinstance(node, SwitchStatement):
+        elif isinstance(node, MenuStatement):
             self._check_expression(node.expr)
             for case in node.cases:
                 for value in case.values:
@@ -89,13 +89,13 @@ class FunctionChecker:
             if node.default:
                 for stmt in node.default:
                     self._check_statement(stmt)
-        elif isinstance(node, WhileLoop):
+        elif isinstance(node, RepeatLoop):
             self._check_expression(node.condition)
             self._check_platter(node.body)
-        elif isinstance(node, DoWhileLoop):
+        elif isinstance(node, OrderRepeatLoop):
             self._check_platter(node.body)
             self._check_expression(node.condition)
-        elif isinstance(node, ForLoop):
+        elif isinstance(node, PassLoop):
             if node.init:
                 if isinstance(node.init, Assignment):
                     self._check_expression(node.init.target)
@@ -117,7 +117,7 @@ class FunctionChecker:
         if expr is None:
             return
         
-        if isinstance(expr, FunctionCall):
+        if isinstance(expr, RecipeCall):
             self._check_function_call(expr)
         elif isinstance(expr, BinaryOp):
             self._check_expression(expr.left)
@@ -135,10 +135,10 @@ class FunctionChecker:
             for elem in expr.elements:
                 self._check_expression(elem)
         elif isinstance(expr, TableLiteral):
-            for field_name, value in expr.field_inits:
+            for field_name, value, line, col in expr.field_inits:
                 self._check_expression(value)
     
-    def _check_function_call(self, node: FunctionCall):
+    def _check_function_call(self, node: RecipeCall):
         """Check recipe call flavors (arguments)"""
         # Check if it's a built-in recipe
         if is_builtin_recipe(node.name):
@@ -213,7 +213,7 @@ class FunctionChecker:
         for arg in node.args:
             self._check_expression(arg)
     
-    def _check_builtin_recipe_call(self, node: FunctionCall, builtin):
+    def _check_builtin_recipe_call(self, node: RecipeCall, builtin):
         """Check built-in recipe call"""
         expected_count = builtin.get_spice_count()
         
@@ -317,7 +317,7 @@ class FunctionChecker:
                 return table_type.get_field_type(expr.field)
             return None
         
-        elif isinstance(expr, FunctionCall):
+        elif isinstance(expr, RecipeCall):
             func_symbol = self.symbol_table.lookup_symbol(expr.name)
             if func_symbol:
                 return func_symbol.type_info
@@ -338,7 +338,7 @@ class FunctionChecker:
         elif isinstance(expr, TableLiteral):
             # Build field types from literal
             field_types = {}
-            for field_name, value in expr.field_inits:
+            for field_name, value, line, col in expr.field_inits:
                 field_type = self._get_expression_type(value)
                 if field_type:
                     field_types[field_name] = field_type

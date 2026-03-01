@@ -1,0 +1,2 @@
+[WARNING] [W102] Unused ingredient 'y' at line 2, column 8
+[ERROR] [E101] Type mismatch in ingredient 'y' initialization: expected sip, got piece at line 2, column 8

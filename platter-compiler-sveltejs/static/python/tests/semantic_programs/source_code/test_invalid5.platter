@@ -1,0 +1,4 @@
+chars[] of name;
+start() {
+        name[0] = 1;
+}

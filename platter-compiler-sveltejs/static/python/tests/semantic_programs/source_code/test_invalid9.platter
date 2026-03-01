@@ -1,0 +1,9 @@
+prepare piece of test(){
+    piece of i;
+    pass(i = 0; i+=1; i <1) {
+        check(i > 1000) {
+            serve 1;
+        }
+    }
+}
+start(){}

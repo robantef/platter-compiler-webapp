@@ -17,6 +17,7 @@ class ControlFlowChecker:
         self.in_loop = 0
         self.in_recipe = False
         self.current_recipe_has_serve = False
+        self.code_is_reachable = True  # Track if current code is reachable
     
     def check(self, ast_root: Program):
         """Run control flow checking pass"""
@@ -43,21 +44,34 @@ class ControlFlowChecker:
         if node.body:
             self._check_platter(node.body)
         
-        # Check if non-void recipe has serve statement
-        if node.return_type != "void" and not self.current_recipe_has_serve:
-            self.error_handler.add_warning(
-                f"Recipe '{node.name}' may not serve a value in all code paths",
-                node,
-                ErrorCodes.MISSING_SERVE
-            )
+        # Check if non-void recipe has guaranteed serve statement
+        if node.return_type != "void":
+            if not node.body or not self._block_has_serve(node.body):
+                self.error_handler.add_error(
+                    f"Recipe '{node.name}' must have a guaranteed serve statement in all code paths",
+                    node,
+                    ErrorCodes.MISSING_SERVE
+                )
         
         self.in_recipe = old_in_recipe
         self.current_recipe_has_serve = old_has_serve
     
     def _check_platter(self, node: Platter):
         """Check block/compound statement"""
-        for stmt in node.statements:
+        for i, stmt in enumerate(node.statements):
             self._check_statement(stmt)
+            
+            # If we hit a serve statement, mark subsequent code as unreachable
+            if isinstance(stmt, ServeStatement):
+                # Check if there are statements after serve
+                if i + 1 < len(node.statements):
+                    next_stmt = node.statements[i + 1]
+                    self.error_handler.add_error(
+                        "Unreachable code after serve statement",
+                        next_stmt,
+                        ErrorCodes.UNREACHABLE_CODE
+                    )
+                    break  # Stop checking further statements in this block
     
     def _check_statement(self, node: ASTNode):
         """Check a statement"""
@@ -65,18 +79,18 @@ class ControlFlowChecker:
             self._check_break_statement(node)
         elif isinstance(node, ContinueStatement):
             self._check_continue_statement(node)
-        elif isinstance(node, ReturnStatement):
-            self._check_return_statement(node)
-        elif isinstance(node, IfStatement):
-            self._check_if_statement(node)
-        elif isinstance(node, SwitchStatement):
-            self._check_switch_statement(node)
-        elif isinstance(node, WhileLoop):
-            self._check_while_loop(node)
-        elif isinstance(node, DoWhileLoop):
-            self._check_do_while_loop(node)
-        elif isinstance(node, ForLoop):
-            self._check_for_loop(node)
+        elif isinstance(node, ServeStatement):
+            self._check_serve_statement(node)
+        elif isinstance(node, CheckStatement):
+            self._check_check_statement(node)
+        elif isinstance(node, MenuStatement):
+            self._check_menu_statement(node)
+        elif isinstance(node, RepeatLoop):
+            self._check_repeat_loop(node)
+        elif isinstance(node, OrderRepeatLoop):
+            self._check_order_repeat_loop(node)
+        elif isinstance(node, PassLoop):
+            self._check_pass_loop(node)
         elif isinstance(node, Platter):
             self._check_platter(node)
     
@@ -98,7 +112,7 @@ class ControlFlowChecker:
                 ErrorCodes.NEXT_OUTSIDE_LOOP
             )
     
-    def _check_return_statement(self, node: ReturnStatement):
+    def _check_serve_statement(self, node: ServeStatement):
         """Check serve statement is inside a recipe"""
         if not self.in_recipe:
             self.error_handler.add_error(
@@ -106,26 +120,9 @@ class ControlFlowChecker:
                 node,
                 ErrorCodes.SERVE_OUTSIDE_RECIPE
             )
-        else:
-            self.current_recipe_has_serve = True
     
-    def _check_if_statement(self, node: IfStatement):
+    def _check_check_statement(self, node: CheckStatement):
         """Check check statement (if/alt/instead)"""
-        # Track if all branches serve
-        then_serves = self._block_has_serve(node.then_block)
-        
-        alt_serves = []
-        for _, alt_block in node.elif_clauses:
-            alt_serves.append(self._block_has_serve(alt_block))
-        
-        instead_serves = False
-        if node.else_block:
-            instead_serves = self._block_has_serve(node.else_block)
-        
-        # If all branches serve, mark recipe as having serve
-        if then_serves and (not node.elif_clauses or all(alt_serves)) and instead_serves:
-            self.current_recipe_has_serve = True
-        
         # Check branches
         self._check_platter(node.then_block)
         for _, alt_block in node.elif_clauses:
@@ -133,7 +130,7 @@ class ControlFlowChecker:
         if node.else_block:
             self._check_platter(node.else_block)
     
-    def _check_switch_statement(self, node: SwitchStatement):
+    def _check_menu_statement(self, node: MenuStatement):
         """Check menu statement (menu/choice/usual)"""
         # Allow stop in menu
         self.in_loop += 1
@@ -150,19 +147,19 @@ class ControlFlowChecker:
         
         self.in_loop -= 1
     
-    def _check_while_loop(self, node: WhileLoop):
+    def _check_repeat_loop(self, node: RepeatLoop):
         """Check repeat loop"""
         self.in_loop += 1
         self._check_platter(node.body)
         self.in_loop -= 1
     
-    def _check_do_while_loop(self, node: DoWhileLoop):
+    def _check_order_repeat_loop(self, node: OrderRepeatLoop):
         """Check order-repeat loop"""
         self.in_loop += 1
         self._check_platter(node.body)
         self.in_loop -= 1
     
-    def _check_for_loop(self, node: ForLoop):
+    def _check_pass_loop(self, node: PassLoop):
         """Check pass loop"""
         self.in_loop += 1
         self._check_platter(node.body)
@@ -171,9 +168,9 @@ class ControlFlowChecker:
     def _block_has_serve(self, block: Platter) -> bool:
         """Check if a block definitely has a serve statement"""
         for stmt in block.statements:
-            if isinstance(stmt, ReturnStatement):
+            if isinstance(stmt, ServeStatement):
                 return True
-            elif isinstance(stmt, IfStatement):
+            elif isinstance(stmt, CheckStatement):
                 # Check if all branches serve
                 then_serves = self._block_has_serve(stmt.then_block)
                 

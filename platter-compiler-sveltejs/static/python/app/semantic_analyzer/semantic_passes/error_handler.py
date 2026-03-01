@@ -181,6 +181,7 @@ class ErrorCodes:
     STOP_OUTSIDE_LOOP = "E401"  # break outside loop
     NEXT_OUTSIDE_LOOP = "E402"  # continue outside loop
     SERVE_OUTSIDE_RECIPE = "E403"  # return outside function
+    UNREACHABLE_CODE = "E404"  # unreachable code
     
     # Initialization errors
     UNINITIALIZED_INGREDIENT = "W101"  # uninitialized variable

@@ -31,6 +31,41 @@ class SymbolTableBuilder:
     
     def __init__(self):
         self.symbol_table = SymbolTable()
+    
+    def _create_default_value(self, data_type: str, dimensions: int = 0):
+        """Create default value for uninitialized declarations"""
+        if dimensions > 0:
+            # Create nested empty array literal
+            return ArrayLiteral([])
+        else:
+            # Primitive types
+            if data_type == "chars":
+                return Literal("chars", "")
+            elif data_type == "piece":
+                return Literal("piece", 0)
+            elif data_type == "sip":
+                return Literal("sip", 0.0)
+            elif data_type == "flag":
+                return Literal("flag", False)  # down = False
+            else:
+                # For unknown types, return None
+                return None
+    
+    def _create_default_table_value(self, table_type_info: TypeInfo):
+        """Create default table value with all fields initialized to their defaults"""
+        if not table_type_info or not table_type_info.table_fields:
+            return None
+        
+        field_inits = []
+        for field_name, field_type in table_type_info.table_fields.items():
+            default_value = self._create_default_value(field_type.base_type, field_type.dimensions)
+            if default_value:
+                # TableLiteral expects 4-tuple: (field_name, value, line, col)
+                field_inits.append((field_name, default_value, None, None))
+        
+        if field_inits:
+            return TableLiteral(field_inits)
+        return None
         self.built = False
         self._register_builtin_recipes()
     
@@ -111,7 +146,7 @@ class SymbolTableBuilder:
     def _process_global_declarations(self, program: Program):
         """Process global variable declarations"""
         for decl in program.global_decl:
-            if isinstance(decl, VarDecl):
+            if isinstance(decl, IngrDecl):
                 self._process_var_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._process_array_decl(decl)
@@ -175,9 +210,13 @@ class SymbolTableBuilder:
             node
         )
     
-    def _process_var_decl(self, node: VarDecl):
+    def _process_var_decl(self, node: IngrDecl):
         """Process an ingredient declaration"""
         type_info = self._create_type_info(node.data_type, 0)
+        
+        # Add default value if not initialized
+        if not node.init_value:
+            node.init_value = self._create_default_value(node.data_type, 0)
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -194,6 +233,10 @@ class SymbolTableBuilder:
         """Process an array declaration"""
         dims = node.dimensions if node.dimensions is not None else 0
         type_info = self._create_type_info(node.data_type, dims)
+        
+        # Add default value if not initialized
+        if not node.init_value:
+            node.init_value = self._create_default_value(node.data_type, dims)
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -222,6 +265,10 @@ class SymbolTableBuilder:
             if dims > 0:
                 type_info.is_table = True
                 type_info.table_fields = table_type.table_fields
+            
+            # Add default value if not initialized (only for non-array table instances)
+            if not node.init_value and dims == 0:
+                node.init_value = self._create_default_table_value(table_type)
         else:
             type_info = TypeInfo(node.table_type, dims)
         
@@ -239,7 +286,7 @@ class SymbolTableBuilder:
     def _process_platter(self, node: Platter):
         """Process a block/compound statement"""
         for decl in node.local_decls:
-            if isinstance(decl, VarDecl):
+            if isinstance(decl, IngrDecl):
                 self._process_var_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._process_array_decl(decl)
@@ -251,15 +298,15 @@ class SymbolTableBuilder:
     
     def _process_statement(self, node: ASTNode):
         """Process a statement"""
-        if isinstance(node, IfStatement):
+        if isinstance(node, CheckStatement):
             self._process_if_statement(node)
-        elif isinstance(node, SwitchStatement):
+        elif isinstance(node, MenuStatement):
             self._process_switch_statement(node)
-        elif isinstance(node, WhileLoop):
+        elif isinstance(node, RepeatLoop):
             self._process_while_loop(node)
-        elif isinstance(node, DoWhileLoop):
+        elif isinstance(node, OrderRepeatLoop):
             self._process_do_while_loop(node)
-        elif isinstance(node, ForLoop):
+        elif isinstance(node, PassLoop):
             self._process_for_loop(node)
         elif isinstance(node, Platter):
             self.symbol_table.enter_scope("block")
@@ -268,13 +315,13 @@ class SymbolTableBuilder:
         elif isinstance(node, Assignment):
             self._track_expression_usage(node.target)
             self._track_expression_usage(node.value)
-        elif isinstance(node, ReturnStatement):
+        elif isinstance(node, ServeStatement):
             if node.value:
                 self._track_expression_usage(node.value)
         elif isinstance(node, ExpressionStatement):
             self._track_expression_usage(node.expr)
     
-    def _process_if_statement(self, node: IfStatement):
+    def _process_if_statement(self, node: CheckStatement):
         """Process if statement - use Platter syntax: check/alt/instead"""
         # Track condition expression usage
         self._track_expression_usage(node.condition)
@@ -294,7 +341,7 @@ class SymbolTableBuilder:
             self._process_platter(node.else_block)
             self.symbol_table.exit_scope()
     
-    def _process_switch_statement(self, node: SwitchStatement):
+    def _process_switch_statement(self, node: MenuStatement):
         """Process menu statement - use Platter syntax: menu/choice/usual"""
         # Track menu expression usage
         self._track_expression_usage(node.expr)
@@ -311,7 +358,7 @@ class SymbolTableBuilder:
                 self._process_statement(stmt)
             self.symbol_table.exit_scope()
     
-    def _process_while_loop(self, node: WhileLoop):
+    def _process_while_loop(self, node: RepeatLoop):
         """Process while loop - use Platter syntax: repeat"""
         self.symbol_table.in_loop += 1
         # Track condition expression usage
@@ -322,7 +369,7 @@ class SymbolTableBuilder:
         self.symbol_table.exit_scope()
         self.symbol_table.in_loop -= 1
     
-    def _process_do_while_loop(self, node: DoWhileLoop):
+    def _process_do_while_loop(self, node: OrderRepeatLoop):
         """Process do-while loop - use Platter syntax: order_repeat"""
         self.symbol_table.in_loop += 1
         self.symbol_table.enter_scope("order_repeat")
@@ -332,7 +379,7 @@ class SymbolTableBuilder:
         self._track_expression_usage(node.condition)
         self.symbol_table.in_loop -= 1
     
-    def _process_for_loop(self, node: ForLoop):
+    def _process_for_loop(self, node: PassLoop):
         """Process for loop - use Platter syntax: pass"""
         self.symbol_table.in_loop += 1
         
@@ -416,7 +463,7 @@ class SymbolTableBuilder:
         elif isinstance(expr, TableAccess):
             self._track_expression_usage(expr.table)
         
-        elif isinstance(expr, FunctionCall):
+        elif isinstance(expr, RecipeCall):
             # Track recipe name usage
             symbol = self.symbol_table.lookup_symbol(expr.name)
             if symbol:
@@ -454,7 +501,7 @@ class SymbolTableBuilder:
                 self._track_expression_usage(elem)
         
         elif isinstance(expr, TableLiteral):
-            for field_name, value in expr.field_inits:
+            for field_name, value, line, col in expr.field_inits:
                 self._track_expression_usage(value)
     
     def _find_declaring_scope(self, symbol_name: str) -> Optional[Scope]:

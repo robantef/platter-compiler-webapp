@@ -23,7 +23,7 @@ class ScopeChecker:
         """Run scope checking pass"""
         # Check for undefined symbols in expressions
         for decl in ast_root.global_decl:
-            if isinstance(decl, VarDecl):
+            if isinstance(decl, IngrDecl):
                 self._check_var_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._check_array_decl(decl)
@@ -43,7 +43,7 @@ class ScopeChecker:
         # Check for unused ingredients (warnings)
         self._check_unused_symbols()
     
-    def _check_var_decl(self, node: VarDecl):
+    def _check_var_decl(self, node: IngrDecl):
         """Check ingredient declaration"""
         # Check if type is defined
         if not self.symbol_table.is_type_defined(node.data_type):
@@ -90,7 +90,7 @@ class ScopeChecker:
             )
         
         # Check dimensions if it's an array of tables
-        if node.dimensions is not None and node.dimensions <= 0:
+        if node.dimensions is not None and node.dimensions < 0:
             self.error_handler.add_error(
                 f"Array dimensions must be positive, got {node.dimensions}",
                 node,
@@ -131,7 +131,7 @@ class ScopeChecker:
         """Check block/compound statement"""
         # Check local declarations
         for decl in node.local_decls:
-            if isinstance(decl, VarDecl):
+            if isinstance(decl, IngrDecl):
                 self._check_var_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._check_array_decl(decl)
@@ -147,10 +147,10 @@ class ScopeChecker:
         if isinstance(node, Assignment):
             self._check_expression(node.target)
             self._check_expression(node.value)
-        elif isinstance(node, ReturnStatement):
+        elif isinstance(node, ServeStatement):
             if node.value:
                 self._check_expression(node.value)
-        elif isinstance(node, IfStatement):
+        elif isinstance(node, CheckStatement):
             self._check_expression(node.condition)
             self._check_platter(node.then_block)
             for elif_cond, elif_block in node.elif_clauses:
@@ -158,7 +158,7 @@ class ScopeChecker:
                 self._check_platter(elif_block)
             if node.else_block:
                 self._check_platter(node.else_block)
-        elif isinstance(node, SwitchStatement):
+        elif isinstance(node, MenuStatement):
             self._check_expression(node.expr)
             for case in node.cases:
                 for value in case.values:
@@ -168,13 +168,13 @@ class ScopeChecker:
             if node.default:
                 for stmt in node.default:
                     self._check_statement(stmt)
-        elif isinstance(node, WhileLoop):
+        elif isinstance(node, RepeatLoop):
             self._check_expression(node.condition)
             self._check_platter(node.body)
-        elif isinstance(node, DoWhileLoop):
+        elif isinstance(node, OrderRepeatLoop):
             self._check_platter(node.body)
             self._check_expression(node.condition)
-        elif isinstance(node, ForLoop):
+        elif isinstance(node, PassLoop):
             if node.init:
                 if isinstance(node.init, Assignment):
                     self._check_expression(node.init.target)
@@ -224,7 +224,7 @@ class ScopeChecker:
         elif isinstance(expr, TableAccess):
             self._check_expression(expr.table)
         
-        elif isinstance(expr, FunctionCall):
+        elif isinstance(expr, RecipeCall):
             # Check if recipe is defined (including built-in recipes)
             if is_builtin_recipe(expr.name):
                 # Built-in recipes are always available
@@ -267,7 +267,7 @@ class ScopeChecker:
                 self._check_expression(elem)
         
         elif isinstance(expr, TableLiteral):
-            for field_name, value in expr.field_inits:
+            for field_name, value, line, col in expr.field_inits:
                 self._check_expression(value)
     
     def _check_unused_symbols(self):

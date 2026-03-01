@@ -39,12 +39,35 @@ class TypeInfo:
                 self.dimensions == other.dimensions and
                 self.is_table == other.is_table)
     
+    def is_exact_match(self, other: 'TypeInfo') -> bool:
+        """Check if this type exactly matches another (no implicit conversions)"""
+        if self == other:
+            return True
+        if self.dimensions != other.dimensions:
+            return False
+        # Allow unknown base type to match any base type (for empty array inference)
+        if self.base_type == "unknown" or other.base_type == "unknown":
+            return True
+        # No implicit promotion between piece and sip for assignments
+        if self.base_type != other.base_type:
+            return False
+        if self.is_table and other.is_table:
+            if set(self.table_fields.keys()) != set(other.table_fields.keys()):
+                return False
+            for field_name in self.table_fields:
+                if not self.table_fields[field_name].is_exact_match(other.table_fields[field_name]):
+                    return False
+        return True
+    
     def is_compatible_with(self, other: 'TypeInfo') -> bool:
         """Check if this type is compatible with another"""
         if self == other:
             return True
         if self.dimensions != other.dimensions:
             return False
+        # Allow unknown base type to match any base type (for empty array inference)
+        if self.base_type == "unknown" or other.base_type == "unknown":
+            return True
         if self.base_type != other.base_type:
             # piece and sip are compatible
             if {self.base_type, other.base_type} == {"piece", "sip"}:

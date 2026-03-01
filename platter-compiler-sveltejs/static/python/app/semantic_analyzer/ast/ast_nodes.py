@@ -40,16 +40,16 @@ class Program(ASTNode):
 # Declarations
 # ============================================================================
 
-class VarDecl(ASTNode):
+class IngrDecl(ASTNode):
     """Ingredient declaration (scalar ingredient)"""
     def __init__(self, data_type, identifier, init_value=None, line=None, column=None):
-        super().__init__("VarDecl", line, column)
+        super().__init__("IngrDecl", line, column)
         self.data_type = data_type  # "piece", "sip", "flag", "chars"
         self.identifier = identifier  # String
         self.init_value = init_value  # Expression node or None
     
     def __repr__(self):
-        return f"VarDecl({self.data_type} {self.identifier}, init={'Yes' if self.init_value else 'No'})"
+        return f"IngrDecl({self.data_type} {self.identifier}, init={'Yes' if self.init_value else 'No'})"
 
 class ArrayDecl(ASTNode):
     """Array declaration"""
@@ -157,10 +157,10 @@ class Assignment(ASTNode):
     def __repr__(self):
         return f"Assignment({self.operator})"
 
-class IfStatement(ASTNode):
+class CheckStatement(ASTNode):
     """Conditional statement (check/alt/instead)"""
     def __init__(self, condition, then_block, elif_clauses=None, else_block=None, line=None, column=None):
-        super().__init__("IfStatement", line, column)
+        super().__init__("CheckStatement", line, column)
         self.condition = condition  # Expression
         self.then_block = then_block  # Platter
         self.elif_clauses = elif_clauses or []  # List of (condition, block) tuples (alt)
@@ -170,12 +170,12 @@ class IfStatement(ASTNode):
         self.elif_clauses.append((condition, block))
     
     def __repr__(self):
-        return f"IfStatement(alts={len(self.elif_clauses)}, instead={'Yes' if self.else_block else 'No'})"
+        return f"CheckStatement(alts={len(self.elif_clauses)}, instead={'Yes' if self.else_block else 'No'})"
 
-class SwitchStatement(ASTNode):
+class MenuStatement(ASTNode):
     """Menu statement (menu/choice/usual)"""
     def __init__(self, expr, cases, default=None, line=None, column=None):
-        super().__init__("SwitchStatement", line, column)
+        super().__init__("MenuStatement", line, column)
         self.expr = expr  # Expression to menu on
         self.cases = cases or []  # List of CaseClause nodes (choice)
         self.default = default  # Statements list or None (usual)
@@ -184,7 +184,7 @@ class SwitchStatement(ASTNode):
         self.cases.append(case_node)
     
     def __repr__(self):
-        return f"SwitchStatement({len(self.cases)} choices, usual={'Yes' if self.default else 'No'})"
+        return f"MenuStatement({len(self.cases)} choices, usual={'Yes' if self.default else 'No'})"
 
 class CaseClause(ASTNode):
     """Choice in a menu statement"""
@@ -196,46 +196,46 @@ class CaseClause(ASTNode):
     def __repr__(self):
         return f"CaseClause({len(self.statements)} stmts)"
 
-class WhileLoop(ASTNode):
+class RepeatLoop(ASTNode):
     """Repeat loop (repeat)"""
     def __init__(self, condition, body, line=None, column=None):
-        super().__init__("WhileLoop", line, column)
+        super().__init__("RepeatLoop", line, column)
         self.condition = condition
         self.body = body  # Platter
     
     def __repr__(self):
-        return f"WhileLoop()"
+        return f"RepeatLoop()"
 
-class DoWhileLoop(ASTNode):
+class OrderRepeatLoop(ASTNode):
     """Order-repeat loop (order...repeat)"""
     def __init__(self, body, condition, line=None, column=None):
-        super().__init__("DoWhileLoop", line, column)
+        super().__init__("OrderRepeatLoop", line, column)
         self.body = body
         self.condition = condition
     
     def __repr__(self):
-        return f"DoWhileLoop()"
+        return f"OrderRepeatLoop()"
 
-class ForLoop(ASTNode):
+class PassLoop(ASTNode):
     """Pass loop (pass)"""
     def __init__(self, init, update, condition, body, line=None, column=None):
-        super().__init__("ForLoop", line, column)
+        super().__init__("PassLoop", line, column)
         self.init = init  # Assignment or None
         self.update = update  # Assignment
         self.condition = condition  # Expression
         self.body = body  # Platter
     
     def __repr__(self):
-        return f"ForLoop()"
+        return f"PassLoop()"
 
-class ReturnStatement(ASTNode):
+class ServeStatement(ASTNode):
     """Serve statement (serve)"""
     def __init__(self, value=None, line=None, column=None):
-        super().__init__("ReturnStatement", line, column)
+        super().__init__("ServeStatement", line, column)
         self.value = value  # Expression or None
     
     def __repr__(self):
-        return f"ReturnStatement(has_value={'Yes' if self.value else 'No'})"
+        return f"ServeStatement(has_value={'Yes' if self.value else 'No'})"
 
 class BreakStatement(ASTNode):
     """Stop statement (stop)"""
@@ -316,10 +316,10 @@ class TableAccess(ASTNode):
     def __repr__(self):
         return f"TableAccess(.{self.field})"
 
-class FunctionCall(ASTNode):
+class RecipeCall(ASTNode):
     """Recipe call"""
     def __init__(self, name, args=None, line=None, column=None):
-        super().__init__("FunctionCall", line, column)
+        super().__init__("RecipeCall", line, column)
         self.name = name
         self.args = args or []  # flavors
     
@@ -327,7 +327,7 @@ class FunctionCall(ASTNode):
         self.args.append(arg)
     
     def __repr__(self):
-        return f"FunctionCall({self.name}, {len(self.args)} flavors)"
+        return f"RecipeCall({self.name}, {len(self.args)} flavors)"
 
 class CastExpr(ASTNode):
     """Type cast expression"""
@@ -374,7 +374,7 @@ class TableLiteral(ASTNode):
     """Table literal"""
     def __init__(self, field_inits=None, line=None, column=None):
         super().__init__("TableLiteral", line, column)
-        self.field_inits = field_inits or []  # List of (field_name, value) tuples
+        self.field_inits = field_inits or []  # List of (field_name, value, line, col) tuples
     
     def add_field(self, field_name, value):
         self.field_inits.append((field_name, value))
