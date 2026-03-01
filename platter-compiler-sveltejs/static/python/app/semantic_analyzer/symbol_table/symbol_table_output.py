@@ -123,62 +123,8 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
         return scope_name
     
     def get_value_str(symbol: Symbol) -> str:
-        """Get initial value with verbose details"""
-        # For table prototypes, show field structure
-        if symbol.kind == SymbolKind.TABLE_TYPE and symbol.type_info.table_fields:
-            fields = []
-            for field_name, field_type in symbol.type_info.table_fields.items():
-                fields.append(f"{field_name}: {field_type}")
-            if len(fields) <= 2:
-                return "{ " + ", ".join(fields) + " }"
-            else:
-                # Show first 2 fields and count
-                return "{ " + ", ".join(fields[:2]) + f", ... ({len(fields)} fields) }}"
-        
-        if not symbol.declaration_node:
-            return "-"
-        
-        node = symbol.declaration_node
-        if hasattr(node, 'init_value') and node.init_value:
-            # Try to get literal value
-            if isinstance(node.init_value, Literal):
-                val = node.init_value.value
-                if isinstance(val, str):
-                    return f'"{val}"'
-                return str(val)
-            elif isinstance(node.init_value, ArrayLiteral):
-                # Show array element type if available
-                elem_type = symbol.type_info.get_element_type()
-                if elem_type:
-                    return f"[{len(node.init_value.elements)} × {elem_type}]"
-                return f"[{len(node.init_value.elements)} items]"
-            elif isinstance(node.init_value, TableLiteral):
-                # Show field values
-                fields = []
-                for field_name, value, line, col in node.init_value.field_inits:
-                    if isinstance(value, Literal):
-                        val = value.value
-                        if isinstance(val, str):
-                            val_str = f'"{val}"'
-                        else:
-                            val_str = str(val)
-                        fields.append(f"{field_name}: {val_str}")
-                    elif isinstance(value, Identifier):
-                        fields.append(f"{field_name}: @{value.name}")
-                    else:
-                        fields.append(f"{field_name}: <expr>")
-                
-                if len(fields) <= 2:
-                    return "{ " + ", ".join(fields) + " }"
-                else:
-                    # Show first 2 fields and count
-                    return "{ " + ", ".join(fields[:2]) + f", ... ({len(fields)} fields) }}"
-            elif isinstance(node.init_value, Identifier):
-                # Reference to another symbol
-                return f"@{node.init_value.name}"
-            else:
-                return "<expr>"
-        return "-"
+        """Get the computed default value from the symbol"""
+        return symbol.value if symbol.value is not None else "-"
     
     def get_position_str(symbol: Symbol) -> str:
         """Get declaration position if available"""

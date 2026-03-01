@@ -81,6 +81,9 @@ class SymbolTable:
         
         symbol = Symbol(name, kind, type_info, self.current_scope.level, declaration_node, self.current_scope)
         
+        # Compute default value for display
+        symbol.compute_default_value(self.table_types)
+        
         if not self.current_scope.define(symbol):
             if self.error_handler:
                 self.error_handler.add_error(
@@ -96,6 +99,9 @@ class SymbolTable:
     
     def add_symbol(self, name: str, symbol: Symbol) -> bool:
         """Add a pre-created symbol to current scope"""
+        # Compute default value for display
+        symbol.compute_default_value(self.table_types)
+        
         if not self.current_scope.define(symbol):
             if self.error_handler:
                 self.error_handler.add_error(
@@ -126,6 +132,9 @@ class SymbolTable:
         """Register a built-in recipe overload (allows multiple signatures)"""
         if name not in self.builtin_recipes:
             self.builtin_recipes[name] = []
+        
+        # Compute default value for display
+        symbol.compute_default_value(self.table_types)
         
         # Check for duplicate signature
         for existing in self.builtin_recipes[name]:

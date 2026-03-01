@@ -217,6 +217,9 @@ class SymbolTableBuilder:
             self.symbol_table.current_scope
         )
         
+        # Compute default value for symbol table display
+        recipe_symbol.compute_default_value(self.symbol_table.table_types)
+        
         if not self.symbol_table.current_scope.define(recipe_symbol):
             if self.symbol_table.error_handler:
                 self.symbol_table.error_handler.add_error(f"Recipe '{node.name}' already defined", node)
