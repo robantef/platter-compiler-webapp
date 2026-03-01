@@ -1,0 +1,1 @@
+[ERROR] [E304] Serve type mismatch: expected piece, got sip at line 2, column 9

@@ -1,0 +1,6 @@
+prepare piece of a(piece of a){
+        serve 0;
+}
+start() {
+        a(1);
+}

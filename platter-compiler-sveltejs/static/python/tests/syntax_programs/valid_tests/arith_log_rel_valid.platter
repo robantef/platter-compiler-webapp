@@ -9,9 +9,9 @@ start() {
     
     flag of b = a == 3; 
 	flag of b = "Hello" == "Hello";
-	# flag of b = (x <= y) == (x == z);  		paren error
+	flag of b = (x <= y) == (x == z);  		
 	flag of b = tosip(p) <= r;
-	# flag of b = (a>b)==(b<p);					paren error
+	flag of b = (a>b)==(b<p);					
 	flag of b = flagArray[0] != flagArray[1];
 
 

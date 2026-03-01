@@ -409,94 +409,95 @@ prod_no	<lhs>	=>	action_type	ast_class	field_mapping	note
 408	<flag_expr_tail>	=>	skip	-	-	Empty flag expr tail	
 409	<simple_flag>	=>	propagate	-	$1	Paren flag operand	
 410	<simple_flag>	=>	propagate	-	$0	Flag operand	
-411	<flag_operand>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag operand piece	
-412	<flag_operand>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag operand sip	
-413	<flag_operand>	=>	build_binop	-	left=$0 right=$1	Flag operand ret	
-414	<flag_operand>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag operand chars	
-415	<flag_operand>	=>	build_unary	-	operator=not operand=$1 tail=$2	Flag operand not	
-416	<flag_operand>	=>	build_binop	-	left=$0 right=$1	Flag operand ID	
-417	<flag_operand>	=>	build_binop	-	left=$1 right=$3	Flag operand paren	
-418	<flag_cont_any>	=>	build_binop	-	op=+ right=$1	Flag cont add	
-419	<flag_cont_any>	=>	build_binop	-	op=- right=$1	Flag cont sub	
-420	<flag_cont_any>	=>	build_binop	-	op=* right=$1	Flag cont mult	
-421	<flag_cont_any>	=>	build_binop	-	op=/ right=$1	Flag cont div	
-422	<flag_cont_any>	=>	manual	-	lambda left: BinaryOp(BinaryOp(left, "%", $1), $2, $3)	Flag cont mod rel	
-423	<flag_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Flag cont rel	
-424	<flag_cont_any>	=>	skip	-	-	Empty flag cont any	
-425	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag cps piece	
-426	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag cps sip	
-427	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag cps chars	
-428	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1	Flag cps ID	
-429	<flag_cps_expr>	=>	build_binop	-	left=$1 right=$3	Flag cps paren	
-430	<flag_cps_cont_any>	=>	build_binop	-	op=+ right=$1	Flag cps cont add	
-431	<flag_cps_cont_any>	=>	build_binop	-	op=- right=$1	Flag cps cont sub	
-432	<flag_cps_cont_any>	=>	build_binop	-	op=* right=$1	Flag cps cont mult	
-433	<flag_cps_cont_any>	=>	build_binop	-	op=/ right=$1	Flag cps cont div	
-434	<flag_cps_cont_any>	=>	build_binop	-	op=% right=$1 tail=$2	Flag cps cont mod	
-435	<flag_cps_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Flag cps cont rel	
-436	<flag_ps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag ps piece	
-437	<flag_ps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag ps sip	
-438	<flag_ps_expr>	=>	build_binop	-	left=$0 right=$1	Flag ps ID	
-439	<flag_ps_expr>	=>	build_binop	-	left=$1 right=$3	Flag ps paren	
-440	<flag_ps_cont_any>	=>	build_binop	-	op=+ right=$1	Flag ps cont add	
-441	<flag_ps_cont_any>	=>	build_binop	-	op=- right=$1	Flag ps cont sub	
-442	<flag_ps_cont_any>	=>	build_binop	-	op=* right=$1	Flag ps cont mult	
-443	<flag_ps_cont_any>	=>	build_binop	-	op=/ right=$1	Flag ps cont div	
-444	<flag_ps_cont_any>	=>	build_binop	-	op=% right=$1 tail=$2	Flag ps cont mod	
-445	<flag_ps_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Flag ps cont rel	
-446	<any_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Any piece	
-447	<any_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Any sip	
-448	<any_expr>	=>	build_binop	-	left=$0 right=$1	Any flag	
-449	<any_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Any chars	
-450	<any_expr>	=>	build_binop	-	left=$0 right=$1	Any ID	
-451	<any_expr>	=>	build_binop	-	left=$1 right=$3	Any paren	
-452	<any_expr>	=>	create	UnaryOp	operator=not operand=$1	Any not	
-453	<any_cont_any>	=>	build_binop	-	op=+ right=$1 tail=$2	Any cont add	
-454	<any_cont_any>	=>	build_binop	-	op=- right=$1 tail=$2	Any cont sub	
-455	<any_cont_any>	=>	build_binop	-	op=* right=$1 tail=$2	Any cont mult	
-456	<any_cont_any>	=>	build_binop	-	op=/ right=$1 tail=$2	Any cont div	
-457	<any_cont_any>	=>	build_binop	-	op=% right=$1 tail=$2	Any cont mod	
-458	<any_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any cont rel	
-459	<any_cont_any>	=>	propagate	-	$0	Any cont flag	
-460	<any_cont_any>	=>	skip	-	-	Empty any cont	
-461	<any_cont_cps_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any cps tail	
-462	<any_cont_cps_flag_tail>	=>	skip	-	-	Empty cps tail	
-463	<any_cont_ps_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any ps tail	
-464	<any_cont_ps_flag_tail>	=>	skip	-	-	Empty ps tail	
-465	<any_cont_p_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any p tail	
-466	<any_cont_p_flag_tail>	=>	skip	-	-	Empty p tail	
-467	<any_cont_s_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any s tail	
-468	<any_cont_s_flag_tail>	=>	skip	-	-	Empty s tail	
-469	<any_cont_c_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any c tail	
-470	<any_cont_c_flag_tail>	=>	skip	-	-	Empty c tail	
-471	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps piece	
-472	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps sip	
-473	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps chars	
-474	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps ID	
-475	<strict_cps_expr>	=>	build_binop	-	left=$1 right=$3	Strict cps paren	
-476	<cps_cont_any>	=>	build_binop	-	op=+ right=$1	Cps cont add	
-477	<cps_cont_any>	=>	build_binop	-	op=- right=$1	Cps cont sub	
-478	<cps_cont_any>	=>	build_binop	-	op=* right=$1	Cps cont mult	
-479	<cps_cont_any>	=>	build_binop	-	op=/ right=$1	Cps cont div	
-480	<cps_cont_any>	=>	build_binop	-	op=% right=$1	Cps cont mod	
-481	<cps_cont_any>	=>	skip	-	-	Empty cps cont	
-482	<strict_ps_expr>	=>	build_binop	-	left=$0 right=$1	Strict ps piece	
-483	<strict_ps_expr>	=>	build_binop	-	left=$0 right=$1	Strict ps sip	
-484	<strict_ps_expr>	=>	build_binop	-	left=$0 right=$1	Strict ps ID	
-485	<strict_ps_expr>	=>	build_binop	-	left=$1 right=$3	Strict ps paren	
-486	<ps_cont_any>	=>	build_binop	-	op=+ right=$1	Ps cont add	
-487	<ps_cont_any>	=>	build_binop	-	op=- right=$1	Ps cont sub	
-488	<ps_cont_any>	=>	build_binop	-	op=* right=$1	Ps cont mult	
-489	<ps_cont_any>	=>	build_binop	-	op=/ right=$1	Ps cont div	
-490	<ps_cont_any>	=>	build_binop	-	op=% right=$1	Ps cont mod	
-491	<ps_cont_any>	=>	skip	-	-	Empty ps cont	
-492	<strict_piece_chars_expr>	=>	build_binop	-	left=$0 right=$1	Piece/chars ID	
-493	<strict_piece_chars_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Piece/chars piece	
-494	<strict_piece_chars_expr>	=>	build_binop	-	left=$0 right=$1	Piece/chars chars	
-495	<strict_piece_chars_expr>	=>	build_binop	-	left=$1 right=$3	Piece/chars paren	
-496	<pc_ambig_tail>	=>	build_binop	-	op=+ right=$1	PC ambig add	
-497	<pc_ambig_tail>	=>	build_binop	-	op=- right=$1	PC ambig sub	
-498	<pc_ambig_tail>	=>	build_binop	-	op=* right=$1	PC ambig mult	
-499	<pc_ambig_tail>	=>	build_binop	-	op=/ right=$1	PC ambig div	
-500	<pc_ambig_tail>	=>	build_binop	-	op=% right=$1	PC ambig mod	
-501	<pc_ambig_tail>	=>	skip	-	-	Empty PC ambig	
+411	<simple_flag>	=>	propagate	-	$0		
+412	<flag_operand>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag operand piece	
+413	<flag_operand>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag operand sip	
+414	<flag_operand>	=>	build_binop	-	left=$0 right=$1	Flag operand ret	
+415	<flag_operand>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag operand chars	
+416	<flag_operand>	=>	build_unary	-	operator=not operand=$1 tail=$2	Flag operand not	
+417	<flag_operand>	=>	build_binop	-	left=$0 right=$1	Flag operand ID	
+418	<flag_operand>	=>	build_binop	-	left=$1 right=$3	Flag operand paren	
+419	<flag_cont_any>	=>	build_binop	-	op=+ right=$1	Flag cont add	
+420	<flag_cont_any>	=>	build_binop	-	op=- right=$1	Flag cont sub	
+421	<flag_cont_any>	=>	build_binop	-	op=* right=$1	Flag cont mult	
+422	<flag_cont_any>	=>	build_binop	-	op=/ right=$1	Flag cont div	
+423	<flag_cont_any>	=>	manual	-	lambda left: BinaryOp(BinaryOp(left, "%", $1), $2, $3)	Flag cont mod rel	
+424	<flag_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Flag cont rel	
+425	<flag_cont_any>	=>	skip	-	-	Empty flag cont any	
+426	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag cps piece	
+427	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag cps sip	
+428	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag cps chars	
+429	<flag_cps_expr>	=>	build_binop	-	left=$0 right=$1	Flag cps ID	
+430	<flag_cps_expr>	=>	build_binop	-	left=$1 right=$3	Flag cps paren	
+431	<flag_cps_cont_any>	=>	build_binop	-	op=+ right=$1	Flag cps cont add	
+432	<flag_cps_cont_any>	=>	build_binop	-	op=- right=$1	Flag cps cont sub	
+433	<flag_cps_cont_any>	=>	build_binop	-	op=* right=$1	Flag cps cont mult	
+434	<flag_cps_cont_any>	=>	build_binop	-	op=/ right=$1	Flag cps cont div	
+435	<flag_cps_cont_any>	=>	build_binop	-	op=% right=$1 tail=$2	Flag cps cont mod	
+436	<flag_cps_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Flag cps cont rel	
+437	<flag_ps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag ps piece	
+438	<flag_ps_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Flag ps sip	
+439	<flag_ps_expr>	=>	build_binop	-	left=$0 right=$1	Flag ps ID	
+440	<flag_ps_expr>	=>	build_binop	-	left=$1 right=$3	Flag ps paren	
+441	<flag_ps_cont_any>	=>	build_binop	-	op=+ right=$1	Flag ps cont add	
+442	<flag_ps_cont_any>	=>	build_binop	-	op=- right=$1	Flag ps cont sub	
+443	<flag_ps_cont_any>	=>	build_binop	-	op=* right=$1	Flag ps cont mult	
+444	<flag_ps_cont_any>	=>	build_binop	-	op=/ right=$1	Flag ps cont div	
+445	<flag_ps_cont_any>	=>	build_binop	-	op=% right=$1 tail=$2	Flag ps cont mod	
+446	<flag_ps_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Flag ps cont rel	
+447	<any_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Any piece	
+448	<any_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Any sip	
+449	<any_expr>	=>	build_binop	-	left=$0 right=$1	Any flag	
+450	<any_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Any chars	
+451	<any_expr>	=>	build_binop	-	left=$0 right=$1	Any ID	
+452	<any_expr>	=>	build_binop	-	left=$1 right=$3	Any paren	
+453	<any_expr>	=>	create	UnaryOp	operator=not operand=$1	Any not	
+454	<any_cont_any>	=>	build_binop	-	op=+ right=$1 tail=$2	Any cont add	
+455	<any_cont_any>	=>	build_binop	-	op=- right=$1 tail=$2	Any cont sub	
+456	<any_cont_any>	=>	build_binop	-	op=* right=$1 tail=$2	Any cont mult	
+457	<any_cont_any>	=>	build_binop	-	op=/ right=$1 tail=$2	Any cont div	
+458	<any_cont_any>	=>	build_binop	-	op=% right=$1 tail=$2	Any cont mod	
+459	<any_cont_any>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any cont rel	
+460	<any_cont_any>	=>	propagate	-	$0	Any cont flag	
+461	<any_cont_any>	=>	skip	-	-	Empty any cont	
+462	<any_cont_cps_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any cps tail	
+463	<any_cont_cps_flag_tail>	=>	skip	-	-	Empty cps tail	
+464	<any_cont_ps_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any ps tail	
+465	<any_cont_ps_flag_tail>	=>	skip	-	-	Empty ps tail	
+466	<any_cont_p_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any p tail	
+467	<any_cont_p_flag_tail>	=>	skip	-	-	Empty p tail	
+468	<any_cont_s_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any s tail	
+469	<any_cont_s_flag_tail>	=>	skip	-	-	Empty s tail	
+470	<any_cont_c_flag_tail>	=>	build_binop	-	op=$0 right=$1 tail=$2	Any c tail	
+471	<any_cont_c_flag_tail>	=>	skip	-	-	Empty c tail	
+472	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps piece	
+473	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps sip	
+474	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps chars	
+475	<strict_cps_expr>	=>	build_binop	-	left=$0 right=$1	Strict cps ID	
+476	<strict_cps_expr>	=>	build_binop	-	left=$1 right=$3	Strict cps paren	
+477	<cps_cont_any>	=>	build_binop	-	op=+ right=$1	Cps cont add	
+478	<cps_cont_any>	=>	build_binop	-	op=- right=$1	Cps cont sub	
+479	<cps_cont_any>	=>	build_binop	-	op=* right=$1	Cps cont mult	
+480	<cps_cont_any>	=>	build_binop	-	op=/ right=$1	Cps cont div	
+481	<cps_cont_any>	=>	build_binop	-	op=% right=$1	Cps cont mod	
+482	<cps_cont_any>	=>	skip	-	-	Empty cps cont	
+483	<strict_ps_expr>	=>	build_binop	-	left=$0 right=$1	Strict ps piece	
+484	<strict_ps_expr>	=>	build_binop	-	left=$0 right=$1	Strict ps sip	
+485	<strict_ps_expr>	=>	build_binop	-	left=$0 right=$1	Strict ps ID	
+486	<strict_ps_expr>	=>	build_binop	-	left=$1 right=$3	Strict ps paren	
+487	<ps_cont_any>	=>	build_binop	-	op=+ right=$1	Ps cont add	
+488	<ps_cont_any>	=>	build_binop	-	op=- right=$1	Ps cont sub	
+489	<ps_cont_any>	=>	build_binop	-	op=* right=$1	Ps cont mult	
+490	<ps_cont_any>	=>	build_binop	-	op=/ right=$1	Ps cont div	
+491	<ps_cont_any>	=>	build_binop	-	op=% right=$1	Ps cont mod	
+492	<ps_cont_any>	=>	skip	-	-	Empty ps cont	
+493	<strict_piece_chars_expr>	=>	build_binop	-	left=$0 right=$1	Piece/chars ID	
+494	<strict_piece_chars_expr>	=>	build_binop	-	left=$0 right=$1 tail=$2	Piece/chars piece	
+495	<strict_piece_chars_expr>	=>	build_binop	-	left=$0 right=$1	Piece/chars chars	
+496	<strict_piece_chars_expr>	=>	build_binop	-	left=$1 right=$3	Piece/chars paren	
+497	<pc_ambig_tail>	=>	build_binop	-	op=+ right=$1	PC ambig add	
+498	<pc_ambig_tail>	=>	build_binop	-	op=- right=$1	PC ambig sub	
+499	<pc_ambig_tail>	=>	build_binop	-	op=* right=$1	PC ambig mult	
+500	<pc_ambig_tail>	=>	build_binop	-	op=/ right=$1	PC ambig div	
+501	<pc_ambig_tail>	=>	build_binop	-	op=% right=$1	PC ambig mod	
+502	<pc_ambig_tail>	=>	skip	-	-	Empty PC ambig	

@@ -1,0 +1,1 @@
+Syntax Error: Unexpected '[' at line 1, col 23. Expected ',', ']'.

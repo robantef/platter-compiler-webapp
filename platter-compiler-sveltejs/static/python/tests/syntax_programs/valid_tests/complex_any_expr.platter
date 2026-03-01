@@ -1,13 +1,11 @@
 start(){
-    # a = (tochars( ( (12345 + pow(2,3)) * (fact(16) - fact(3)) ) ) + fact() ) );     paren error
-    # b = (((size(arr1) > 10) and not(matches(arr2, "abc"))) or (flagVar == true));
-    # c =(arrNums[search(arrNums, 42)] + (arrNums[0] * arrNums[1]));
-    # d =(table1:fieldA + reverse("xyz") + table2:fieldB);
+    a = tochars( ( (12345 + pow(2,3)) * (fact(16) - fact(3)) ) + fact(3) );     
+    b = (((size(arr1) > 10) and not(matches(arr2, []))) or (flagVar == true));
+    c =(arrNums[searchInd] + (arrNums[0] * arrNums[1]));
+    d =(table1:fieldA + tochars("xyz") + table2:fieldB);
     f = (arrTables[2]:fieldX == (arrTables[1]:fieldY + 99));
-    # g = (( not(flagA) or (flagB and flagC)) and ((flagD != false) or true));
+    g = (( not(flagA) or (flagB and flagC)) and ((flagD != false) or true));
     h = ("Result: " + tochars(1234) + " / " + tochars(size(arrData)));
-    # i = ( ( pow(3, fact(9)) + fact() ) / (fact(4) - 6) );
+    i = ( ( pow(3, fact(9)) + fact(8) ) / (fact(4) - 6) );
     j = ((tosip("42") + 0.5) <= (pieceVar * 2.2) );
 }
-
-# commented parren erros

@@ -10,9 +10,10 @@ from app.utils.FormatASTParser import main as format_ast_parser
 if __name__ == "__main__":
     # Build regular parser
     format_parser()
-    
-    # Build AST parser
     print("\n" + "="*80)
-    print("Building AST Parser...")
-    print("="*80 + "\n")
-    format_ast_parser()
+    print("Skipped AST Builder, disconnected generator")
+    # Build AST parser
+    # print("\n" + "="*80)
+    # print("Building AST Parser...")
+    # print("="*80 + "\n")
+    # format_ast_parser()

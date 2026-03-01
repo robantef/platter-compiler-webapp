@@ -1,0 +1,5 @@
+flag of b = (a>b)==(b<p);
+flag of j = (x > y) == (x < z) and up or not down and (5+ 2) >= 7 or not down;
+flag of b = (x <= y) == (x == z); 
+
+start(){}

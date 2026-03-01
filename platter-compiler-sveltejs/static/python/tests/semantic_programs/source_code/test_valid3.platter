@@ -1,0 +1,5 @@
+start() {
+flag of expr = (1 - 23 > 12) and (up and down);
+flag of expr1 = ("a" > "b") and (up and down);
+bill(tochars(expr)+tochars(expr1));
+}

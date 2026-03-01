@@ -3,12 +3,12 @@ start() {
 	flag of b = ((up) or (up or down)) == up;
 	flag of c = not (4 % 2 == 1);
 	piece of d = x + pieceArray[0] * pieceArray[z];
-    # flag of e = ((20 / 5) + 3) * 2 <= 14 or (18 - 10) % 4 == 1; parren error
+    flag of e = ((20 / 5) + 3) * 2 <= 14 or (18 - 10) % 4 == 1; 
 	flag of f = (50 / (5 * 2)) + (12 % 5) < 10 or (6 * 3) - 4 == 14;
 	flag of g = not (x >= y) and not (y >= x);
 	flag of h = (double(3) + 5) * 2 >= 10 * 2 + 2;
 	flag of i = ((x + y) < z) and q == 4;
-	# flag of j = (x > y) == (x < z) and up or not down and (5+ 2) >= 7 or not down; 		parren error
+	flag of j = (x > y) == (x < z) and up or not down and (5+ 2) >= 7 or not down; 		
     
     chars of k = tochars(age) + " years old";
 	chars of l = greet + " " + "world";

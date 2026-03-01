@@ -1,0 +1,2 @@
+start(){a = (tochars( ( (12345 + pow(2,3)) * 2 ) + fact(3) ) );
+a = (tochars( ( 3 * 2 ) + fact(3) ) );}

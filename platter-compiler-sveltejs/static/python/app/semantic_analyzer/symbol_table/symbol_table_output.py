@@ -3,14 +3,33 @@ Symbol Table Output Utilities
 Provides helper functions for formatting and displaying symbol table information
 """
 
-from app.semantic_analyzer.symbol_table import SymbolTable, Symbol, Scope
-from app.semantic_analyzer.ast.ast_nodes import Literal, ArrayLiteral, TableLiteral
+from app.semantic_analyzer.symbol_table import SymbolTable, Symbol, Scope, SymbolKind
+from app.semantic_analyzer.ast.ast_nodes import Literal, ArrayLiteral, TableLiteral, Identifier
 from typing import List, Optional, Tuple
+
+
+def _get_parameters_str(symbol: Symbol) -> str:
+    """Get parameter list for functions"""
+    if symbol.kind.value != 'recipe' or not symbol.declaration_node:
+        return "-"
+    
+    if hasattr(symbol.declaration_node, 'params'):
+        params = symbol.declaration_node.params
+        if not params:
+            return "()"
+        param_strs = []
+        for p in params:
+            dims_str = f"[{p.dimensions}]" if hasattr(p, 'dimensions') and p.dimensions else ""
+            param_id = p.identifier if hasattr(p, 'identifier') else ""
+            param_strs.append(f"{p.data_type}{dims_str} {param_id}".strip())
+        return f"({', '.join(param_strs)})"
+    return "-"
 
 
 def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -> str:
     """
     Format symbol table in a nicely formatted table with columns
+    Separates built-in recipes from user-defined symbols
     
     Args:
         symbol_table: The symbol table to format
@@ -21,6 +40,78 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
     """
     output = []
     
+    # === BUILT-IN RECIPES SECTION ===
+    if hasattr(symbol_table, 'builtin_recipes') and symbol_table.builtin_recipes:
+        output.append("╔════════════════════════════════════════════════════════════════════════╗")
+        output.append("║                      BUILT-IN RECIPES (OVERLOADABLE)                   ║")
+        output.append("╚════════════════════════════════════════════════════════════════════════╝")
+        output.append("")
+        
+        builtin_data = []
+        for recipe_name, overloads in sorted(symbol_table.builtin_recipes.items()):
+            for idx, symbol in enumerate(overloads, 1):
+                params_str = _get_parameters_str(symbol)
+                return_type = symbol.type_info.base_type
+                return_dims = "[]" * symbol.type_info.dimensions if symbol.type_info.dimensions > 0 else ""
+                
+                builtin_data.append({
+                    'name': recipe_name if idx == 1 else "",  # Show name only once
+                    'overload': f"#{idx}",
+                    'parameters': params_str,
+                    'returns': f"{return_type}{return_dims}"
+                })
+        
+        if builtin_data:
+            # Calculate column widths
+            max_name = max(len(b['name']) for b in builtin_data)
+            max_overload = max(len(b['overload']) for b in builtin_data)
+            max_params = max(len(b['parameters']) for b in builtin_data)
+            max_returns = max(len(b['returns']) for b in builtin_data)
+            
+            name_width = max(max_name, len("Recipe")) + 2
+            overload_width = max(max_overload, len("Ver")) + 2
+            params_width = min(max(max_params, len("Parameters")) + 2, 50)
+            returns_width = max(max_returns, len("Returns")) + 2
+            
+            # Build table header
+            output.append("┌" + "─" * name_width + "┬" + "─" * overload_width + "┬" + 
+                         "─" * params_width + "┬" + "─" * returns_width + "┐")
+            
+            header = (f"│ {'Recipe':<{name_width-2}} │ {'Ver':<{overload_width-2}} │ "
+                     f"{'Parameters':<{params_width-2}} │ {'Returns':<{returns_width-2}} │")
+            output.append(header)
+            
+            output.append("├" + "─" * name_width + "┼" + "─" * overload_width + "┼" + 
+                         "─" * params_width + "┼" + "─" * returns_width + "┤")
+            
+            # Add data rows
+            current_recipe = None
+            for data in builtin_data:
+                # Add separator between different recipes
+                if current_recipe != data['name'] and data['name'] and current_recipe is not None:
+                    output.append("├" + "─" * name_width + "┼" + "─" * overload_width + "┼" + 
+                                 "─" * params_width + "┼" + "─" * returns_width + "┤")
+                
+                if data['name']:
+                    current_recipe = data['name']
+                
+                params_display = data['parameters'][:params_width-2] if len(data['parameters']) > params_width-2 else data['parameters']
+                
+                row = (f"│ {data['name']:<{name_width-2}} │ {data['overload']:<{overload_width-2}} │ "
+                      f"{params_display:<{params_width-2}} │ {data['returns']:<{returns_width-2}} │")
+                output.append(row)
+            
+            # Close table
+            output.append("└" + "─" * name_width + "┴" + "─" * overload_width + "┴" + 
+                         "─" * params_width + "┴" + "─" * returns_width + "┘")
+        
+        output.append("")
+        output.append("╔════════════════════════════════════════════════════════════════════════╗")
+        output.append("║                      USER-DEFINED SYMBOLS                              ║")
+        output.append("╚════════════════════════════════════════════════════════════════════════╝")
+        output.append("")
+    
+    # === USER-DEFINED SYMBOLS SECTION ===
     # Collect all symbols with their scope information
     symbols_data = []
     
@@ -31,24 +122,19 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
         # Return the actual scope name which contains recipe names and statement types
         return scope_name
     
-    def get_parameters_str(symbol: Symbol) -> str:
-        """Get parameter list for functions"""
-        if symbol.kind.value != 'function' or not symbol.declaration_node:
-            return "-"
-        
-        if hasattr(symbol.declaration_node, 'params'):
-            params = symbol.declaration_node.params
-            if not params:
-                return "()"
-            param_strs = []
-            for p in params:
-                dims_str = f"[{p.dimensions}]" if p.dimensions else ""
-                param_strs.append(f"{p.data_type}{dims_str} {p.identifier}")
-            return f"({', '.join(param_strs)})"
-        return "-"
-    
     def get_value_str(symbol: Symbol) -> str:
-        """Get initial value if available"""
+        """Get initial value with verbose details"""
+        # For table prototypes, show field structure
+        if symbol.kind == SymbolKind.TABLE_TYPE and symbol.type_info.table_fields:
+            fields = []
+            for field_name, field_type in symbol.type_info.table_fields.items():
+                fields.append(f"{field_name}: {field_type}")
+            if len(fields) <= 2:
+                return "{ " + ", ".join(fields) + " }"
+            else:
+                # Show first 2 fields and count
+                return "{ " + ", ".join(fields[:2]) + f", ... ({len(fields)} fields) }}"
+        
         if not symbol.declaration_node:
             return "-"
         
@@ -56,11 +142,40 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
         if hasattr(node, 'init_value') and node.init_value:
             # Try to get literal value
             if isinstance(node.init_value, Literal):
-                return str(node.init_value.value)
+                val = node.init_value.value
+                if isinstance(val, str):
+                    return f'"{val}"'
+                return str(val)
             elif isinstance(node.init_value, ArrayLiteral):
+                # Show array element type if available
+                elem_type = symbol.type_info.get_element_type()
+                if elem_type:
+                    return f"[{len(node.init_value.elements)} × {elem_type}]"
                 return f"[{len(node.init_value.elements)} items]"
             elif isinstance(node.init_value, TableLiteral):
-                return f"{{{len(node.init_value.field_inits)} fields}}"
+                # Show field values
+                fields = []
+                for field_name, value, line, col in node.init_value.field_inits:
+                    if isinstance(value, Literal):
+                        val = value.value
+                        if isinstance(val, str):
+                            val_str = f'"{val}"'
+                        else:
+                            val_str = str(val)
+                        fields.append(f"{field_name}: {val_str}")
+                    elif isinstance(value, Identifier):
+                        fields.append(f"{field_name}: @{value.name}")
+                    else:
+                        fields.append(f"{field_name}: <expr>")
+                
+                if len(fields) <= 2:
+                    return "{ " + ", ".join(fields) + " }"
+                else:
+                    # Show first 2 fields and count
+                    return "{ " + ", ".join(fields[:2]) + f", ... ({len(fields)} fields) }}"
+            elif isinstance(node.init_value, Identifier):
+                # Reference to another symbol
+                return f"@{node.init_value.name}"
             else:
                 return "<expr>"
         return "-"
@@ -79,14 +194,23 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
             accessed_list = symbol.accessed_in_scopes if symbol.accessed_in_scopes else []
             accessed_str = ", ".join(accessed_list) if accessed_list else "-"
             
+            # Format type display
+            type_display = symbol.type_info.base_type
+            if symbol.kind == SymbolKind.TABLE_TYPE:
+                # Show as table prototype
+                type_display = f"table<{symbol.type_info.base_type}>"
+            elif symbol.type_info.is_table:
+                # Show table instance with arrow
+                type_display = f"→{symbol.type_info.base_type}"
+            
             symbols_data.append({
                 'id': symbol.name,
-                'type': symbol.type_info.base_type,
+                'type': type_display,
                 'dims': str(symbol.type_info.dimensions) if symbol.type_info.dimensions > 0 else "-",
                 'declared_scope': declared_scope_name if declared_scope_name else "-",
                 'accessed_scopes': accessed_str,
                 'accessed_list': accessed_list,  # Store as list for console output
-                'parameters': get_parameters_str(symbol),
+                'parameters': _get_parameters_str(symbol),
                 'args': "-",  # Args tracked at call sites, not in symbol definition
                 'value': get_value_str(symbol),
                 'kind': symbol.kind.value,
@@ -139,7 +263,7 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
         accessed_width = min(max(max_accessed, len("Accessed")) + 2, 25)  # Cap at 25
         params_width = min(max(max_params, len("Parameters")) + 2, 35)  # Cap at 35
         args_width = max(max_args, len("Args")) + 2
-        value_width = min(max(max_value, len("Value")) + 2, 15)  # Cap at 15
+        value_width = min(max(max_value, len("Value")) + 2, 50)  # Cap at 50 for more detail
         
         # Build table header with Unicode box-drawing characters
         output.append("┌" + "─" * id_width + "┬" + "─" * type_width + "┬" + "─" * dims_width + "┬" + 
@@ -240,22 +364,6 @@ def format_symbol_table_for_console(symbol_table: SymbolTable) -> List[dict]:
     """
     symbols_output = []
     
-    def get_parameters_str(symbol: Symbol) -> str:
-        """Get parameter list for functions"""
-        if symbol.kind.value != 'function' or not symbol.declaration_node:
-            return "-"
-        
-        if hasattr(symbol.declaration_node, 'params'):
-            params = symbol.declaration_node.params
-            if not params:
-                return "()"
-            param_strs = []
-            for p in params:
-                dims_str = f"[{p.dimensions}]" if p.dimensions else ""
-                param_strs.append(f"{p.data_type}{dims_str} {p.identifier}")
-            return f"({', '.join(param_strs)})"
-        return "-"
-    
     def get_value_str(symbol: Symbol) -> str:
         """Get initial value if available"""
         if not symbol.declaration_node:
@@ -285,7 +393,7 @@ def format_symbol_table_for_console(symbol_table: SymbolTable) -> List[dict]:
                 'Dims': str(symbol.type_info.dimensions) if symbol.type_info.dimensions > 0 else "-",
                 'Declared': declared_scope_name if declared_scope_name else "-",
                 'Accessed': symbol.accessed_in_scopes if symbol.accessed_in_scopes else [],
-                'Parameters': get_parameters_str(symbol),
+                'Parameters': _get_parameters_str(symbol),
                 'Value': get_value_str(symbol),
                 'Kind': symbol.kind.value,
                 'Level': scope.level
@@ -477,7 +585,7 @@ if __name__ == "__main__":
     program = Program()
     
     # Add a variable
-    var_decl = VarDecl("piece", "testVar", Literal("piece", 42))
+    var_decl = IngrDecl("piece", "testVar", Literal("piece", 42))
     program.add_global_decl(var_decl)
     
     # Add a function

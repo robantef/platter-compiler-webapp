@@ -50,13 +50,13 @@ class SemanticAnalyzer:
         type_checker = TypeChecker(self.symbol_table, self.error_handler)
         type_checker.check(ast_root)
         
-        # Pass 3: Control flow checking (break/continue, return statements)
+        # Pass 3: Control flow checking (stop/next, serve statements)
         control_flow_checker = ControlFlowChecker(self.symbol_table, self.error_handler)
         control_flow_checker.check(ast_root)
         
-        # Pass 4: Function checking (argument count, argument types)
-        function_checker = FunctionChecker(self.symbol_table, self.error_handler)
-        function_checker.check(ast_root)
+        # Pass 4: Recipe checking (flavor count, flavor types)
+        recipe_checker = FunctionChecker(self.symbol_table, self.error_handler)
+        recipe_checker.check(ast_root)
     
     def has_errors(self) -> bool:
         """Check if there are any errors"""

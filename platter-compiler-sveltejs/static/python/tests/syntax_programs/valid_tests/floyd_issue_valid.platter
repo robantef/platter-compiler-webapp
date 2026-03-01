@@ -2,6 +2,6 @@ start(){
     flag of j = (x / y > 12) and (x < z) and up or not down and (5+ 2) >= 7 or not down;
     flag of b = ((up) or (up or down)) == up;
     flag of c = not (4 % 2 == 1);
-    # flag of id = ( id + id > piece_lit ) == ( id < id ); paren error
+    flag of id = ( id + id > piece_lit ) == ( id < id );
     j = (x + 12.32 > 32.2);
 }

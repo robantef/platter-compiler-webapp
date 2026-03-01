@@ -5,8 +5,8 @@ Main entry point for semantic analysis with modular passes:
 - Symbol table building (collects symbols and scope information)
 - Scope checking (undefined symbols, duplicate definitions)
 - Type checking (type compatibility, operations)
-- Control flow checking (break/continue, return statements)
-- Function checking (argument count, argument types)
+- Control flow checking (stop/next, serve statements)
+- Recipe checking (flavor count, flavor types)
 """
 
 from .semantic_analyzer import (
@@ -36,6 +36,14 @@ from .semantic_passes import (
     FunctionChecker
 )
 
+from .builtin_recipes import (
+    BuiltinRecipeSignature,
+    BUILTIN_RECIPES,
+    get_builtin_recipe,
+    is_builtin_recipe,
+    get_all_builtin_recipe_names
+)
+
 __all__ = [
     # Main analyzer
     'SemanticAnalyzer',
@@ -61,5 +69,12 @@ __all__ = [
     'TypeChecker',
     'ScopeChecker',
     'ControlFlowChecker',
-    'FunctionChecker'
+    'FunctionChecker',
+    
+    # Built-in recipes
+    'BuiltinRecipeSignature',
+    'BUILTIN_RECIPES',
+    'get_builtin_recipe',
+    'is_builtin_recipe',
+    'get_all_builtin_recipe_names'
 ]

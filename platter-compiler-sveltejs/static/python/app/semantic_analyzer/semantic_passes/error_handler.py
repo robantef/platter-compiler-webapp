@@ -170,18 +170,19 @@ class ErrorCodes:
     UNDEFINED_FIELD = "E203"
     INVALID_DIMENSION = "E204"
     
-    # Function errors
-    UNDEFINED_FUNCTION = "E301"
-    ARGUMENT_COUNT_MISMATCH = "E302"
-    ARGUMENT_TYPE_MISMATCH = "E303"
-    INVALID_RETURN_TYPE = "E304"
-    MISSING_RETURN = "E305"
+    # Recipe errors (functions)
+    UNDEFINED_RECIPE = "E301"
+    FLAVOR_COUNT_MISMATCH = "E302"  # argument count
+    FLAVOR_TYPE_MISMATCH = "E303"  # argument type
+    INVALID_SERVE_TYPE = "E304"  # return type
+    MISSING_SERVE = "E305"  # missing return
     
     # Control flow errors
-    BREAK_OUTSIDE_LOOP = "E401"
-    CONTINUE_OUTSIDE_LOOP = "E402"
-    RETURN_OUTSIDE_FUNCTION = "E403"
+    STOP_OUTSIDE_LOOP = "E401"  # break outside loop
+    NEXT_OUTSIDE_LOOP = "E402"  # continue outside loop
+    SERVE_OUTSIDE_RECIPE = "E403"  # return outside function
+    UNREACHABLE_CODE = "E404"  # unreachable code
     
     # Initialization errors
-    UNINITIALIZED_VARIABLE = "W101"
-    UNUSED_VARIABLE = "W102"
+    UNINITIALIZED_INGREDIENT = "W101"  # uninitialized variable
+    UNUSED_INGREDIENT = "W102"  # unused variable

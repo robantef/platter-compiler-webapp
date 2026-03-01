@@ -5,6 +5,8 @@ This module generates both Three Address Code (TAC) and Quadruples
 from the Abstract Syntax Tree (AST).
 """
 
+from __future__ import annotations
+
 from typing import List, Optional, Tuple, Any
 import sys
 import os
@@ -17,6 +19,17 @@ sys.path.insert(0, python_dir)
 from app.semantic_analyzer.ast.ast_nodes import *
 from .tac import *
 from .quadruple import *
+
+
+# AST compatibility aliases (supports both legacy and current AST node names)
+VarDecl = globals().get("VarDecl", globals().get("IngrDecl"))
+IfStatement = globals().get("IfStatement", globals().get("CheckStatement"))
+WhileLoop = globals().get("WhileLoop", globals().get("RepeatLoop"))
+DoWhileLoop = globals().get("DoWhileLoop", globals().get("OrderRepeatLoop"))
+ForLoop = globals().get("ForLoop", globals().get("PassLoop"))
+SwitchStatement = globals().get("SwitchStatement", globals().get("MenuStatement"))
+ReturnStatement = globals().get("ReturnStatement", globals().get("ServeStatement"))
+FunctionCall = globals().get("FunctionCall", globals().get("RecipeCall"))
 
 
 class IRGenerator:
@@ -121,7 +134,7 @@ class IRGenerator:
         elif isinstance(node, TableDecl):
             self.visit_table_decl(node)
     
-    def visit_var_decl(self, node: VarDecl):
+    def visit_var_decl(self, node: ASTNode):
         """Generate IR for variable declaration"""
         if node.init_value:
             # Variable with initialization
@@ -274,7 +287,7 @@ class IRGenerator:
             self.emit_tac(TACAssignment(target_addr, value))
             self.emit_quad("=", value, None, target_addr)
     
-    def visit_if_statement(self, node: IfStatement):
+    def visit_if_statement(self, node: ASTNode):
         """Generate IR for if statement"""
         # Labels
         else_label = self.new_label("else")
@@ -319,7 +332,7 @@ class IRGenerator:
         self.emit_tac(TACLabel(end_label))
         self.emit_quad("label", end_label)
     
-    def visit_while_loop(self, node: WhileLoop):
+    def visit_while_loop(self, node: ASTNode):
         """Generate IR for while loop"""
         start_label = self.new_label("while_start")
         end_label = self.new_label("while_end")
@@ -351,7 +364,7 @@ class IRGenerator:
         
         self.loop_stack.pop()
     
-    def visit_do_while_loop(self, node: DoWhileLoop):
+    def visit_do_while_loop(self, node: ASTNode):
         """Generate IR for do-while loop"""
         start_label = self.new_label("do_start")
         continue_label = self.new_label("do_continue")
@@ -383,7 +396,7 @@ class IRGenerator:
         
         self.loop_stack.pop()
     
-    def visit_for_loop(self, node: ForLoop):
+    def visit_for_loop(self, node: ASTNode):
         """Generate IR for for loop"""
         start_label = self.new_label("for_start")
         continue_label = self.new_label("for_continue")
@@ -425,7 +438,7 @@ class IRGenerator:
         
         self.loop_stack.pop()
     
-    def visit_switch_statement(self, node: SwitchStatement):
+    def visit_switch_statement(self, node: ASTNode):
         """Generate IR for switch statement"""
         end_label = self.new_label("switch_end")
         
@@ -473,7 +486,7 @@ class IRGenerator:
         self.emit_tac(TACLabel(end_label))
         self.emit_quad("label", end_label)
     
-    def visit_return_statement(self, node: ReturnStatement):
+    def visit_return_statement(self, node: ASTNode):
         """Generate IR for return statement"""
         if node.value:
             value_temp = self.visit_expression(node.value)
@@ -581,7 +594,7 @@ class IRGenerator:
         
         return result_temp
     
-    def visit_function_call(self, node: FunctionCall) -> str:
+    def visit_function_call(self, node: ASTNode) -> str:
         """Generate IR for function call"""
         # Evaluate and push arguments
         for arg in node.args:

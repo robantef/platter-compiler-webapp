@@ -46,4 +46,5 @@ jobs:
             platter-compiler-sveltejs/static/python/tests/syntax_programs/valid_test_results.txt
             platter-compiler-sveltejs/static/python/tests/syntax_programs/invalid_test_results.txt
             platter-compiler-sveltejs/static/python/tests/syntax_programs/test_results.txt
+            platter-compiler-sveltejs/static/python/tests/semantic_programs/tests_semantic_results.txt
           if-no-files-found: ignore

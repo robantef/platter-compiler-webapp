@@ -8,7 +8,7 @@ import logging as log
 
 # To disable logs, set level=log.CRITICAL. 
 # To enable logs, set level=log.DEBUG
-log.basicConfig(level=log.DEBUG, format='%(levelname)s: <%(funcName)s> | %(message)s') # J
+log.basicConfig(level=log.CRITICAL, format='%(levelname)s: <%(funcName)s> | %(message)s') # J
 
 class Parser():
     def __init__(self, tokens):
@@ -3724,7 +3724,6 @@ class Parser():
         elif self.tokens[self.pos].type in PREDICT_SET["<simple_flag>_2"]:
             self.id_()
 
-
         else: self.parse_token(self.error_arr)
 
         log.info("Exit: " + self.tokens[self.pos].type) # J
@@ -3734,7 +3733,7 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    411 <flag_operand>	=>	<ret_piece>	<cont_piece>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
+        """    412 <flag_operand>	=>	<ret_piece>	<cont_piece>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<flag_operand>"]:
             self.ret_piece()
             self.cont_piece()
@@ -3742,7 +3741,7 @@ class Parser():
             self.strict_piece_expr()
             self.flag_eq_tail()
 
-            """    412 <flag_operand>	=>	<ret_sip>	<cont_sip>	<rel_op>	<strict_sip_expr>	<flag_eq_tail>    """
+            """    413 <flag_operand>	=>	<ret_sip>	<cont_sip>	<rel_op>	<strict_sip_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_operand>_1"]:
             self.ret_sip()
             self.cont_sip()
@@ -3750,12 +3749,12 @@ class Parser():
             self.strict_sip_expr()
             self.flag_eq_tail()
 
-            """    413 <flag_operand>	=>	<ret_flag>	<flag_eq_tail>    """
+            """    414 <flag_operand>	=>	<ret_flag>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_operand>_2"]:
             self.ret_flag()
             self.flag_eq_tail()
 
-            """    414 <flag_operand>	=>	<ret_chars>	<cont_chars>	<rel_op>	<strict_chars_expr>	<flag_eq_tail>    """
+            """    415 <flag_operand>	=>	<ret_chars>	<cont_chars>	<rel_op>	<strict_chars_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_operand>_3"]:
             self.ret_chars()
             self.cont_chars()
@@ -3763,18 +3762,18 @@ class Parser():
             self.strict_chars_expr()
             self.flag_eq_tail()
 
-            """    415 <flag_operand>	=>	not	<flag_operand>	<flag_eq_tail>    """
+            """    416 <flag_operand>	=>	not	<flag_operand>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_operand>_4"]:
             self.parse_token("not")
             self.flag_operand()
             self.flag_eq_tail()
 
-            """    416 <flag_operand>	=>	<id>	<flag_cont_any>    """
+            """    417 <flag_operand>	=>	<id>	<flag_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_operand>_5"]:
             self.id_()
             self.flag_cont_any()
 
-            """    417 <flag_operand>	=>	(	<any_expr>	)	<flag_cont_any>    """
+            """    418 <flag_operand>	=>	(	<any_expr>	)	<flag_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_operand>_6"]:
             self.parse_token("(")
             self.any_expr()
@@ -3790,40 +3789,40 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    418 <flag_cont_any>	=>	+	<flag_cps_expr>    """
+        """    419 <flag_cont_any>	=>	+	<flag_cps_expr>    """
         if self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>"]:
             self.parse_token("+")
             self.flag_cps_expr()
 
-            """    419 <flag_cont_any>	=>	-	<flag_ps_expr>    """
+            """    420 <flag_cont_any>	=>	-	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_1"]:
             self.parse_token("-")
             self.flag_ps_expr()
 
-            """    420 <flag_cont_any>	=>	*	<flag_ps_expr>    """
+            """    421 <flag_cont_any>	=>	*	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_2"]:
             self.parse_token("*")
             self.flag_ps_expr()
 
-            """    421 <flag_cont_any>	=>	/	<flag_ps_expr>    """
+            """    422 <flag_cont_any>	=>	/	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_3"]:
             self.parse_token("/")
             self.flag_ps_expr()
 
-            """    422 <flag_cont_any>	=>	%	<strict_piece_expr>	<rel_op>	<strict_piece_expr>    """
+            """    423 <flag_cont_any>	=>	%	<strict_piece_expr>	<rel_op>	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
             self.rel_op()
             self.strict_piece_expr()
 
-            """    423 <flag_cont_any>	=>	<rel_op>	<any_expr>	<flag_eq_tail>    """
+            """    424 <flag_cont_any>	=>	<rel_op>	<any_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_5"]:
             self.rel_op()
             self.any_expr()
             self.flag_eq_tail()
 
-            """    424 <flag_cont_any>	=>	    """
+            """    425 <flag_cont_any>	=>	    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_6"]:
             pass
 
@@ -3835,7 +3834,7 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    425 <flag_cps_expr>	=>	<ret_piece>	<cont_piece>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
+        """    426 <flag_cps_expr>	=>	<ret_piece>	<cont_piece>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<flag_cps_expr>"]:
             self.ret_piece()
             self.cont_piece()
@@ -3843,7 +3842,7 @@ class Parser():
             self.strict_piece_expr()
             self.flag_eq_tail()
 
-            """    426 <flag_cps_expr>	=>	<ret_sip>	<cont_sip>	<rel_op>	<strict_sip_expr>	<flag_eq_tail>    """
+            """    427 <flag_cps_expr>	=>	<ret_sip>	<cont_sip>	<rel_op>	<strict_sip_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_expr>_1"]:
             self.ret_sip()
             self.cont_sip()
@@ -3851,7 +3850,7 @@ class Parser():
             self.strict_sip_expr()
             self.flag_eq_tail()
 
-            """    427 <flag_cps_expr>	=>	<ret_chars>	<cont_chars>	<rel_op>	<strict_chars_expr>	<flag_eq_tail>    """
+            """    428 <flag_cps_expr>	=>	<ret_chars>	<cont_chars>	<rel_op>	<strict_chars_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_expr>_2"]:
             self.ret_chars()
             self.cont_chars()
@@ -3859,12 +3858,12 @@ class Parser():
             self.strict_chars_expr()
             self.flag_eq_tail()
 
-            """    428 <flag_cps_expr>	=>	<id>	<flag_cps_cont_any>    """
+            """    429 <flag_cps_expr>	=>	<id>	<flag_cps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_expr>_3"]:
             self.id_()
             self.flag_cps_cont_any()
 
-            """    429 <flag_cps_expr>	=>	(	<any_expr>	)	<flag_cps_cont_any>    """
+            """    430 <flag_cps_expr>	=>	(	<any_expr>	)	<flag_cps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_expr>_4"]:
             self.parse_token("(")
             self.any_expr()
@@ -3880,27 +3879,27 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    430 <flag_cps_cont_any>	=>	+	<flag_cps_expr>    """
+        """    431 <flag_cps_cont_any>	=>	+	<flag_cps_expr>    """
         if self.tokens[self.pos].type in PREDICT_SET["<flag_cps_cont_any>"]:
             self.parse_token("+")
             self.flag_cps_expr()
 
-            """    431 <flag_cps_cont_any>	=>	-	<flag_ps_expr>    """
+            """    432 <flag_cps_cont_any>	=>	-	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_cont_any>_1"]:
             self.parse_token("-")
             self.flag_ps_expr()
 
-            """    432 <flag_cps_cont_any>	=>	*	<flag_ps_expr>    """
+            """    433 <flag_cps_cont_any>	=>	*	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_cont_any>_2"]:
             self.parse_token("*")
             self.flag_ps_expr()
 
-            """    433 <flag_cps_cont_any>	=>	/	<flag_ps_expr>    """
+            """    434 <flag_cps_cont_any>	=>	/	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_cont_any>_3"]:
             self.parse_token("/")
             self.flag_ps_expr()
 
-            """    434 <flag_cps_cont_any>	=>	%	<strict_piece_expr>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
+            """    435 <flag_cps_cont_any>	=>	%	<strict_piece_expr>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_cont_any>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
@@ -3908,7 +3907,7 @@ class Parser():
             self.strict_piece_expr()
             self.flag_eq_tail()
 
-            """    435 <flag_cps_cont_any>	=>	<rel_op>	<strict_cps_expr>	<flag_eq_tail>    """
+            """    436 <flag_cps_cont_any>	=>	<rel_op>	<strict_cps_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cps_cont_any>_5"]:
             self.rel_op()
             self.strict_cps_expr()
@@ -3923,7 +3922,7 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    436 <flag_ps_expr>	=>	<ret_piece>	<cont_piece>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
+        """    437 <flag_ps_expr>	=>	<ret_piece>	<cont_piece>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<flag_ps_expr>"]:
             self.ret_piece()
             self.cont_piece()
@@ -3931,7 +3930,7 @@ class Parser():
             self.strict_piece_expr()
             self.flag_eq_tail()
 
-            """    437 <flag_ps_expr>	=>	<ret_sip>	<cont_sip>	<rel_op>	<strict_sip_expr>	<flag_eq_tail>    """
+            """    438 <flag_ps_expr>	=>	<ret_sip>	<cont_sip>	<rel_op>	<strict_sip_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_expr>_1"]:
             self.ret_sip()
             self.cont_sip()
@@ -3939,12 +3938,12 @@ class Parser():
             self.strict_sip_expr()
             self.flag_eq_tail()
 
-            """    438 <flag_ps_expr>	=>	<id>	<flag_ps_cont_any>    """
+            """    439 <flag_ps_expr>	=>	<id>	<flag_ps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_expr>_2"]:
             self.id_()
             self.flag_ps_cont_any()
 
-            """    439 <flag_ps_expr>	=>	(	<any_expr>	)	<flag_ps_cont_any>    """
+            """    440 <flag_ps_expr>	=>	(	<any_expr>	)	<flag_ps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_expr>_3"]:
             self.parse_token("(")
             self.any_expr()
@@ -3960,27 +3959,27 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    440 <flag_ps_cont_any>	=>	+	<flag_ps_expr>    """
+        """    441 <flag_ps_cont_any>	=>	+	<flag_ps_expr>    """
         if self.tokens[self.pos].type in PREDICT_SET["<flag_ps_cont_any>"]:
             self.parse_token("+")
             self.flag_ps_expr()
 
-            """    441 <flag_ps_cont_any>	=>	-	<flag_ps_expr>    """
+            """    442 <flag_ps_cont_any>	=>	-	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_cont_any>_1"]:
             self.parse_token("-")
             self.flag_ps_expr()
 
-            """    442 <flag_ps_cont_any>	=>	*	<flag_ps_expr>    """
+            """    443 <flag_ps_cont_any>	=>	*	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_cont_any>_2"]:
             self.parse_token("*")
             self.flag_ps_expr()
 
-            """    443 <flag_ps_cont_any>	=>	/	<flag_ps_expr>    """
+            """    444 <flag_ps_cont_any>	=>	/	<flag_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_cont_any>_3"]:
             self.parse_token("/")
             self.flag_ps_expr()
 
-            """    444 <flag_ps_cont_any>	=>	%	<strict_piece_expr>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
+            """    445 <flag_ps_cont_any>	=>	%	<strict_piece_expr>	<rel_op>	<strict_piece_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_cont_any>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
@@ -3988,7 +3987,7 @@ class Parser():
             self.strict_piece_expr()
             self.flag_eq_tail()
 
-            """    445 <flag_ps_cont_any>	=>	<rel_op>	<strict_ps_expr>	<flag_eq_tail>    """
+            """    446 <flag_ps_cont_any>	=>	<rel_op>	<strict_ps_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_ps_cont_any>_5"]:
             self.rel_op()
             self.strict_ps_expr()
@@ -4003,42 +4002,42 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    446 <any_expr>	=>	<ret_piece>	<cont_piece>	<any_cont_p_flag_tail>    """
+        """    447 <any_expr>	=>	<ret_piece>	<cont_piece>	<any_cont_p_flag_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_expr>"]:
             self.ret_piece()
             self.cont_piece()
             self.any_cont_p_flag_tail()
 
-            """    447 <any_expr>	=>	<ret_sip>	<cont_sip>	<any_cont_s_flag_tail>    """
+            """    448 <any_expr>	=>	<ret_sip>	<cont_sip>	<any_cont_s_flag_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_expr>_1"]:
             self.ret_sip()
             self.cont_sip()
             self.any_cont_s_flag_tail()
 
-            """    448 <any_expr>	=>	<ret_flag>	<flag_op_tail>    """
+            """    449 <any_expr>	=>	<ret_flag>	<flag_op_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_expr>_2"]:
             self.ret_flag()
             self.flag_op_tail()
 
-            """    449 <any_expr>	=>	<ret_chars>	<cont_chars>	<any_cont_c_flag_tail>    """
+            """    450 <any_expr>	=>	<ret_chars>	<cont_chars>	<any_cont_c_flag_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_expr>_3"]:
             self.ret_chars()
             self.cont_chars()
             self.any_cont_c_flag_tail()
 
-            """    450 <any_expr>	=>	<id>	<any_cont_any>    """
+            """    451 <any_expr>	=>	<id>	<any_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_expr>_4"]:
             self.id_()
             self.any_cont_any()
 
-            """    451 <any_expr>	=>	(	<any_expr>	)	<any_cont_any>    """
+            """    452 <any_expr>	=>	(	<any_expr>	)	<any_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_expr>_5"]:
             self.parse_token("(")
             self.any_expr()
             self.parse_token(")")
             self.any_cont_any()
 
-            """    452 <any_expr>	=>	not	<strict_flag_expr>    """
+            """    453 <any_expr>	=>	not	<strict_flag_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_expr>_6"]:
             self.parse_token("not")
             self.strict_flag_expr()
@@ -4052,47 +4051,47 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    453 <any_cont_any>	=>	+	<strict_cps_expr>	<any_cont_cps_flag_tail>    """
+        """    454 <any_cont_any>	=>	+	<strict_cps_expr>	<any_cont_cps_flag_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>"]:
             self.parse_token("+")
             self.strict_cps_expr()
             self.any_cont_cps_flag_tail()
 
-            """    454 <any_cont_any>	=>	-	<strict_ps_expr>	<any_cont_ps_flag_tail>    """
+            """    455 <any_cont_any>	=>	-	<strict_ps_expr>	<any_cont_ps_flag_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_1"]:
             self.parse_token("-")
             self.strict_ps_expr()
             self.any_cont_ps_flag_tail()
 
-            """    455 <any_cont_any>	=>	*	<strict_ps_expr>	<any_cont_ps_flag_tail>    """
+            """    456 <any_cont_any>	=>	*	<strict_ps_expr>	<any_cont_ps_flag_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_2"]:
             self.parse_token("*")
             self.strict_ps_expr()
             self.any_cont_ps_flag_tail()
 
-            """    456 <any_cont_any>	=>	/	<strict_ps_expr>	<any_cont_ps_flag_tail>    """
+            """    457 <any_cont_any>	=>	/	<strict_ps_expr>	<any_cont_ps_flag_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_3"]:
             self.parse_token("/")
             self.strict_ps_expr()
             self.any_cont_ps_flag_tail()
 
-            """    457 <any_cont_any>	=>	%	<strict_piece_expr>	<any_cont_p_flag_tail>    """
+            """    458 <any_cont_any>	=>	%	<strict_piece_expr>	<any_cont_p_flag_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
             self.any_cont_p_flag_tail()
 
-            """    458 <any_cont_any>	=>	<rel_op>	<any_expr>	<flag_op_tail>    """
+            """    459 <any_cont_any>	=>	<rel_op>	<any_expr>	<flag_op_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_5"]:
             self.rel_op()
             self.any_expr()
             self.flag_op_tail()
 
-            """    459 <any_cont_any>	=>	<flag_expr_tail>    """
+            """    460 <any_cont_any>	=>	<flag_expr_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_6"]:
             self.flag_expr_tail()
 
-            """    460 <any_cont_any>	=>	    """
+            """    461 <any_cont_any>	=>	    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_7"]:
             pass
 
@@ -4104,13 +4103,13 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    461 <any_cont_cps_flag_tail>	=>	<rel_op>	<strict_cps_expr>	<flag_op_tail>    """
+        """    462 <any_cont_cps_flag_tail>	=>	<rel_op>	<strict_cps_expr>	<flag_op_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_cont_cps_flag_tail>"]:
             self.rel_op()
             self.strict_cps_expr()
             self.flag_op_tail()
 
-            """    462 <any_cont_cps_flag_tail>	=>	    """
+            """    463 <any_cont_cps_flag_tail>	=>	    """
 
 
 
@@ -4121,13 +4120,13 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    463 <any_cont_ps_flag_tail>	=>	<rel_op>	<strict_ps_expr>	<flag_op_tail>    """
+        """    464 <any_cont_ps_flag_tail>	=>	<rel_op>	<strict_ps_expr>	<flag_op_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_cont_ps_flag_tail>"]:
             self.rel_op()
             self.strict_ps_expr()
             self.flag_op_tail()
 
-            """    464 <any_cont_ps_flag_tail>	=>	    """
+            """    465 <any_cont_ps_flag_tail>	=>	    """
 
 
 
@@ -4138,13 +4137,13 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    465 <any_cont_p_flag_tail>	=>	<rel_op>	<strict_piece_expr>	<flag_op_tail>    """
+        """    466 <any_cont_p_flag_tail>	=>	<rel_op>	<strict_piece_expr>	<flag_op_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_cont_p_flag_tail>"]:
             self.rel_op()
             self.strict_piece_expr()
             self.flag_op_tail()
 
-            """    466 <any_cont_p_flag_tail>	=>	    """
+            """    467 <any_cont_p_flag_tail>	=>	    """
 
 
 
@@ -4155,13 +4154,13 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    467 <any_cont_s_flag_tail>	=>	<rel_op>	<strict_sip_expr>	<flag_op_tail>    """
+        """    468 <any_cont_s_flag_tail>	=>	<rel_op>	<strict_sip_expr>	<flag_op_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_cont_s_flag_tail>"]:
             self.rel_op()
             self.strict_sip_expr()
             self.flag_op_tail()
 
-            """    468 <any_cont_s_flag_tail>	=>	    """
+            """    469 <any_cont_s_flag_tail>	=>	    """
 
 
 
@@ -4172,13 +4171,13 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    469 <any_cont_c_flag_tail>	=>	<rel_op>	<strict_chars_expr>	<flag_op_tail>    """
+        """    470 <any_cont_c_flag_tail>	=>	<rel_op>	<strict_chars_expr>	<flag_op_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<any_cont_c_flag_tail>"]:
             self.rel_op()
             self.strict_chars_expr()
             self.flag_op_tail()
 
-            """    470 <any_cont_c_flag_tail>	=>	    """
+            """    471 <any_cont_c_flag_tail>	=>	    """
 
 
 
@@ -4189,27 +4188,27 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    471 <strict_cps_expr>	=>	<ret_piece>	<cont_piece>    """
+        """    472 <strict_cps_expr>	=>	<ret_piece>	<cont_piece>    """
         if self.tokens[self.pos].type in PREDICT_SET["<strict_cps_expr>"]:
             self.ret_piece()
             self.cont_piece()
 
-            """    472 <strict_cps_expr>	=>	<ret_sip>	<cont_sip>    """
+            """    473 <strict_cps_expr>	=>	<ret_sip>	<cont_sip>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_cps_expr>_1"]:
             self.ret_sip()
             self.cont_sip()
 
-            """    473 <strict_cps_expr>	=>	<ret_chars>	<cont_chars>    """
+            """    474 <strict_cps_expr>	=>	<ret_chars>	<cont_chars>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_cps_expr>_2"]:
             self.ret_chars()
             self.cont_chars()
 
-            """    474 <strict_cps_expr>	=>	<id>	<cps_cont_any>    """
+            """    475 <strict_cps_expr>	=>	<id>	<cps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_cps_expr>_3"]:
             self.id_()
             self.cps_cont_any()
 
-            """    475 <strict_cps_expr>	=>	(	<strict_cps_expr>	)	<cps_cont_any>    """
+            """    476 <strict_cps_expr>	=>	(	<strict_cps_expr>	)	<cps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_cps_expr>_4"]:
             self.parse_token("(")
             self.strict_cps_expr()
@@ -4225,32 +4224,32 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    476 <cps_cont_any>	=>	+	<strict_cps_expr>    """
+        """    477 <cps_cont_any>	=>	+	<strict_cps_expr>    """
         if self.tokens[self.pos].type in PREDICT_SET["<cps_cont_any>"]:
             self.parse_token("+")
             self.strict_cps_expr()
 
-            """    477 <cps_cont_any>	=>	-	<strict_ps_expr>    """
+            """    478 <cps_cont_any>	=>	-	<strict_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<cps_cont_any>_1"]:
             self.parse_token("-")
             self.strict_ps_expr()
 
-            """    478 <cps_cont_any>	=>	*	<strict_ps_expr>    """
+            """    479 <cps_cont_any>	=>	*	<strict_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<cps_cont_any>_2"]:
             self.parse_token("*")
             self.strict_ps_expr()
 
-            """    479 <cps_cont_any>	=>	/	<strict_ps_expr>    """
+            """    480 <cps_cont_any>	=>	/	<strict_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<cps_cont_any>_3"]:
             self.parse_token("/")
             self.strict_ps_expr()
 
-            """    480 <cps_cont_any>	=>	%	<strict_piece_expr>    """
+            """    481 <cps_cont_any>	=>	%	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<cps_cont_any>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
 
-            """    481 <cps_cont_any>	=>	    """
+            """    482 <cps_cont_any>	=>	    """
         elif self.tokens[self.pos].type in PREDICT_SET["<cps_cont_any>_5"]:
             pass
 
@@ -4262,22 +4261,22 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    482 <strict_ps_expr>	=>	<ret_piece>	<cont_piece>    """
+        """    483 <strict_ps_expr>	=>	<ret_piece>	<cont_piece>    """
         if self.tokens[self.pos].type in PREDICT_SET["<strict_ps_expr>"]:
             self.ret_piece()
             self.cont_piece()
 
-            """    483 <strict_ps_expr>	=>	<ret_sip>	<cont_sip>    """
+            """    484 <strict_ps_expr>	=>	<ret_sip>	<cont_sip>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_ps_expr>_1"]:
             self.ret_sip()
             self.cont_sip()
 
-            """    484 <strict_ps_expr>	=>	<id>	<ps_cont_any>    """
+            """    485 <strict_ps_expr>	=>	<id>	<ps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_ps_expr>_2"]:
             self.id_()
             self.ps_cont_any()
 
-            """    485 <strict_ps_expr>	=>	(	<strict_ps_expr>	)	<ps_cont_any>    """
+            """    486 <strict_ps_expr>	=>	(	<strict_ps_expr>	)	<ps_cont_any>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_ps_expr>_3"]:
             self.parse_token("(")
             self.strict_ps_expr()
@@ -4293,32 +4292,32 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    486 <ps_cont_any>	=>	+	<strict_ps_expr>    """
+        """    487 <ps_cont_any>	=>	+	<strict_ps_expr>    """
         if self.tokens[self.pos].type in PREDICT_SET["<ps_cont_any>"]:
             self.parse_token("+")
             self.strict_ps_expr()
 
-            """    487 <ps_cont_any>	=>	-	<strict_ps_expr>    """
+            """    488 <ps_cont_any>	=>	-	<strict_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<ps_cont_any>_1"]:
             self.parse_token("-")
             self.strict_ps_expr()
 
-            """    488 <ps_cont_any>	=>	*	<strict_ps_expr>    """
+            """    489 <ps_cont_any>	=>	*	<strict_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<ps_cont_any>_2"]:
             self.parse_token("*")
             self.strict_ps_expr()
 
-            """    489 <ps_cont_any>	=>	/	<strict_ps_expr>    """
+            """    490 <ps_cont_any>	=>	/	<strict_ps_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<ps_cont_any>_3"]:
             self.parse_token("/")
             self.strict_ps_expr()
 
-            """    490 <ps_cont_any>	=>	%	<strict_piece_expr>    """
+            """    491 <ps_cont_any>	=>	%	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<ps_cont_any>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
 
-            """    491 <ps_cont_any>	=>	    """
+            """    492 <ps_cont_any>	=>	    """
         elif self.tokens[self.pos].type in PREDICT_SET["<ps_cont_any>_5"]:
             pass
 
@@ -4330,23 +4329,23 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    492 <strict_piece_chars_expr>	=>	<id>	<pc_ambig_tail>    """
+        """    493 <strict_piece_chars_expr>	=>	<id>	<pc_ambig_tail>    """
         if self.tokens[self.pos].type in PREDICT_SET["<strict_piece_chars_expr>"]:
             self.id_()
             self.pc_ambig_tail()
 
-            """    493 <strict_piece_chars_expr>	=>	<ret_piece>	<strict_piece_mult_tail>	<strict_piece_add_tail>    """
+            """    494 <strict_piece_chars_expr>	=>	<ret_piece>	<strict_piece_mult_tail>	<strict_piece_add_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_piece_chars_expr>_1"]:
             self.ret_piece()
             self.strict_piece_mult_tail()
             self.strict_piece_add_tail()
 
-            """    494 <strict_piece_chars_expr>	=>	<ret_chars>	<strict_chars_add_tail>    """
+            """    495 <strict_piece_chars_expr>	=>	<ret_chars>	<strict_chars_add_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_piece_chars_expr>_2"]:
             self.ret_chars()
             self.strict_chars_add_tail()
 
-            """    495 <strict_piece_chars_expr>	=>	(	<strict_piece_chars_expr>	)	<pc_ambig_tail>    """
+            """    496 <strict_piece_chars_expr>	=>	(	<strict_piece_chars_expr>	)	<pc_ambig_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_piece_chars_expr>_3"]:
             self.parse_token("(")
             self.strict_piece_chars_expr()
@@ -4362,32 +4361,32 @@ class Parser():
         log.info("Enter: " + self.tokens[self.pos].type)
         log.info("STACK: " + str(self.error_arr))
 
-        """    496 <pc_ambig_tail>	=>	+	<strict_piece_chars_expr>    """
+        """    497 <pc_ambig_tail>	=>	+	<strict_piece_chars_expr>    """
         if self.tokens[self.pos].type in PREDICT_SET["<pc_ambig_tail>"]:
             self.parse_token("+")
             self.strict_piece_chars_expr()
 
-            """    497 <pc_ambig_tail>	=>	-	<strict_piece_expr>    """
+            """    498 <pc_ambig_tail>	=>	-	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<pc_ambig_tail>_1"]:
             self.parse_token("-")
             self.strict_piece_expr()
 
-            """    498 <pc_ambig_tail>	=>	*	<strict_piece_expr>    """
+            """    499 <pc_ambig_tail>	=>	*	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<pc_ambig_tail>_2"]:
             self.parse_token("*")
             self.strict_piece_expr()
 
-            """    499 <pc_ambig_tail>	=>	/	<strict_piece_expr>    """
+            """    500 <pc_ambig_tail>	=>	/	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<pc_ambig_tail>_3"]:
             self.parse_token("/")
             self.strict_piece_expr()
 
-            """    500 <pc_ambig_tail>	=>	%	<strict_piece_expr>    """
+            """    501 <pc_ambig_tail>	=>	%	<strict_piece_expr>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<pc_ambig_tail>_4"]:
             self.parse_token("%")
             self.strict_piece_expr()
 
-            """    501 <pc_ambig_tail>	=>	    """
+            """    502 <pc_ambig_tail>	=>	    """
 
 
 

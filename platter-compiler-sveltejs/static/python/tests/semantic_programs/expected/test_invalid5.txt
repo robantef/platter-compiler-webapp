@@ -1,0 +1,1 @@
+[ERROR] [E101] Type mismatch in assignment: cannot assign piece to chars at line 3, column 14

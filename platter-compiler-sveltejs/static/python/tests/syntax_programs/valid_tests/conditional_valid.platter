@@ -6,7 +6,6 @@ prepare piece of num(piece of a){
      }
 }
 start(){
-# check
   check(candy == 1){
        bill("one candy");
   } alt(candy == 2){
@@ -14,7 +13,7 @@ start(){
   } instead{
        bill("many candies");
   }
-  # check(isTrue() == up){  }
+  check(isTrue() == up){  }
   check(peanut > 0){  } 
   instead{  }
   check(candy == 1){  } 

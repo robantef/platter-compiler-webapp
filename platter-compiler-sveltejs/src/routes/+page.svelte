@@ -247,6 +247,7 @@ start() {
 			'/python/app/parser/first_set.py',
 			'/python/app/semantic_analyzer/__init__.py',
 			'/python/app/semantic_analyzer/semantic_analyzer.py',
+			'/python/app/semantic_analyzer/builtin_recipes.py',
 			'/python/app/semantic_analyzer/ast/__init__.py',
 			'/python/app/semantic_analyzer/ast/ast_nodes.py',
 			'/python/app/semantic_analyzer/ast/ast_parser_program.py',
@@ -573,46 +574,46 @@ import json
 import importlib
 
 # Force reload of modified modules to clear cache
-if 'app.semantic_analyzer.symbol_table.types' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.symbol_table.types'])
-if 'app.semantic_analyzer.symbol_table.symbol_table' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.symbol_table.symbol_table'])
-if 'app.semantic_analyzer.symbol_table.symbol_table_builder' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.symbol_table.symbol_table_builder'])
-if 'app.semantic_analyzer.semantic_passes.error_handler' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.semantic_passes.error_handler'])
-if 'app.semantic_analyzer.semantic_passes.scope_checker' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.semantic_passes.scope_checker'])
-if 'app.semantic_analyzer.semantic_passes.type_checker' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.semantic_passes.type_checker'])
-if 'app.semantic_analyzer.semantic_passes.control_flow_checker' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.semantic_passes.control_flow_checker'])
-if 'app.semantic_analyzer.semantic_passes.function_checker' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.semantic_passes.function_checker'])
-if 'app.semantic_analyzer.semantic_analyzer' in sys.modules:
-    importlib.reload(sys.modules['app.semantic_analyzer.semantic_analyzer'])
-if 'app.intermediate_code.tac' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.tac'])
-if 'app.intermediate_code.quadruple' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.quadruple'])
-if 'app.intermediate_code.ir_generator' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.ir_generator'])
-if 'app.intermediate_code.output_formatter' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.output_formatter'])
-if 'app.intermediate_code.optimizer' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.optimizer'])
-if 'app.intermediate_code.constant_folding' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.constant_folding'])
-if 'app.intermediate_code.propagation' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.propagation'])
-if 'app.intermediate_code.dead_code_elimination' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.dead_code_elimination'])
-if 'app.intermediate_code.algebraic_simplification' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.algebraic_simplification'])
-if 'app.intermediate_code.optimizer_manager' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.optimizer_manager'])
-if 'app.intermediate_code.ir_interpreter' in sys.modules:
-    importlib.reload(sys.modules['app.intermediate_code.ir_interpreter'])
+def _ensure_parent_packages(module_name):
+    parts = module_name.split('.')
+    for i in range(1, len(parts)):
+        parent_name = '.'.join(parts[:i])
+        if parent_name not in sys.modules:
+            importlib.import_module(parent_name)
+
+
+def _safe_reload(module_name):
+    if module_name in sys.modules:
+        try:
+            _ensure_parent_packages(module_name)
+            importlib.reload(sys.modules[module_name])
+        except Exception as reload_err:
+            print(f"[Reload Warning] {module_name}: {reload_err}")
+
+
+for module_name in [
+    'app.semantic_analyzer.symbol_table.types',
+    'app.semantic_analyzer.symbol_table.symbol_table',
+    'app.semantic_analyzer.symbol_table.symbol_table_builder',
+    'app.semantic_analyzer.semantic_passes.error_handler',
+    'app.semantic_analyzer.semantic_passes.scope_checker',
+    'app.semantic_analyzer.semantic_passes.type_checker',
+    'app.semantic_analyzer.semantic_passes.control_flow_checker',
+    'app.semantic_analyzer.semantic_passes.function_checker',
+    'app.semantic_analyzer.semantic_analyzer',
+    'app.intermediate_code.tac',
+    'app.intermediate_code.quadruple',
+    'app.intermediate_code.ir_generator',
+    'app.intermediate_code.output_formatter',
+    'app.intermediate_code.optimizer',
+    'app.intermediate_code.constant_folding',
+    'app.intermediate_code.propagation',
+    'app.intermediate_code.dead_code_elimination',
+    'app.intermediate_code.algebraic_simplification',
+    'app.intermediate_code.optimizer_manager',
+    'app.intermediate_code.ir_interpreter',
+]:
+    _safe_reload(module_name)
 
 from app.lexer.lexer import Lexer
 from app.semantic_analyzer.ast.ast_parser_program import ASTParser
@@ -620,10 +621,6 @@ from app.semantic_analyzer.ast.ast_reader import ASTReader, print_ast
 from app.semantic_analyzer import analyze_program
 from app.semantic_analyzer.symbol_table import print_symbol_table
 from app.semantic_analyzer.symbol_table.symbol_table_output import format_symbol_table_for_console
-from app.intermediate_code.ir_generator import IRGenerator
-from app.intermediate_code.output_formatter import IRFormatter
-from app.intermediate_code.optimizer_manager import OptimizerManager, OptimizationLevel
-from app.intermediate_code.ir_interpreter import run_tac
 
 result = None
 try:
@@ -665,62 +662,8 @@ try:
     execution_success = False
     execution_error = ""
     execution_globals = {}
-    try:
-        ir_gen = IRGenerator()
-        tac_instructions, quad_table = ir_gen.generate(ast)
-        formatter = IRFormatter()
-        ir_tac_text = formatter.format_tac_text(tac_instructions)
-        ir_quads_text = formatter.format_quadruples_text(quad_table)
-        
-        print("")
-        print("="*80)
-        print("Intermediate Code (Three Address Code)")
-        print("="*80)
-        print(ir_tac_text)
-        
-        print("")
-        print("="*80)
-        print("Intermediate Code (Quadruples)")
-        print("="*80)
-        print(ir_quads_text)
-        
-        # Optimized IR
-        optimizer = OptimizerManager(OptimizationLevel.STANDARD)
-        optimized_tac = optimizer.optimize_tac(tac_instructions)
-        ir_tac_optimized_text = formatter.format_tac_text(optimized_tac)
-        
-        print("")
-        print("="*80)
-        print("Optimized IR (Three Address Code - Standard Level)")
-        print("="*80)
-        print(ir_tac_optimized_text)
-        
-        # Execute the optimized TAC directly in Python
-        print("")
-        print("="*80)
-        print("Program Execution (IR Interpreter)")
-        print("="*80)
-        exec_result = run_tac(optimized_tac)
-        execution_output = exec_result.get("output", "")
-        execution_success = exec_result.get("success", False)
-        execution_error = exec_result.get("error", "")
-        execution_globals = exec_result.get("globals", {})
-        if execution_success:
-            print("[Execution OK]")
-            if execution_output:
-                print(execution_output)
-            else:
-                print("(no output)")
-        else:
-            print(f"[Execution Error] {execution_error}")
-    except Exception as ir_err:
-        import traceback
-        print(f"IR generation error: {str(ir_err)}")
-        traceback.print_exc()
-        execution_output = ""
-        execution_success = False
-        execution_error = str(ir_err)
-        execution_globals = {}
+    try: ir_gen = __import__('app.intermediate_code.ir_generator', fromlist=['IRGenerator']).IRGenerator(); tac_instructions, quad_table = ir_gen.generate(ast); formatter = __import__('app.intermediate_code.output_formatter', fromlist=['IRFormatter']).IRFormatter(); ir_tac_text = formatter.format_tac_text(tac_instructions); ir_quads_text = formatter.format_quadruples_text(quad_table); print(""); print("="*80); print("Intermediate Code (Three Address Code)"); print("="*80); print(ir_tac_text); print(""); print("="*80); print("Intermediate Code (Quadruples)"); print("="*80); print(ir_quads_text); optimizer_module = __import__('app.intermediate_code.optimizer_manager', fromlist=['OptimizerManager', 'OptimizationLevel']); OptimizerManager = optimizer_module.OptimizerManager; OptimizationLevel = optimizer_module.OptimizationLevel; optimizer = OptimizerManager(OptimizationLevel.STANDARD); optimized_tac = optimizer.optimize_tac(tac_instructions); ir_tac_optimized_text = formatter.format_tac_text(optimized_tac); print(""); print("="*80); print("Optimized IR (Three Address Code - Standard Level)"); print("="*80); print(ir_tac_optimized_text); print(""); print("="*80); print("Program Execution (IR Interpreter)"); print("="*80); run_tac = __import__('app.intermediate_code.ir_interpreter', fromlist=['run_tac']).run_tac; exec_result = run_tac(optimized_tac); execution_output = exec_result.get("output", ""); execution_success = exec_result.get("success", False); execution_error = exec_result.get("error", ""); execution_globals = exec_result.get("globals", {}); print("[Execution OK]" if execution_success else f"[Execution Error] {execution_error}"); print(execution_output if execution_success and execution_output else "(no output)" if execution_success else "")
+    except Exception as ir_err: import traceback; print(f"IR generation error: {str(ir_err)}"); traceback.print_exc(); execution_output = ""; execution_success = False; execution_error = str(ir_err); execution_globals = {}
     
     # Check for semantic errors from error handler
     if error_handler.has_errors():

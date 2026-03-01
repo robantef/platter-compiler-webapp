@@ -7,7 +7,23 @@ NOTE: This version does NOT perform semantic checking - it only collects symbols
 from app.semantic_analyzer.ast.ast_nodes import *
 from app.semantic_analyzer.symbol_table.types import Symbol, Scope, SymbolKind, TypeInfo
 from app.semantic_analyzer.symbol_table.symbol_table import SymbolTable
+from app.semantic_analyzer.builtin_recipes import BUILTIN_RECIPES
 from typing import Optional
+
+
+class _BuiltinParam:
+    """Simple parameter holder for built-in recipes"""
+    def __init__(self, data_type: str, dimensions: int):
+        self.data_type = data_type
+        self.dimensions = dimensions
+
+
+class _BuiltinDeclaration:
+    """Simple declaration node holder for built-in recipes"""
+    def __init__(self, params: list, return_type: str, return_dims: int):
+        self.params = params
+        self.return_type = return_type
+        self.return_dims = return_dims
 
 
 class SymbolTableBuilder:
@@ -15,46 +31,75 @@ class SymbolTableBuilder:
     
     def __init__(self):
         self.symbol_table = SymbolTable()
-        self.built = False
-        self._register_builtin_functions()
     
-    def _register_builtin_functions(self):
-        """Register Platter built-in functions (reserved words that act as functions)"""
-        builtin_functions = [
-            # Type conversions
-            ("topiece", "piece"),  # topiece(any) → piece
-            ("tosip",   "sip"),    # tosip(any)   → sip
-            ("tochars", "chars"),  # tochars(any) → chars
-
-            # Math, Formatting, Random
-            ("pow",     "piece"),  # pow(piece, piece) → piece
-            ("sqrt",    "sip"),    # sqrt(piece)       → sip (7 fractional digits)
-            ("fact",    "piece"),  # fact(piece)        → piece (factorial)
-            ("cut",     "chars"),  # cut(sip, sip)      → chars (formatted numeric)
-            ("rand",    "sip"),    # rand()              → sip (0.0–0.9999999, no args)
-
-            # String operation
-            ("copy",    "chars"),  # copy(chars, piece, piece) → chars (substring)
-
-            # Collection built-ins — all serve NEW arrays/tables
-            ("size",    "piece"),  # size(array)          → piece
-            ("sort",    "array"),  # sort(array)          → new sorted array
-            ("reverse", "array"),  # reverse(array)       → new reversed array
-            ("append",  "array"),  # append(array, val)   → new array with val
-            ("remove",  "array"),  # remove(array, piece) → new array without element at index
-            ("search",  "piece"),  # search(array, val)   → piece (first matching index, -1 if not found)
-            ("matches", "flag"),   # matches(arr|tbl, arr|tbl) → flag (deep equality)
-
-            # I/O built-ins
-            ("bill",    "chars"),  # bill(chars) → chars (outputs text, serves "")
-            ("take",    "chars"),  # take()      → chars (awaits input, no args)
-        ]
+    def _create_default_value(self, data_type: str, dimensions: int = 0):
+        """Create default value for uninitialized declarations"""
+        if dimensions > 0:
+            # Create nested empty array literal
+            return ArrayLiteral([])
+        else:
+            # Primitive types
+            if data_type == "chars":
+                return Literal("chars", "")
+            elif data_type == "piece":
+                return Literal("piece", 0)
+            elif data_type == "sip":
+                return Literal("sip", 0.0)
+            elif data_type == "flag":
+                return Literal("flag", False)  # down = False
+            else:
+                # For unknown types, return None
+                return None
+    
+    def _create_default_table_value(self, table_type_info: TypeInfo):
+        """Create default table value with all fields initialized to their defaults"""
+        if not table_type_info or not table_type_info.table_fields:
+            return None
         
-        for func_name, return_type in builtin_functions:
-            type_info = TypeInfo(return_type, 0)
-            type_info.is_function = True
-            # Built-in functions can accept any type as parameter
-            self.symbol_table.define_symbol(func_name, SymbolKind.FUNCTION, type_info, None)
+        field_inits = []
+        for field_name, field_type in table_type_info.table_fields.items():
+            default_value = self._create_default_value(field_type.base_type, field_type.dimensions)
+            if default_value:
+                # TableLiteral expects 4-tuple: (field_name, value, line, col)
+                field_inits.append((field_name, default_value, None, None))
+        
+        if field_inits:
+            return TableLiteral(field_inits)
+        return None
+        self.built = False
+        self._register_builtin_recipes()
+    
+    def _register_builtin_recipes(self):
+        """Register all built-in recipes with their overloads"""
+        for recipe_name, signatures in BUILTIN_RECIPES.items():
+            for signature in signatures:
+                # Create mock parameter nodes for signature matching
+                params = [_BuiltinParam(spice_type, spice_dims) 
+                         for spice_type, spice_dims in signature.spices]
+                
+                # Create a mock declaration node
+                declaration = _BuiltinDeclaration(
+                    params, 
+                    signature.return_type, 
+                    signature.return_dims
+                )
+                
+                # Create type info with is_function flag
+                type_info = signature.get_return_type_info()
+                type_info.is_function = True
+                
+                # Create symbol
+                symbol = Symbol(
+                    recipe_name, 
+                    SymbolKind.FUNCTION, 
+                    type_info, 
+                    0,
+                    declaration,
+                    self.symbol_table.global_scope
+                )
+                
+                # Register as built-in (allows overloading)
+                self.symbol_table.register_builtin_recipe(recipe_name, symbol)
     
     def build(self, ast_root: Program) -> SymbolTable:
         """Build symbol table from AST"""
@@ -101,7 +146,7 @@ class SymbolTableBuilder:
     def _process_global_declarations(self, program: Program):
         """Process global variable declarations"""
         for decl in program.global_decl:
-            if isinstance(decl, VarDecl):
+            if isinstance(decl, IngrDecl):
                 self._process_var_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._process_array_decl(decl)
@@ -114,29 +159,38 @@ class SymbolTableBuilder:
             self._process_recipe_decl(recipe)
     
     def _process_recipe_decl(self, node: RecipeDecl):
-        """Process a function declaration"""
-        dims = node.return_dims if node.return_dims is not None else 0
-        return_type = self._create_type_info(node.return_type, dims)
+        """Process a recipe declaration"""
+        # Prevent user-defined recipes from shadowing built-ins
+        if self.symbol_table.is_builtin_recipe(node.name):
+            if self.symbol_table.error_handler:
+                self.symbol_table.error_handler.add_error(
+                    f"Cannot redefine built-in recipe '{node.name}'", 
+                    node
+                )
+            return
         
-        func_symbol = Symbol(
+        dims = node.return_dims if node.return_dims is not None else 0
+        serve_type = self._create_type_info(node.return_type, dims)
+        
+        recipe_symbol = Symbol(
             node.name,
             SymbolKind.FUNCTION,
-            return_type,
+            serve_type,
             0,
             node,
             self.symbol_table.current_scope
         )
         
-        if not self.symbol_table.current_scope.define(func_symbol):
+        if not self.symbol_table.current_scope.define(recipe_symbol):
             if self.symbol_table.error_handler:
                 self.symbol_table.error_handler.add_error(f"Recipe '{node.name}' already defined", node)
             return
         
         self.symbol_table.enter_scope(f"recipe_{node.name}")
-        self.symbol_table.current_function = func_symbol
+        self.symbol_table.current_function = recipe_symbol
         
-        for param in node.params:
-            self._process_param_decl(param)
+        for spice in node.params:
+            self._process_param_decl(spice)
         
         if node.body:
             self._process_platter(node.body)
@@ -145,7 +199,7 @@ class SymbolTableBuilder:
         self.symbol_table.exit_scope()
     
     def _process_param_decl(self, node: ParamDecl):
-        """Process a function parameter"""
+        """Process a recipe spice (parameter)"""
         dims = node.dimensions if node.dimensions is not None else 0
         type_info = self._create_type_info(node.data_type, dims)
         
@@ -156,9 +210,13 @@ class SymbolTableBuilder:
             node
         )
     
-    def _process_var_decl(self, node: VarDecl):
-        """Process a variable declaration"""
+    def _process_var_decl(self, node: IngrDecl):
+        """Process an ingredient declaration"""
         type_info = self._create_type_info(node.data_type, 0)
+        
+        # Add default value if not initialized
+        if not node.init_value:
+            node.init_value = self._create_default_value(node.data_type, 0)
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -175,6 +233,10 @@ class SymbolTableBuilder:
         """Process an array declaration"""
         dims = node.dimensions if node.dimensions is not None else 0
         type_info = self._create_type_info(node.data_type, dims)
+        
+        # Add default value if not initialized
+        if not node.init_value:
+            node.init_value = self._create_default_value(node.data_type, dims)
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -203,6 +265,10 @@ class SymbolTableBuilder:
             if dims > 0:
                 type_info.is_table = True
                 type_info.table_fields = table_type.table_fields
+            
+            # Add default value if not initialized (only for non-array table instances)
+            if not node.init_value and dims == 0:
+                node.init_value = self._create_default_table_value(table_type)
         else:
             type_info = TypeInfo(node.table_type, dims)
         
@@ -220,7 +286,7 @@ class SymbolTableBuilder:
     def _process_platter(self, node: Platter):
         """Process a block/compound statement"""
         for decl in node.local_decls:
-            if isinstance(decl, VarDecl):
+            if isinstance(decl, IngrDecl):
                 self._process_var_decl(decl)
             elif isinstance(decl, ArrayDecl):
                 self._process_array_decl(decl)
@@ -232,15 +298,15 @@ class SymbolTableBuilder:
     
     def _process_statement(self, node: ASTNode):
         """Process a statement"""
-        if isinstance(node, IfStatement):
+        if isinstance(node, CheckStatement):
             self._process_if_statement(node)
-        elif isinstance(node, SwitchStatement):
+        elif isinstance(node, MenuStatement):
             self._process_switch_statement(node)
-        elif isinstance(node, WhileLoop):
+        elif isinstance(node, RepeatLoop):
             self._process_while_loop(node)
-        elif isinstance(node, DoWhileLoop):
+        elif isinstance(node, OrderRepeatLoop):
             self._process_do_while_loop(node)
-        elif isinstance(node, ForLoop):
+        elif isinstance(node, PassLoop):
             self._process_for_loop(node)
         elif isinstance(node, Platter):
             self.symbol_table.enter_scope("block")
@@ -249,13 +315,13 @@ class SymbolTableBuilder:
         elif isinstance(node, Assignment):
             self._track_expression_usage(node.target)
             self._track_expression_usage(node.value)
-        elif isinstance(node, ReturnStatement):
+        elif isinstance(node, ServeStatement):
             if node.value:
                 self._track_expression_usage(node.value)
         elif isinstance(node, ExpressionStatement):
             self._track_expression_usage(node.expr)
     
-    def _process_if_statement(self, node: IfStatement):
+    def _process_if_statement(self, node: CheckStatement):
         """Process if statement - use Platter syntax: check/alt/instead"""
         # Track condition expression usage
         self._track_expression_usage(node.condition)
@@ -275,9 +341,9 @@ class SymbolTableBuilder:
             self._process_platter(node.else_block)
             self.symbol_table.exit_scope()
     
-    def _process_switch_statement(self, node: SwitchStatement):
-        """Process switch statement - use Platter syntax: menu/choice"""
-        # Track switch expression usage
+    def _process_switch_statement(self, node: MenuStatement):
+        """Process menu statement - use Platter syntax: menu/choice/usual"""
+        # Track menu expression usage
         self._track_expression_usage(node.expr)
         
         for i, case in enumerate(node.cases):
@@ -287,12 +353,12 @@ class SymbolTableBuilder:
             self.symbol_table.exit_scope()
         
         if node.default:
-            self.symbol_table.enter_scope("default")
+            self.symbol_table.enter_scope("usual")
             for stmt in node.default:
                 self._process_statement(stmt)
             self.symbol_table.exit_scope()
     
-    def _process_while_loop(self, node: WhileLoop):
+    def _process_while_loop(self, node: RepeatLoop):
         """Process while loop - use Platter syntax: repeat"""
         self.symbol_table.in_loop += 1
         # Track condition expression usage
@@ -303,7 +369,7 @@ class SymbolTableBuilder:
         self.symbol_table.exit_scope()
         self.symbol_table.in_loop -= 1
     
-    def _process_do_while_loop(self, node: DoWhileLoop):
+    def _process_do_while_loop(self, node: OrderRepeatLoop):
         """Process do-while loop - use Platter syntax: order_repeat"""
         self.symbol_table.in_loop += 1
         self.symbol_table.enter_scope("order_repeat")
@@ -313,7 +379,7 @@ class SymbolTableBuilder:
         self._track_expression_usage(node.condition)
         self.symbol_table.in_loop -= 1
     
-    def _process_for_loop(self, node: ForLoop):
+    def _process_for_loop(self, node: PassLoop):
         """Process for loop - use Platter syntax: pass"""
         self.symbol_table.in_loop += 1
         
@@ -397,15 +463,15 @@ class SymbolTableBuilder:
         elif isinstance(expr, TableAccess):
             self._track_expression_usage(expr.table)
         
-        elif isinstance(expr, FunctionCall):
-            # Track function name usage
+        elif isinstance(expr, RecipeCall):
+            # Track recipe name usage
             symbol = self.symbol_table.lookup_symbol(expr.name)
             if symbol:
                 declared_scope = self._find_declaring_scope(symbol.name)
                 if declared_scope:
                     symbol.add_usage(self.symbol_table.current_scope.name, declared_scope.name)
             else:
-                # Function not declared - track as undeclared but accessed
+                # Recipe not declared - track as undeclared but accessed
                 if expr.name not in self.symbol_table.undeclared_symbols:
                     undeclared_symbol = Symbol(
                         name=expr.name,
@@ -423,7 +489,7 @@ class SymbolTableBuilder:
                 current_scope_name = self.symbol_table.current_scope.name
                 if current_scope_name not in undeclared_symbol.accessed_in_scopes:
                     undeclared_symbol.accessed_in_scopes.append(current_scope_name)
-            # Track arguments
+            # Track flavors (arguments)
             for arg in expr.args:
                 self._track_expression_usage(arg)
         
@@ -435,7 +501,7 @@ class SymbolTableBuilder:
                 self._track_expression_usage(elem)
         
         elif isinstance(expr, TableLiteral):
-            for field_name, value in expr.field_inits:
+            for field_name, value, line, col in expr.field_inits:
                 self._track_expression_usage(value)
     
     def _find_declaring_scope(self, symbol_name: str) -> Optional[Scope]:
