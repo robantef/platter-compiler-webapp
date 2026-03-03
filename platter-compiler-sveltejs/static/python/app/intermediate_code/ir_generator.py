@@ -222,7 +222,10 @@ class IRGenerator:
         """Generate IR for platter (block statement)"""
         # Local declarations
         for decl in node.local_decls:
-            self.visit_declaration(decl)
+            if isinstance(decl, (VarDecl, ArrayDecl, TablePrototype, TableDecl)):
+                self.visit_declaration(decl)
+            else:
+                self.visit_statement(decl)
         
         # Statements
         for stmt in node.statements:
@@ -528,6 +531,20 @@ class IRGenerator:
     
     def visit_expression_statement(self, node: ExpressionStatement):
         """Generate IR for expression statement"""
+        # For array-transforming built-ins used as statements, write result back
+        # to the first argument so calls like append(arr, x); update arr.
+        if isinstance(node.expr, FunctionCall):
+            result_temp = self.visit_function_call(node.expr)
+            if (
+                node.expr.name in {"append", "remove", "sort", "reverse"}
+                and len(node.expr.args) >= 1
+                and isinstance(node.expr.args[0], Identifier)
+            ):
+                target_name = node.expr.args[0].name
+                self.emit_tac(TACAssignment(target_name, result_temp))
+                self.emit_quad("=", result_temp, None, target_name)
+            return
+
         self.visit_expression(node.expr)
     
     # =========================================================================

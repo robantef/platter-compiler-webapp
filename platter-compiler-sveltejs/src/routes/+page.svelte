@@ -240,10 +240,7 @@ start() {
 			'/python/app/lexer/char_com.py',
 			'/python/app/lexer/lexer.py',
 			'/python/app/parser/__init__.py',
-			'/python/app/parser/ast_nodes.py',
-			'/python/app/parser/ast_reader.py',
 			'/python/app/parser/error_handler.py',
-			'/python/app/parser/predict_set_m.py',
 			'/python/app/parser/predict_set.py',
 			'/python/app/parser/parser_program.py',
 			'/python/app/utils/FileHandler.py',
@@ -283,6 +280,9 @@ start() {
 		// Fetch and write Python files to Pyodide's virtual filesystem
 		for (const file of pythonFiles) {
 			const response = await fetch(`${data.basePath}${file}`);
+			if (!response.ok) {
+				throw new Error(`Failed to load Python file: ${file} (HTTP ${response.status})`);
+			}
 			const content = await response.text();
 			const path = file.replace('/python/', '');
 				
