@@ -273,6 +273,31 @@ class BinaryOp(ASTNode):
         self.left = left
         self.operator = operator  # "+", "-", "*", "/", "%", "==", "!=", ">", "<", ">=", "<=", "and", "or"
         self.right = right
+        
+        # Auto-rotate tree to fix right-associativity issues from LL(1) grammar
+        precedence = {
+            "or": 0, "and": 1, 
+            "==": 2, "!=": 2,
+            "<": 3, ">": 3, "<=": 3, ">=": 3,
+            "+": 4, "-": 4,
+            "*": 5, "/": 5, "%": 5
+        }
+        
+        while isinstance(self.right, BinaryOp):
+            my_prec = precedence.get(self.operator, -1)
+            right_prec = precedence.get(self.right.operator, -1)
+            
+            # If our operator binds tighter than or equal to the right operator, rotate left!
+            if my_prec >= right_prec and right_prec != -1:
+                # new left child is our original operator with the right's left child
+                new_left = BinaryOp(self.left, self.operator, self.right.left, self.line, self.column)
+                
+                # We become the right operator's identity
+                self.operator = self.right.operator
+                self.left = new_left
+                self.right = self.right.right
+            else:
+                break
     
     def __repr__(self):
         return f"BinaryOp({self.operator})"

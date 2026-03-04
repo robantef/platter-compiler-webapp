@@ -354,6 +354,8 @@ class SymbolTableBuilder:
                 self._process_array_decl(decl)
             elif isinstance(decl, TableDecl):
                 self._process_table_decl(decl)
+            else:
+                self._process_statement(decl)
         
         for stmt in node.statements:
             self._process_statement(stmt)

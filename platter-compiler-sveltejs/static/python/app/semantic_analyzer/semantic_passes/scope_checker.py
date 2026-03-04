@@ -137,6 +137,8 @@ class ScopeChecker:
                 self._check_array_decl(decl)
             elif isinstance(decl, TableDecl):
                 self._check_table_decl(decl)
+            else:
+                self._check_statement(decl)
         
         # Check statements
         for stmt in node.statements:
