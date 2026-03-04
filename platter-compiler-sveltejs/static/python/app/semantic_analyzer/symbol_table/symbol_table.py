@@ -20,7 +20,7 @@ class SymbolTable:
             'check': 0, 'alt': 0, 'instead': 0,
             'pass': 0, 'repeat': 0, 'order_repeat': 0,
             'menu': 0, 'choice': 0, 'usual': 0,
-            'block': 0, 'start_platter': 0
+            'block': 0
         }
         self.table_types: Dict[str, TypeInfo] = {}
         self.current_function: Optional[Symbol] = None              

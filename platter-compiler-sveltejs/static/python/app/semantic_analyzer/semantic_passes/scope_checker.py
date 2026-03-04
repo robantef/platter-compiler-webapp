@@ -176,8 +176,11 @@ class ScopeChecker:
             self._check_platter(node.body)
             self._check_expression(node.condition)
         elif isinstance(node, PassLoop):
+            # Check init, condition, and update expressions
+            # Note: In PassLoop, these should be in the loop's scope (unlike RepeatLoop where condition is outside)
+            # But the symbol table builder tracks them, so we just validate them here
             if node.init:
-                if isinstance(node.init, Assignment):
+                if isinstance(node.init, Assignment):  
                     self._check_expression(node.init.target)
                     self._check_expression(node.init.value)
             if node.condition:
