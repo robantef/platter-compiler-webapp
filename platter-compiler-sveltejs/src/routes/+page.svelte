@@ -622,7 +622,8 @@ try:
         print("SEMANTIC ERROR DETAILS WITH POSITIONS")
         print("="*80)
         
-        for err in error_handler.get_errors():
+        sorted_errors = sorted(error_handler.get_errors(), key=lambda e: 0 if getattr(e.severity, "name", "") == "ERROR" else 1)
+        for err in sorted_errors:
             error_list.append(str(err))
             # Format each error without emojis
             severity_label = "ERROR" if err.severity.name == "ERROR" else "WARNING"
