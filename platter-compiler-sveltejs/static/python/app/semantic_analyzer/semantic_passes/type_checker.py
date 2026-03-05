@@ -582,6 +582,69 @@ class TypeChecker:
         
         return operand_type
     
+    def _evaluate_constant_expr(self, expr: ASTNode) -> Optional[int]:
+        """Evaluate constant expressions to integer values.
+        
+        Returns:
+            Integer value if expression is constant, None otherwise
+        """
+        if isinstance(expr, Literal) and expr.value_type == "piece":
+            try:
+                return int(expr.value)
+            except (ValueError, TypeError):
+                return None
+        
+        elif isinstance(expr, UnaryOp):
+            # Handle unary operators
+            operand_value = self._evaluate_constant_expr(expr.operand)
+            if operand_value is None:
+                return None
+            
+            if expr.operator == "-":
+                return -operand_value
+            elif expr.operator == "not":
+                return None  # "not" is for boolean, not integer
+            else:
+                return None
+        
+        elif isinstance(expr, Identifier):
+            # Look up the symbol and check if it has a constant initialization
+            symbol = self.symbol_table.lookup_symbol(expr.name)
+            if symbol and symbol.declaration_node:
+                # Check if it's a variable with an initialization value
+                if hasattr(symbol.declaration_node, 'init_value') and symbol.declaration_node.init_value:
+                    # Recursively evaluate the initialization expression
+                    return self._evaluate_constant_expr(symbol.declaration_node.init_value)
+            return None
+        
+        elif isinstance(expr, BinaryOp):
+            # Handle binary operators for completeness
+            left_value = self._evaluate_constant_expr(expr.left)
+            right_value = self._evaluate_constant_expr(expr.right)
+            
+            if left_value is None or right_value is None:
+                return None
+            
+            # Perform the operation
+            if expr.operator == "+":
+                return left_value + right_value
+            elif expr.operator == "-":
+                return left_value - right_value
+            elif expr.operator == "*":
+                return left_value * right_value
+            elif expr.operator == "/":
+                if right_value == 0:
+                    return None
+                return left_value // right_value  # Integer division
+            elif expr.operator == "%":
+                if right_value == 0:
+                    return None
+                return left_value % right_value
+            else:
+                return None
+        
+        return None
+    
     def _get_array_access_type(self, node: ArrayAccess) -> Optional[TypeInfo]:
         """Get type of array access"""
         array_type = self._get_expression_type(node.array)
@@ -608,24 +671,26 @@ class TypeChecker:
             return None
         
         # Bounds checking for constant indices
-        # Only check bounds when we have explicit size information
-        if isinstance(node.index, Literal) and node.index.value_type == "piece":
-            try:
-                index_value = int(node.index.value)
-                # Get the array size if available
-                if array_type.array_sizes and len(array_type.array_sizes) > 0:
-                    array_size = array_type.array_sizes[0]
-                    if index_value < 0 or index_value >= array_size:
-                        self.error_handler.add_error(
-                            f"Array index {index_value} out of bounds (array size: {array_size})",
-                            node.index,
-                            ErrorCodes.ARRAY_OUT_OF_BOUNDS
-                        )
-                # If no size information, skip bounds checking
-                # Arrays can be initialized at various points (literals, table instantiation, etc.)
-            except (ValueError, TypeError):
-                # If we can't convert to int, skip bounds checking
-                pass
+        # Try to evaluate the index as a constant expression
+        index_value = self._evaluate_constant_expr(node.index)
+        
+        if index_value is not None:
+            # Check for negative index (always invalid)
+            if index_value < 0:
+                self.error_handler.add_error(
+                    f"Array index cannot be negative: {index_value}",
+                    node.index,
+                    ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                )
+            # Check for out of bounds if we have size information
+            elif array_type.array_sizes and len(array_type.array_sizes) > 0:
+                array_size = array_type.array_sizes[0]
+                if index_value >= array_size:
+                    self.error_handler.add_error(
+                        f"Array index {index_value} out of bounds (array size: {array_size})",
+                        node.index,
+                        ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                    )
         
         # Return element type
         return array_type.get_element_type()

@@ -1,0 +1,6 @@
+piece[] of y = [1, 2, 3];
+piece of x = -1;
+
+start() {
+    y[x] = 1;
+}

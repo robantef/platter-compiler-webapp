@@ -1,0 +1,7 @@
+piece of c = 1;
+
+start(){
+    piece of a = 5;
+    piece of b = c;
+    piece of c = 1;
+}

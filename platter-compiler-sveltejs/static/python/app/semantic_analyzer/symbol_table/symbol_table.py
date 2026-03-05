@@ -67,8 +67,22 @@ class SymbolTable:
                      declaration_node: ASTNode = None) -> bool:
         """Define a symbol in current scope"""
         
-        # Allow shadowing of table prototypes with variables in local scopes
-        # Table prototypes are in a separate namespace and can be shadowed
+        # Check for shadowing + forward reference:
+        # If a parent scope has this symbol AND it was accessed in current scope,
+        # then we're both shadowing and using before local declaration
+        if kind != SymbolKind.TABLE_TYPE:
+            parent_symbol = self._lookup_in_parent_scopes(name)
+            if parent_symbol and parent_symbol.kind != SymbolKind.TABLE_TYPE:
+                # Check if this parent symbol was accessed from the current scope
+                if self.current_scope.name in parent_symbol.accessed_in_scopes:
+                    if self.error_handler:
+                        parent_scope_name = parent_symbol.declared_scope.name if parent_symbol.declared_scope else "parent scope"
+                        self.error_handler.add_error(
+                            f"Symbol '{name}' shadows declaration from '{parent_scope_name}'",
+                            declaration_node,
+                            "E003"  # SHADOWING error code
+                        )
+                    return False
         
         symbol = Symbol(name, kind, type_info, self.current_scope.level, declaration_node, self.current_scope)
         
@@ -114,6 +128,15 @@ class SymbolTable:
         
         # Then check user-defined symbols
         return self.current_scope.lookup(name)
+    
+    def _lookup_in_parent_scopes(self, name: str) -> Optional[Symbol]:
+        """Look up symbol in parent scopes only (not current scope)"""
+        scope = self.current_scope.parent
+        while scope:
+            if name in scope.symbols:
+                return scope.symbols[name]
+            scope = scope.parent
+        return None
     
     def is_builtin_recipe(self, name: str) -> bool:
         """Check if a name is a built-in recipe"""

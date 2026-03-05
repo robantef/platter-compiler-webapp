@@ -158,7 +158,8 @@ class ErrorCodes:
     # Scope/Symbol Table errors (E0XX)
     DUPLICATE_SYMBOL = "E001"
     UNDEFINED_SYMBOL = "E002"
-    SHADOWING_SYMBOL = "W001"
+    SHADOWING = "E003"
+    SHADOWING_SYMBOL = "W001"  # deprecated, use SHADOWING
     
     # Type errors (E1XX)
     TYPE_MISMATCH = "E101"
