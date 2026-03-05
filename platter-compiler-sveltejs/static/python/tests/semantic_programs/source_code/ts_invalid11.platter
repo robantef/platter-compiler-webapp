@@ -1,0 +1,4 @@
+prepare piece of add(){
+    serve "invalid type";
+}
+start() {}

@@ -20,11 +20,12 @@ class SymbolKind(Enum):
 class TypeInfo:
     """Represents type information including arrays and nested structures"""
     
-    def __init__(self, base_type: str, dimensions: int = 0, table_fields: Optional[Dict[str, 'TypeInfo']] = None):
+    def __init__(self, base_type: str, dimensions: int = 0, table_fields: Optional[Dict[str, 'TypeInfo']] = None, array_sizes: Optional[List[int]] = None):
         self.base_type = base_type
         self.dimensions = dimensions if dimensions is not None else 0
         self.table_fields = table_fields or {}
         self.is_table = table_fields is not None
+        self.array_sizes = array_sizes or []  # List of sizes for each dimension (outermost first)
     
     def __repr__(self):
         dims = f"{'[]' * self.dimensions}" if self.dimensions > 0 else ""
@@ -108,12 +109,135 @@ class Symbol:
         self.is_initialized = False
         self.usages = []  # List of scope names where this symbol is accessed
         self.accessed_in_scopes = []  # Track unique scope names where accessed
+        self.value = None  # Store the computed default value for display
     
     def add_usage(self, scope_name: str, declared_scope_name: str):
         """Record that this symbol was accessed in a given scope (only if different from declaration scope)"""
         # Only record if accessed in a different scope than where it was declared
         if scope_name != declared_scope_name and scope_name not in self.accessed_in_scopes:
             self.accessed_in_scopes.append(scope_name)
+    
+    def compute_default_value(self, table_types: Dict[str, TypeInfo] = None):
+        """Compute and set the default value based on type and kind"""
+        table_types = table_types or {}
+        
+        # For recipes, return default value of return type
+        if self.kind == SymbolKind.FUNCTION:
+            self.value = self._get_type_default(self.type_info, table_types)
+            return self.value
+        
+        # For table prototypes, return field structure
+        if self.kind == SymbolKind.TABLE_TYPE:
+            fields = []
+            for field_name, field_type in self.type_info.table_fields.items():
+                dims_str = '[]' * field_type.dimensions if field_type.dimensions > 0 else ''
+                fields.append(f"{field_name}: {field_type.base_type}{dims_str}")
+            self.value = "{ " + ", ".join(fields) + " }"
+            return self.value
+        
+        # For variables/parameters, check if initialized
+        if self.declaration_node and hasattr(self.declaration_node, 'init_value'):
+            init_value = self.declaration_node.init_value
+            if init_value:
+                self.value = self._extract_value_from_node(init_value, table_types)
+                return self.value
+        
+        # Return type default for uninitialized variables
+        self.value = self._get_type_default(self.type_info, table_types)
+        return self.value
+    
+    def _get_type_default(self, type_info: TypeInfo, table_types: Dict[str, TypeInfo]) -> str:
+        """Get default value string for a type"""
+        # Arrays
+        if type_info.dimensions > 0:
+            return f"[{type_info.base_type}]" + '[]' * (type_info.dimensions - 1)
+        
+        # Table instances
+        if type_info.is_table and type_info.table_fields:
+            fields = []
+            for field_name, field_type in type_info.table_fields.items():
+                default_val = self._get_type_default(field_type, table_types)
+                fields.append(f"{field_name}: {default_val}")
+            return "{ " + ", ".join(fields) + " }"
+        
+        # Primitives
+        if type_info.base_type == "piece":
+            return "0"
+        elif type_info.base_type == "sip":
+            return "0.0"
+        elif type_info.base_type == "chars":
+            return '""'
+        elif type_info.base_type == "flag":
+            return "down"
+        else:
+            # Unknown or custom types
+            return "-"
+    
+    def _extract_value_from_node(self, node, table_types: Dict[str, TypeInfo]) -> str:
+        """Extract value from an AST node"""
+        from app.semantic_analyzer.ast.ast_nodes import Literal, ArrayLiteral, TableLiteral, Identifier, BinaryOp
+        
+        if isinstance(node, Literal):
+            val = node.value
+            # Convert based on value_type since tokens store everything as strings
+            if node.value_type == "piece":
+                # Numeric integer
+                return str(val)  # Already a string from token, just return as-is
+            elif node.value_type == "sip":
+                # Numeric float
+                return str(val)  # Already a string from token
+            elif node.value_type == "chars":
+                # String literal - check if value already includes quotes
+                # Lexer tokens have quotes: '"hello"'
+                # Programmatically created literals don't: "hello"
+                if val and val[0] == '"' and val[-1] == '"':
+                    return str(val)  # Already has quotes
+                else:
+                    return f'"{val}"'  # Add quotes
+            elif node.value_type == "flag":
+                # Boolean - convert "up"/"down" or True/False to up/down
+                if isinstance(val, bool):
+                    return "up" if val else "down"
+                elif isinstance(val, str):
+                    # Token value is "up" or "down"
+                    return val
+                else:
+                    return "up" if val else "down"
+            else:
+                # Unknown type
+                return str(val)
+        
+        elif isinstance(node, ArrayLiteral):
+            if not node.elements:
+                # Empty array - show element type
+                elem_type = self.type_info.get_element_type()
+                if elem_type:
+                    return f"[{elem_type.base_type}]"
+                return "[]"
+            else:
+                # Show array with count
+                elem_type = self.type_info.get_element_type()
+                if elem_type:
+                    return f"[{len(node.elements)} × {elem_type.base_type}]"
+                return f"[{len(node.elements)}]"
+        
+        elif isinstance(node, TableLiteral):
+            fields = []
+            for field_name, value, line, col in node.field_inits:
+                val_str = self._extract_value_from_node(value, table_types)
+                fields.append(f"{field_name}: {val_str}")
+            return "{ " + ", ".join(fields) + " }"
+        
+        elif isinstance(node, Identifier):
+            return f"@{node.name}"
+        
+        elif isinstance(node, BinaryOp):
+            # For expressions, show the result type
+            return f"<{self.type_info.base_type}>"
+        
+        else:
+            # Other expressions
+            return f"<{self.type_info.base_type}>"
     
     def __repr__(self):
         return f"Symbol({self.name}: {self.type_info}, kind={self.kind.value}, level={self.scope_level})"

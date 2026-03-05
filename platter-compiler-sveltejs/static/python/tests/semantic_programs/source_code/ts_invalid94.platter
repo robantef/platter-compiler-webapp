@@ -1,0 +1,8 @@
+table of Student = [
+        chars of name;
+        piece of name;
+    ];
+
+    start(){
+        bill("done");
+    }

@@ -1,0 +1,6 @@
+start(){
+flag of a = up, b = down, c = not up, d = up;
+flag of result;
+result = (a or b) and not (c and (not d or 
+(a and not b))) or ((a == c) and (d != b));
+}

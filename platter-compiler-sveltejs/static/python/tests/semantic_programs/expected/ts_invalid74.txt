@@ -1,0 +1,2 @@
+Semantic analysis failed with 1 error(s) and 0 warning(s)
+[ERROR] Type mismatch in assignment: cannot assign piece to Student[]

@@ -1,0 +1,6 @@
+prepare piece of sum(piece of a, piece of b){
+    serve a + b;
+}
+start() {
+    piece of x = sum(1);
+}

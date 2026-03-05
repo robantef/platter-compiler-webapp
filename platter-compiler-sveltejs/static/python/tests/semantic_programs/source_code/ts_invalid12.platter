@@ -1,0 +1,7 @@
+prepare sip of returnsSip() {
+    serve 1.1;
+}
+prepare piece of add(){
+    serve returnsSip();
+}
+start() {}

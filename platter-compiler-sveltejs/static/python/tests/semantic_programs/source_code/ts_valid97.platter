@@ -1,0 +1,6 @@
+start(){
+    piece of i = 0;
+    repeat(i < 3){
+        i += 1;
+    }
+}

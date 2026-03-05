@@ -1,0 +1,33 @@
+piece of i, n = 29;
+flag of isPrime = up;
+    
+prepare piece of print(flag of isPrime) {
+        check(isPrime == up) {
+        bill(tochars(n) + " is prime");
+    } instead {
+        bill(tochars(n) + " is not prime");
+    }
+    serve 0;
+}
+
+start() {
+
+    # Numbers <= 1 are not prime
+    check(n <= 1) {
+        isPrime = down;
+    } instead {
+        piece of i = 2; # syntax error
+
+        # Test divisors from 2 to n-1
+        repeat(i < n) {
+            check(n % i == 0) {
+                isPrime = down;
+                i = n;          # exit loop
+            } instead {
+                i = i + 1;
+            }
+        }
+    }
+    
+    print(isPrime);
+}

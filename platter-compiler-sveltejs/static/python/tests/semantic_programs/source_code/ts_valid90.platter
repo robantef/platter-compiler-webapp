@@ -1,0 +1,5 @@
+start(){
+    piece[][] of m = [[1, 2], [3, 4]];
+    piece of x = m[1][0];
+    bill(tochars(x));
+}

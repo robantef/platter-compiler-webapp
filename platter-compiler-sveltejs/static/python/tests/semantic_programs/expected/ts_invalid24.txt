@@ -1,0 +1,4 @@
+Semantic analysis failed with 1 error(s) and 2 warning(s)
+[WARNING] Unused ingredient 'a'
+[WARNING] Unused ingredient 'x'
+[ERROR] Recipe 'f' must have a guaranteed serve statement in all code paths

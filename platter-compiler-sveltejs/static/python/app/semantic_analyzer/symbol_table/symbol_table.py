@@ -20,7 +20,7 @@ class SymbolTable:
             'check': 0, 'alt': 0, 'instead': 0,
             'pass': 0, 'repeat': 0, 'order_repeat': 0,
             'menu': 0, 'choice': 0, 'usual': 0,
-            'block': 0, 'start_platter': 0
+            'block': 0
         }
         self.table_types: Dict[str, TypeInfo] = {}
         self.current_function: Optional[Symbol] = None              
@@ -66,7 +66,23 @@ class SymbolTable:
     def define_symbol(self, name: str, kind: SymbolKind, type_info: TypeInfo, 
                      declaration_node: ASTNode = None) -> bool:
         """Define a symbol in current scope"""
+        
+        # Check for ID shadowing with table prototypes
+        if kind != SymbolKind.TABLE_TYPE:
+            # Check if this identifier conflicts with a table prototype
+            if name in self.table_types:
+                if self.error_handler:
+                    self.error_handler.add_error(
+                        f"Identifier '{name}' conflicts with table prototype of the same name",
+                        declaration_node,
+                        "E208"
+                    )
+                return False
+        
         symbol = Symbol(name, kind, type_info, self.current_scope.level, declaration_node, self.current_scope)
+        
+        # Compute default value for display
+        symbol.compute_default_value(self.table_types)
         
         if not self.current_scope.define(symbol):
             if self.error_handler:
@@ -83,6 +99,9 @@ class SymbolTable:
     
     def add_symbol(self, name: str, symbol: Symbol) -> bool:
         """Add a pre-created symbol to current scope"""
+        # Compute default value for display
+        symbol.compute_default_value(self.table_types)
+        
         if not self.current_scope.define(symbol):
             if self.error_handler:
                 self.error_handler.add_error(
@@ -113,6 +132,9 @@ class SymbolTable:
         """Register a built-in recipe overload (allows multiple signatures)"""
         if name not in self.builtin_recipes:
             self.builtin_recipes[name] = []
+        
+        # Compute default value for display
+        symbol.compute_default_value(self.table_types)
         
         # Check for duplicate signature
         for existing in self.builtin_recipes[name]:

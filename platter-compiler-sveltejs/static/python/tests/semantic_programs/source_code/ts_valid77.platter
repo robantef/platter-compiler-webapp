@@ -1,0 +1,9 @@
+table of Person = [
+    piece of age;
+];
+
+Person of p = [ age = 25; ];
+
+start() {
+    piece of x = p:name;
+}

@@ -1,0 +1,18 @@
+table of Student = [
+    chars of name;
+    piece of age;
+];
+
+prepare piece of one(Student of s){
+    serve s:age;
+}
+
+start(){
+    Student of cls = [
+            name = "digong";
+        age = "80";
+        
+    ];
+    piece of a = one(cls);
+    bill("done");
+}

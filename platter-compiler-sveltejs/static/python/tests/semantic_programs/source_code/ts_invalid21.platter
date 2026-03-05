@@ -1,0 +1,6 @@
+piece of x = 5, y = 3, z = 1;
+
+start(){
+flag of r;
+r = (x > y > z);
+}

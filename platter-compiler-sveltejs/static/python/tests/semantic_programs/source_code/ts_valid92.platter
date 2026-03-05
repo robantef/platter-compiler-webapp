@@ -1,0 +1,10 @@
+start(){
+    flag of x = up;
+    piece of a = 0;
+    check(x){
+        a = 1;
+    } instead {
+        a = 2;
+    }
+    bill(tochars(a));
+}

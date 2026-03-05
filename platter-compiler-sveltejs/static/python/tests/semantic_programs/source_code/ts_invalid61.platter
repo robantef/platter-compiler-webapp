@@ -1,0 +1,9 @@
+start() {
+    piece of x = 1;
+    menu(x) {
+        choice 1:
+            bill("one");
+        choice 1:
+            bill("one");
+    }
+}

@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'cls'
+[ERROR] Field 'name' type mismatch: expected chars, got piece

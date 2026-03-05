@@ -1,0 +1,20 @@
+table of Data = [
+    piece of x;
+    chars of y;
+    sip of z;
+    flag of f;
+];
+
+prepare Data of getData(Data of x) {
+    serve x;
+}
+
+start() {
+    Data of x;
+    x:x = 1;
+    x:y = "Raphael";
+    x:z = 1.1;
+    x:f = up;
+    
+    getData(x);
+}

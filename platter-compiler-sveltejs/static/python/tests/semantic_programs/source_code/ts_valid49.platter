@@ -1,0 +1,11 @@
+table of Data = [
+    piece of x;
+];
+
+prepare Data of getData(Data of x) {
+    serve x;
+}
+
+start() {
+    getData([]);
+}

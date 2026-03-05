@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'cls'
+[ERROR] Type mismatch in table literal: field 'age' expects piece, got chars

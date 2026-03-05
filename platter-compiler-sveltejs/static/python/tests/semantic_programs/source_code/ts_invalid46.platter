@@ -1,0 +1,11 @@
+table of Data = [
+    piece of x;
+    chars of y;
+    sip of z;
+    flag of f;
+];
+
+start() {
+    Data of x;
+    x:x = 1.1;
+}

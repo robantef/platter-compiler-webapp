@@ -1,0 +1,5 @@
+start() {
+    Data of x = [
+        y = "Non existent";
+    ];
+}

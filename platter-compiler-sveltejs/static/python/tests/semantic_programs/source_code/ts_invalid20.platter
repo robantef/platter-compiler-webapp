@@ -1,0 +1,4 @@
+start() {
+    piece of x;
+    x = (5 > 3) + 4;
+}

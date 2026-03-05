@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'names'
+[ERROR] Type mismatch in array 'names' initialization: expected chars[], got unknown[][]

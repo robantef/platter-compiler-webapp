@@ -1,0 +1,6 @@
+start(){
+
+    chars[] of nums = ["1", "2", "3"];
+    
+    piece of a = topiece(nums);   
+}

@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'x'
+[ERROR] Flavor 1 of recipe 'add': expected piece, got flag

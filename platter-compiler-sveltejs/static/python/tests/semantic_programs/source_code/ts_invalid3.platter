@@ -1,0 +1,6 @@
+prepare piece of userDefined() {
+    piece of x;
+    piece of x;
+    serve 0;
+}
+start() {}

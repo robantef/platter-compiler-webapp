@@ -1,0 +1,36 @@
+table of Data = [
+    piece of count;
+    sip of ratio;
+    piece[] of what;
+];
+
+Data[] of aot;
+
+Data of d = [
+    count = 5;
+    ratio = 5.0;
+    what = [1,2,3,4,5];
+];
+
+Data of e = [
+    count = 4;
+    ratio = 4.0;
+    what = [1,2,3,4,5];
+];
+
+
+start(){
+        aot = [d,e];
+        check(d:count > topiece(d:ratio)) {
+            
+        bill("success");
+    } 
+    alt(d:count==topiece(d:what[4])){
+    bill("equal");
+    
+    }
+    instead {
+            bill("fail");
+    }
+    bill(tochars(aot[0]:count) +  " "+ tochars(aot[1]:count)); # array of tablle of array
+}

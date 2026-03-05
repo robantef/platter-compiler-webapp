@@ -1,0 +1,16 @@
+table of Student = [
+    chars of name;
+    piece of age;
+];
+
+Student of s = [
+    name = "Ana";
+    age = 20;
+];
+
+piece of y;
+
+start(){
+    s:age = 21;
+    y = s:age;
+}

@@ -1,0 +1,13 @@
+table of Student = [
+    chars of name;
+    piece of age;
+];
+
+prepare piece of count(Student[] of cls){
+    serve 0;
+}
+
+start(){
+    piece of a = count(1);
+    bill("done");
+}

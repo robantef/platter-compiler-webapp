@@ -1,0 +1,4 @@
+start(){
+ piece of a=3;
+ piece of b=((a+(a+(a+(a)))));
+}

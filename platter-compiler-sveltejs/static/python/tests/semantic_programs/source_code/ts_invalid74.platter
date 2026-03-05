@@ -1,0 +1,10 @@
+table of Student = [
+        chars of stud_name;
+    piece of age;
+];
+
+Student[] of blk1;
+
+start(){
+        blk1 = 1;
+}

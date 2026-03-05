@@ -36,7 +36,7 @@ class ScopeChecker:
         
         # Check start_platter if present (navigate to its existing scope)
         if ast_root.start_platter:
-            if self.symbol_table.navigate_to_scope("start_platter_1"):
+            if self.symbol_table.navigate_to_scope("start_platter"):
                 self._check_platter(ast_root.start_platter)
                 self.symbol_table.exit_scope()
         
@@ -137,6 +137,8 @@ class ScopeChecker:
                 self._check_array_decl(decl)
             elif isinstance(decl, TableDecl):
                 self._check_table_decl(decl)
+            else:
+                self._check_statement(decl)
         
         # Check statements
         for stmt in node.statements:
@@ -161,8 +163,7 @@ class ScopeChecker:
         elif isinstance(node, MenuStatement):
             self._check_expression(node.expr)
             for case in node.cases:
-                for value in case.values:
-                    self._check_expression(value)
+                self._check_expression(case.value)
                 for stmt in case.statements:
                     self._check_statement(stmt)
             if node.default:
@@ -175,8 +176,11 @@ class ScopeChecker:
             self._check_platter(node.body)
             self._check_expression(node.condition)
         elif isinstance(node, PassLoop):
+            # Check init, condition, and update expressions
+            # Note: In PassLoop, these should be in the loop's scope (unlike RepeatLoop where condition is outside)
+            # But the symbol table builder tracks them, so we just validate them here
             if node.init:
-                if isinstance(node.init, Assignment):
+                if isinstance(node.init, Assignment):  
                     self._check_expression(node.init.target)
                     self._check_expression(node.init.value)
             if node.condition:

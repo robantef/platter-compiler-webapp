@@ -1,0 +1,39 @@
+DEBUG ASSIGN LINE 12: target=piece[], value_node=<class 'app.semantic_analyzer.ast.ast_nodes.RecipeCall'>, value_type=piece, expected target_type=piece[]
+DEBUG ASSIGN LINE 18: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.BinaryOp'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 23: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 23: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 28: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Identifier'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 28: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 32: target=piece[], value_node=<class 'app.semantic_analyzer.ast.ast_nodes.RecipeCall'>, value_type=piece[], expected target_type=piece[]
+DEBUG ASSIGN LINE 33: target=piece[], value_node=<class 'app.semantic_analyzer.ast.ast_nodes.RecipeCall'>, value_type=piece[], expected target_type=piece[]
+DEBUG ASSIGN LINE 35: target=piece[], value_node=<class 'app.semantic_analyzer.ast.ast_nodes.RecipeCall'>, value_type=piece[], expected target_type=piece[]
+DEBUG ASSIGN LINE 43: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 44: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 47: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 47: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 50: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 54: target=piece, value_node=<class 'app.semantic_analyzer.ast.ast_nodes.Literal'>, value_type=piece, expected target_type=piece
+DEBUG ASSIGN LINE 64: target=piece[], value_node=<class 'app.semantic_analyzer.ast.ast_nodes.ArrayLiteral'>, value_type=piece[], expected target_type=piece[]
+DEBUG ASSIGN LINE 65: target=piece[], value_node=<class 'app.semantic_analyzer.ast.ast_nodes.RecipeCall'>, value_type=piece[], expected target_type=piece[]
+Statements inside Platter:
+Recipe: mergeSort
+  Return Type: piece
+  Return Dims: 1
+Recipe: merge
+  Return Type: piece
+  Return Dims: 1
+  Assignment:
+    target: <class 'app.semantic_analyzer.ast.ast_nodes.Identifier'> sorted None
+    value: <class 'app.semantic_analyzer.ast.ast_nodes.ArrayLiteral'> None
+  Assignment:
+    target: <class 'app.semantic_analyzer.ast.ast_nodes.Identifier'> sorted None
+    value: <class 'app.semantic_analyzer.ast.ast_nodes.RecipeCall'> mergeSort
+  <class 'app.semantic_analyzer.ast.ast_nodes.ServeStatement'>
+
+Global Symbols:
+  mergeSort -> piece[]
+  merge -> piece[]
+
+Used symbols: {'sortedLeft', 'mid', 'size', 'mergeSort', 'arr', 'merged', 'left', 'append', 'j', 'sortedRight', 'n', 'merge', 'k', 'result', 'i', 'right', 'sorted'}
+
+Errors: [[ERROR] [E101] Type mismatch in assignment: cannot assign piece to piece[] at line 35, column 5]

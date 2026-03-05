@@ -1,0 +1,8 @@
+prepare piece of add(piece of a, piece of b){
+    serve a + b;
+}
+
+start(){
+    piece of r = add(1);
+    bill("done");
+}

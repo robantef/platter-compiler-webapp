@@ -1,0 +1,4 @@
+flag of x;
+start() {
+    flag of y = x + x == x;
+}

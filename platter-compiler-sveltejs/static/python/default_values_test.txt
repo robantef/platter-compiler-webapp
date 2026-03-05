@@ -4,9 +4,9 @@
 │ a      │ piece         │ -    │ global   │ -        │ -          │ -    │ 0                           │
 │ b      │ sip           │ -    │ global   │ -        │ -          │ -    │ 0.0                         │
 │ c      │ chars         │ -    │ global   │ -        │ -          │ -    │ ""                          │
-│ d      │ flag          │ -    │ global   │ -        │ -          │ -    │ False                       │
-│ e      │ piece         │ 1    │ global   │ -        │ -          │ -    │ [0 × piece]                 │
-│ f      │ piece         │ 2    │ global   │ -        │ -          │ -    │ [0 × piece[]]               │
+│ d      │ flag          │ -    │ global   │ -        │ -          │ -    │ down                        │
+│ e      │ piece         │ 1    │ global   │ -        │ -          │ -    │ [piece]                     │
+│ f      │ piece         │ 2    │ global   │ -        │ -          │ -    │ [piece]                     │
 │ p1     │ →Person       │ -    │ global   │ -        │ -          │ -    │ { name: "", age: 0 }        │
 │ Person │ table<Person> │ -    │ global   │ -        │ -          │ -    │ { name: chars, age: piece } │
 └────────┴───────────────┴──────┴──────────┴──────────┴────────────┴──────┴─────────────────────────────┘

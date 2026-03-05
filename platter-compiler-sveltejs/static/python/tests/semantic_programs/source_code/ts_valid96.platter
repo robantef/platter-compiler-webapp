@@ -1,0 +1,10 @@
+prepare piece[] of make(){
+    piece[] of x = [1, 2, 3];
+    serve x;
+}
+
+start(){
+    piece[] of arr = make();
+    piece of v = arr[2];
+    bill(tochars(v));
+}

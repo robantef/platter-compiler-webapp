@@ -1,0 +1,14 @@
+table of Data = [
+    piece of count;
+    sip of ratio;
+];
+
+Data of d = [
+    count = 5;
+    ratio = 5.0;
+];
+
+start(){
+    repeat((((d:count) >= (d:ratio)))){
+        next;
+}}

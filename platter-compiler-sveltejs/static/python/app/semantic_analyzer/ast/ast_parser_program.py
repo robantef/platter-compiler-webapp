@@ -154,7 +154,7 @@ class ASTParser:
             node_1 = self.global_decl()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    7 <global_decl>	=>	id	<table_decl>	<global_decl>    """
@@ -1131,7 +1131,7 @@ class ASTParser:
             node_1 = self.flavor_tail()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    81 <flavor>	=>	    """
@@ -1197,12 +1197,22 @@ class ASTParser:
         elif self.tokens[self.pos].type in PREDICT_SET["<notation_val>_1"]:
             token_0 = self.tokens[self.pos]
             self.parse_token("id")
+            # Save previous context identifier to avoid clobbering in nested structures
+            saved_context_id = self._context_identifier
+            saved_context_line = self._context_identifier_line
+            saved_context_col = self._context_identifier_col
+            
             # Set identifier context for subsequent parsing
             self._context_identifier = token_0.value
             self._context_identifier_line = token_0.line
             self._context_identifier_col = token_0.col
             node_1 = self.array_or_table()
 
+            # Restore previous context after parsing nested structure
+            self._context_identifier = saved_context_id
+            self._context_identifier_line = saved_context_line
+            self._context_identifier_col = saved_context_col
+            
             return node_1
 
             """    87 <notation_val>	=>	    """
@@ -1267,7 +1277,13 @@ class ASTParser:
             node_3 = self.element_value_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1363,7 +1379,13 @@ class ASTParser:
             node_3 = self.element_piece_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1449,7 +1471,13 @@ class ASTParser:
             node_3 = self.element_sip_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1535,7 +1563,13 @@ class ASTParser:
             node_3 = self.element_chars_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1621,7 +1655,13 @@ class ASTParser:
             node_3 = self.element_flag_tail()
 
             # Collect: [ArrayLiteral($1)] + $3
-            result = [ArrayLiteral(node_1, token_0.line, token_0.col)] + node_3
+            # If node_1 is a TableLiteral, don't wrap it - use it as the element directly
+            if isinstance(node_1, TableLiteral):
+                result = [node_1] + node_3
+            else:
+                # Ensure node_1 is a list (wrap single nodes)
+                elements = node_1 if isinstance(node_1, list) else ([node_1] if node_1 is not None else [])
+                result = [ArrayLiteral(elements, token_0.line, token_0.col)] + node_3
             return result
 
         else: self.parse_token(self.error_arr)
@@ -1683,7 +1723,7 @@ class ASTParser:
             node_1 = self.element_table_tail()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
         else: self.parse_token(self.error_arr)
 
@@ -2263,7 +2303,7 @@ class ASTParser:
             node_1 = self.spice_tail()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    168 <spice>	=>	    """
@@ -2377,6 +2417,8 @@ class ASTParser:
             self._context_identifier = token_0.value
             self._context_identifier_line = token_0.line
             self._context_identifier_col = token_0.col
+            # Also set context type for table declarations
+            self._context_type = token_0.value
             node_1 = self.local_id_tail()
 
             # Collect: $1
@@ -2406,8 +2448,8 @@ class ASTParser:
             self.parse_token(";")
             node_3 = self.local_decl()
 
-            # Collect: [TableDecl(CONTEXT,$1)] + $3
-            result = [TableDecl(self._context_dimensions,node_1)] + node_3
+            # Collect: $1 + $3
+            result = node_1 + node_3
             return result
 
             """    179 <local_id_tail>	=>	[	<endsb_tail>    """
@@ -2422,6 +2464,11 @@ class ASTParser:
 
             """    180 <local_id_tail>	=>	<table_accessor>	<assignment_op>	<value>	;	<statements>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<local_id_tail>_2"]:
+            # Save context identifier before parsing value (to avoid overwriting by nested table literals)
+            saved_context_id = self._context_identifier
+            saved_context_line = self._context_identifier_line
+            saved_context_col = self._context_identifier_col
+            
             node_0 = self.table_accessor()
             node_1 = self.assignment_op()
             node_2 = self.value()
@@ -2429,8 +2476,9 @@ class ASTParser:
             self.parse_token(";")
             node_4 = self.statements()
 
+            # Restore context identifier for building assignment target
             # Collect: [Assignment(($0(Identifier(CONTEXT)) if $0 else Identifier(CONTEXT)), $1, $2)] + $4
-            base_id = Identifier(self._context_identifier, self._context_identifier_line, self._context_identifier_col)
+            base_id = Identifier(saved_context_id, saved_context_line, saved_context_col)
             result = [Assignment((node_0(base_id) if node_0 else base_id), node_1, node_2)] + node_4
             return result
 
@@ -2481,8 +2529,11 @@ class ASTParser:
             self.parse_token(";")
             node_6 = self.local_decl()
 
-            # Collect: [ArrayDecl(CONTEXT,$1,$3.value,$4)] + $6
-            result = [ArrayDecl(self._context_dimensions,node_1,token_3.value,node_4, token_3.line, token_3.col)] + node_6
+            # Calculate dimensions: 1 (for the already parsed []) + dimensions_tail result
+            # This matches how dimensions() calculates: 1 + (node_2 if node_2 else 0)
+            dims = 1 + (node_1 if node_1 else 0)
+            # Collect: [ArrayDecl(CONTEXT_TYPE, dims, $3.value,$4)] + $6
+            result = [ArrayDecl(self._context_type, dims, token_3.value, node_4, token_3.line, token_3.col)] + node_6
             return result
 
             """    184 <endsb_tail>	=>	<array_accessor_val>	<assignment_op>	<value>	;	<statements>    """
@@ -2585,7 +2636,7 @@ class ASTParser:
             node_1 = self.statements()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    194 <statements>	=>	<looping_st>	<statements>    """
@@ -2594,7 +2645,7 @@ class ASTParser:
             node_1 = self.statements()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    195 <statements>	=>	<jump_serve>	<statements>    """
@@ -2603,7 +2654,7 @@ class ASTParser:
             node_1 = self.statements()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    196 <statements>	=>	    """
@@ -3127,10 +3178,17 @@ class ASTParser:
             node_2 = self.strict_piece_chars_expr()
             token_3 = self.tokens[self.pos]
             self.parse_token(")")
-            node_4 = self.menu_platter()
+            
+            # Parse menu_platter manually to separate cases and default
+            token_bracket = self.tokens[self.pos]
+            self.parse_token("{")
+            cases = self.choice_clause()
+            default = self.usual_clause()
+            token_close_bracket = self.tokens[self.pos]
+            self.parse_token("}")
 
-            # Create MenuStatement node
-            node = MenuStatement(node_2, node_4, token_0.line, token_0.col)
+            # Create MenuStatement node with separated cases and default
+            node = MenuStatement(node_2, cases, default if default else None, token_0.line, token_0.col)
             return node
         else: self.parse_token(self.error_arr)
 
@@ -3223,7 +3281,7 @@ class ASTParser:
             node_1 = self.statements_menu()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    236 <statements_menu>	=>	<built_in_rec_call>	;	<statements_menu>    """
@@ -3243,7 +3301,7 @@ class ASTParser:
             node_1 = self.statements_menu()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    238 <statements_menu>	=>	<looping_st>	<statements_menu>    """
@@ -3252,7 +3310,7 @@ class ASTParser:
             node_1 = self.statements_menu()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    239 <statements_menu>	=>	<jump_stop>	<statements_menu>    """
@@ -3261,7 +3319,7 @@ class ASTParser:
             node_1 = self.statements_menu()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    240 <statements_menu>	=>	<jump_serve>	<statements_menu>    """
@@ -3270,7 +3328,7 @@ class ASTParser:
             node_1 = self.statements_menu()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    241 <statements_menu>	=>	    """
@@ -3291,10 +3349,13 @@ class ASTParser:
         if self.tokens[self.pos].type in PREDICT_SET["<id_statements_menu>"]:
             token_0 = self.tokens[self.pos]
             self.parse_token("id")
+            self._context_identifier = token_0.value
+            self._context_identifier_line = token_0.line
+            self._context_identifier_col = token_0.col
             node_1 = self.id_statements_ext()
             node_2 = self.statements_menu()
 
-            return node_1
+            return [node_1] + node_2
         else: self.parse_token(self.error_arr)
 
         log.info("Exit: " + self.tokens[self.pos].type)
@@ -3419,6 +3480,11 @@ class ASTParser:
         elif self.tokens[self.pos].type in PREDICT_SET["<local_decl_menu>_4"]:
             token_0 = self.tokens[self.pos]
             self.parse_token("id")
+            # Set context type for table declarations
+            self._context_type = token_0.value
+            self._context_identifier = token_0.value
+            self._context_identifier_line = token_0.line
+            self._context_identifier_col = token_0.col
             node_1 = self.local_id_tail_menu()
 
             # Collect: $1
@@ -3448,8 +3514,8 @@ class ASTParser:
             self.parse_token(";")
             node_3 = self.local_decl_menu()
 
-            # Collect: [TableDecl(CONTEXT,$1)] + $3
-            result = [TableDecl(self._context_dimensions,node_1)] + node_3
+            # Collect: $1 + $3
+            result = node_1 + node_3
             return result
 
             """    254 <local_id_tail_menu>	=>	[	<endsb_tail_menu>    """
@@ -3464,6 +3530,11 @@ class ASTParser:
 
             """    255 <local_id_tail_menu>	=>	<table_accessor>	<assignment_op>	<value>	;	<statements_menu>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<local_id_tail_menu>_2"]:
+            # Save context identifier before parsing value (to avoid overwriting by nested table literals)
+            saved_context_id = self._context_identifier
+            saved_context_line = self._context_identifier_line
+            saved_context_col = self._context_identifier_col
+            
             node_0 = self.table_accessor()
             node_1 = self.assignment_op()
             node_2 = self.value()
@@ -3471,8 +3542,10 @@ class ASTParser:
             self.parse_token(";")
             node_4 = self.statements_menu()
 
-            # Collect: [Assignment(($0(CONTEXT) if $0 else CONTEXT), $1, $2)] + $4
-            result = [Assignment((node_0(self._context_dimensions, token_3.line, token_3.col) if node_0 else self._context_dimensions), node_1, node_2)] + node_4
+            # Restore context identifier for building assignment target
+            # Collect: [Assignment(($0(Identifier(CONTEXT)) if $0 else Identifier(CONTEXT)), $1, $2)] + $4
+            base_id = Identifier(saved_context_id, saved_context_line, saved_context_col)
+            result = [Assignment((node_0(base_id) if node_0 else base_id), node_1, node_2)] + node_4
             return result
 
             """    256 <local_id_tail_menu>	=>	<assignment_op>	<value>	;	<statements_menu>    """
@@ -3735,6 +3808,11 @@ class ASTParser:
         elif self.tokens[self.pos].type in PREDICT_SET["<local_decl_loop>_4"]:
             token_0 = self.tokens[self.pos]
             self.parse_token("id")
+            # Set context type for table declarations
+            self._context_type = token_0.value
+            self._context_identifier = token_0.value
+            self._context_identifier_line = token_0.line
+            self._context_identifier_col = token_0.col
             node_1 = self.local_id_tail_loop()
 
             # Collect: $1
@@ -3764,8 +3842,8 @@ class ASTParser:
             self.parse_token(";")
             node_3 = self.local_decl_loop()
 
-            # Collect: [TableDecl(CONTEXT,$1)] + $3
-            result = [TableDecl(self._context_dimensions,node_1)] + node_3
+            # Collect: $1 + $3
+            result = node_1 + node_3
             return result
 
             """    276 <local_id_tail_loop>	=>	[	<endsb_tail_loop>    """
@@ -3780,6 +3858,11 @@ class ASTParser:
 
             """    277 <local_id_tail_loop>	=>	<table_accessor>	<assignment_op>	<value>	;	<statements_loop>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<local_id_tail_loop>_2"]:
+            # Save context identifier before parsing value (to avoid overwriting by nested table literals)
+            saved_context_id = self._context_identifier
+            saved_context_line = self._context_identifier_line
+            saved_context_col = self._context_identifier_col
+            
             node_0 = self.table_accessor()
             node_1 = self.assignment_op()
             node_2 = self.value()
@@ -3787,8 +3870,10 @@ class ASTParser:
             self.parse_token(";")
             node_4 = self.statements_loop()
 
-            # Collect: [Assignment(($0(CONTEXT) if $0 else CONTEXT), $1, $2)] + $4
-            result = [Assignment((node_0(self._context_dimensions, token_3.line, token_3.col) if node_0 else self._context_dimensions), node_1, node_2)] + node_4
+            # Restore context identifier for building assignment target
+            # Collect: [Assignment(($0(Identifier(CONTEXT)) if $0 else Identifier(CONTEXT)), $1, $2)] + $4
+            base_id = Identifier(saved_context_id, saved_context_line, saved_context_col)
+            result = [Assignment((node_0(base_id) if node_0 else base_id), node_1, node_2)] + node_4
             return result
 
             """    278 <local_id_tail_loop>	=>	<assignment_op>	<value>	;	<statements_loop>    """
@@ -3870,7 +3955,7 @@ class ASTParser:
             node_1 = self.statements_loop()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    283 <statements_loop>	=>	<built_in_rec_call>	;	<statements_loop>    """
@@ -3890,7 +3975,7 @@ class ASTParser:
             node_1 = self.statements_loop()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    285 <statements_loop>	=>	<looping_st>	<statements_loop>    """
@@ -3899,7 +3984,7 @@ class ASTParser:
             node_1 = self.statements_loop()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    286 <statements_loop>	=>	<jump_st>	<statements_loop>    """
@@ -3908,7 +3993,7 @@ class ASTParser:
             node_1 = self.statements_loop()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    287 <statements_loop>	=>	    """
@@ -3929,10 +4014,13 @@ class ASTParser:
         if self.tokens[self.pos].type in PREDICT_SET["<id_statements_loop>"]:
             token_0 = self.tokens[self.pos]
             self.parse_token("id")
+            self._context_identifier = token_0.value
+            self._context_identifier_line = token_0.line
+            self._context_identifier_col = token_0.col
             node_1 = self.id_statements_ext()
             node_2 = self.statements_loop()
 
-            return node_1
+            return [node_1] + node_2
         else: self.parse_token(self.error_arr)
 
         log.info("Exit: " + self.tokens[self.pos].type)
@@ -4047,10 +4135,17 @@ class ASTParser:
             node_2 = self.strict_piece_chars_expr()
             token_3 = self.tokens[self.pos]
             self.parse_token(")")
-            node_4 = self.menu_loop_platter()
+            
+            # Parse menu_loop_platter manually to separate cases and default
+            token_bracket = self.tokens[self.pos]
+            self.parse_token("{")
+            cases = self.choice_clause_loop()
+            default = self.usual_clause_loop()
+            token_close_bracket = self.tokens[self.pos]
+            self.parse_token("}")
 
-            # Create MenuStatement node
-            node = MenuStatement(node_2, node_4, token_0.line, token_0.col)
+            # Create MenuStatement node with separated cases and default
+            node = MenuStatement(node_2, cases, default if default else None, token_0.line, token_0.col)
             return node
         else: self.parse_token(self.error_arr)
 
@@ -4140,7 +4235,7 @@ class ASTParser:
             node_1 = self.choice_usual_loop_st()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    303 <choice_usual_loop_st>	=>	<built_in_rec_call>	;	<choice_usual_loop_st>    """
@@ -4160,7 +4255,7 @@ class ASTParser:
             node_1 = self.choice_usual_loop_st()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    305 <choice_usual_loop_st>	=>	<looping_st>	<choice_usual_loop_st>    """
@@ -4169,7 +4264,7 @@ class ASTParser:
             node_1 = self.choice_usual_loop_st()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    306 <choice_usual_loop_st>	=>	<jump_st>	<choice_usual_loop_st>    """
@@ -4178,7 +4273,7 @@ class ASTParser:
             node_1 = self.choice_usual_loop_st()
 
             # Collect: [$0] + $1
-            result = [node_0] + node_1
+            result = (node_0 if isinstance(node_0, list) else [node_0]) + node_1
             return result
 
             """    307 <choice_usual_loop_st>	=>	    """
@@ -4199,10 +4294,13 @@ class ASTParser:
         if self.tokens[self.pos].type in PREDICT_SET["<id_statements_choice_usual_loop>"]:
             token_0 = self.tokens[self.pos]
             self.parse_token("id")
+            self._context_identifier = token_0.value
+            self._context_identifier_line = token_0.line
+            self._context_identifier_col = token_0.col
             node_1 = self.id_statements_ext()
             node_2 = self.choice_usual_loop_st()
 
-            return node_1
+            return [node_1] + node_2
         else: self.parse_token(self.error_arr)
 
         log.info("Exit: " + self.tokens[self.pos].type)
@@ -5177,7 +5275,12 @@ class ASTParser:
             self.parse_token("id")
             node_1 = self.id_tail()
 
-            return Identifier(token_0.value, token_0.line, token_0.col)
+            # Build accessor: id token with tail (same pattern as id_())
+            base = Identifier(token_0.value, token_0.line, token_0.col)
+            if node_1:
+                return node_1(base)
+            else:
+                return base
 
             """    375 <strict_array_expr>	=>	<ret_array>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<strict_array_expr>_2"]:

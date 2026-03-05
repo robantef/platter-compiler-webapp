@@ -1,0 +1,18 @@
+table of Student = [
+    chars of name;
+    piece of age;
+];
+
+start(){
+    Student[] of cls = [
+        [
+            name = "Ana";
+            age = 20;
+        ],
+        [
+            name = "Ben";
+            age = "3";
+        ]
+    ];
+    bill("done");
+}

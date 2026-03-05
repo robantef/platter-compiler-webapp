@@ -1,0 +1,36 @@
+table of Student = [
+    piece of id;
+    chars of name;
+];
+
+Student[][][] of cube;
+
+start(){
+    Student of picked = [id = 0; name = "";];
+
+    cube = [
+        [
+            [
+                [id = 1; name = "Ana";],
+                [id = 2; name = "Ben";]
+            ],
+            [
+                [id = 3; name = "Cal";],
+                [id = 4; name = "Dia";]
+            ]
+        ],
+        [
+            [
+                [id = 5; name = "Eli";],
+                [id = 6; name = "Fay";]
+            ],
+            [
+                [id = 7; name = "Gio";],
+                [id = 8; name = "Han";]
+            ]
+        ]
+    ];
+
+    picked = cube[1][0][1];
+    bill(picked:name); # "Fay"
+}

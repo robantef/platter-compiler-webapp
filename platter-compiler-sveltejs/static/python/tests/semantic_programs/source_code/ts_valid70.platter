@@ -1,0 +1,8 @@
+piece of x = 10, y = 20;
+sip of z = 3.5;
+flag of f = up;
+chars of name = "chef";
+
+start() {
+    piece of a = x + y;
+}

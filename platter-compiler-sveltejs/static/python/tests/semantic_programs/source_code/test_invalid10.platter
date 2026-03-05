@@ -1,0 +1,7 @@
+prepare piece of compute() {
+    serve 5;
+}
+
+start() {
+    piece of compute = compute();
+} 

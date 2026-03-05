@@ -1,0 +1,14 @@
+prepare piece of calc(piece of n){
+    piece of out = 1;
+    piece of i = n;
+    repeat(i > 1){
+        out *= i;
+        i -= 1;
+    }
+    serve out;
+}
+
+start(){
+    piece of f = calc(4);
+    bill(tochars(f));
+}

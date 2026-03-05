@@ -1,0 +1,11 @@
+start(){
+  piece of x = 1;
+  flag of go = up;
+
+  order{
+      x += 2;
+      go = ((x * x) < 20);
+  } repeat(go);
+  
+  serve x;
+}

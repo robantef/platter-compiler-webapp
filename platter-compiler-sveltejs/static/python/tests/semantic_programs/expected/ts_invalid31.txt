@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'x'
+[ERROR] Type mismatch in binary operation: piece >= flag

@@ -1,0 +1,13 @@
+table of Food = [
+        chars of food_name;
+    piece[] of qty_set;
+];
+
+Food of chips = [
+        food_name = "oishi";
+    qty_set = [1, 2, 3];
+];
+
+start(){ 
+        piece[] of a = chips:qty_set;
+}

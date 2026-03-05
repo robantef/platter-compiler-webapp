@@ -1,0 +1,9 @@
+table of Data = [
+    piece of x;
+];
+
+start() {
+    Data of x = [
+        y = "Non existent";
+    ];
+}

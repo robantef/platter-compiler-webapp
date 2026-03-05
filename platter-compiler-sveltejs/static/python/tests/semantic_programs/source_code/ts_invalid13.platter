@@ -1,0 +1,4 @@
+prepare piece of test(){
+    piece of x = 5;
+}
+start(){}

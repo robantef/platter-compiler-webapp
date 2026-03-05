@@ -1,0 +1,4 @@
+start(){
+    piece of x = foo(1);
+    bill("done");
+}

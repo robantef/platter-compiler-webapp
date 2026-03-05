@@ -1,0 +1,2 @@
+Semantic analysis failed with 1 error(s) and 0 warning(s)
+[ERROR] Choice value type piece does not match menu expression type flag

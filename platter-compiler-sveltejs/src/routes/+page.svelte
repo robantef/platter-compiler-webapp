@@ -484,13 +484,18 @@ start() {
 			const line = error.line - 1; // CodeMirror uses 0-based line numbers
 			const col = error.col - 1; // CodeMirror uses 0-based columns
 			const valueLength = error.value?.length || 1;
+			// Determine CSS class based on severity
+			const cssClass = (error as any).severity === 'WARNING' ? 'warning-underline' : 'error-underline';
 			const marker = cmInstance.markText(
 				{ line, ch: col },
 				{ line, ch: col + valueLength },
-				{ className: 'error-underline' }
+				{ 
+					className: cssClass,
+					title: (error as any).message || 'Error'
+				}
 			);
 			errorMarkers.push(marker);
-			console.log(`  [OK] Marker ${index + 1} added successfully`);
+			console.log(`  [OK] Marker ${index + 1} added successfully with ${cssClass}`);
 		});
 		console.log(`Total ${errorMarkers.length} error markers active in editor`);
 	}
@@ -622,16 +627,18 @@ try:
         print("SEMANTIC ERROR DETAILS WITH POSITIONS")
         print("="*80)
         
-        for err in error_handler.get_errors():
+        sorted_errors = sorted(error_handler.get_errors(), key=lambda e: 0 if getattr(e.severity, "name", "") == "ERROR" else 1)
+        for err in sorted_errors:
             error_list.append(str(err))
-            # Format each error without emojis
+            # Format each error with position info
             severity_label = "ERROR" if err.severity.name == "ERROR" else "WARNING"
-            error_details.append(f"[{severity_label}] {err.message}")
+            position_info = f" at line {err.line}, column {err.column}" if err.line and err.column else ""
+            error_details.append(f"[{severity_label}] {err.message}{position_info}")
             
             # Log position info to console
-            position_info = f"Line: {err.line}, Column: {err.column}" if err.line and err.column else "Position: Unknown"
+            position_log = f"Line: {err.line}, Column: {err.column}" if err.line and err.column else "Position: Unknown"
             print(f"{severity_label}: {err.message}")
-            print(f"  > {position_info}")
+            print(f"  > {position_log}")
             print(f"  > Error Code: {err.error_code or 'N/A'}")
             if err.node:
                 print(f"  > Node Type: {err.node.node_type}")
@@ -643,7 +650,8 @@ try:
                     "line": err.line,
                     "col": err.column,
                     "value": err.error_code or "semantic_error",
-                    "message": err.message
+                    "message": err.message,
+                    "severity": severity_label
                 })
                 print(f"  [OK] Error marker added for line {err.line}, col {err.column}")
             else:
@@ -752,13 +760,14 @@ result
 						if (data.error_markers && data.error_markers.length > 0) {
 						console.log('Processing error markers...');
 						const semanticTokens = data.error_markers.map((marker: any) => {
-							console.log(`  Marker: Line ${marker.line}, Col ${marker.col}, Message: ${marker.message}`);
+							console.log(`  Marker: Line ${marker.line}, Col ${marker.col}, Severity: ${marker.severity}, Message: ${marker.message}`);
 							return {
 								type: 'semantic_error',
 								value: marker.value,
 								line: marker.line,
 								col: marker.col,
-								message: marker.message
+								message: marker.message,
+								severity: marker.severity
 							};
 						});
 						console.log('Semantic tokens created:', semanticTokens);
@@ -1870,6 +1879,12 @@ tokens
 	:global(.error-underline) {
 		border-bottom: 2px solid #ff0000 !important;
 		background-color: rgba(255, 0, 0, 0.1) !important;
+	}
+
+	/* Warning underline styling */
+	:global(.warning-underline) {
+		border-bottom: 2px solid #ffa500 !important;
+		background-color: rgba(255, 165, 0, 0.08) !important;
 	}
 
 	/* Platter Language Syntax Highlighting - TypeScript-inspired colors */

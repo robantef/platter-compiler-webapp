@@ -1,0 +1,8 @@
+prepare piece of add(piece of a, piece of b){
+    serve a + b;
+}
+
+start(){
+    piece of s = add(2, 3);
+    bill(tochars(s));
+}

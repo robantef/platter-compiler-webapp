@@ -1,0 +1,8 @@
+prepare chars of greet(chars of name){
+    serve "Hi " + name;
+}
+
+start(){
+    chars of msg = greet("FLOOYD");
+    bill(msg);
+}

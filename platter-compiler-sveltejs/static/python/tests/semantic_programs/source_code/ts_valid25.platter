@@ -1,0 +1,13 @@
+start(){ 
+  piece of a = 3;
+  piece of b = 7;
+  piece of c = 10;
+
+  check(((a * 2) < (b + 1)) and not (((c - b) * (a - 1)) == 6)){
+      a = ((a + b) * (c - 8)) % 5;
+  } alt((a + b) == (c - 0)) {
+        b = (b * 2) - (a / 1);
+    } instead{
+        c = (c + a) - (b * 3);
+    }
+}

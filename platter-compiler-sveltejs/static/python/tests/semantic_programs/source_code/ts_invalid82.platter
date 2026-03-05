@@ -1,0 +1,5 @@
+start(){
+    piece of x = 1;
+    piece of x = 2;
+    bill("done");
+}

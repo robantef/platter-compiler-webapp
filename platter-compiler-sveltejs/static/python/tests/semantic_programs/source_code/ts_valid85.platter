@@ -1,0 +1,6 @@
+start(){
+    chars of a = "hi";
+    chars of b = "goku";
+    chars of c = a + " " + b;
+    bill(c);
+}

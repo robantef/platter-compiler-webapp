@@ -1,0 +1,27 @@
+table of Student = [
+        chars of stud_name;
+    piece of age;
+];
+
+table of Class = [
+        chars of blk_name;
+    Student[] of students;
+];
+
+
+start(){
+        Class of Blk1 = [
+            blk_name = "Diamond";
+        students = [
+                [
+                        stud_name = "Floyd Robante";
+                    age = 67;
+                ],
+                    [
+                        stud_name = "JM Iwag";
+                    age = 67;
+                ]
+        ];
+    ];
+    bill(Blk1:blk_name);
+}

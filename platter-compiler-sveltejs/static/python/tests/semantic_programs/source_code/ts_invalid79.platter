@@ -1,0 +1,7 @@
+prepare piece of square(piece of x) {
+    serve x * x;
+}
+
+start() {
+    piece of y = square(3.5);
+}

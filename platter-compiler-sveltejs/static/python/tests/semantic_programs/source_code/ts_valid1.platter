@@ -1,4 +1,14 @@
-prepare piece[] of a(){
-        serve [];
+piece of x;
+
+prepare piece of userDefined() {
+    piece of x;
+    serve 0;
 }
-start() { }
+
+start(){
+    piece of x;
+    check (up) {
+        piece of x;
+    }
+    serve 0;
+}

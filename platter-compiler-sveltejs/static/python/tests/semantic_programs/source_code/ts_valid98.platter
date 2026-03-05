@@ -1,0 +1,6 @@
+start(){
+    piece of j = 0;
+    order{
+        j += 1;
+    } repeat(j < 2);
+}

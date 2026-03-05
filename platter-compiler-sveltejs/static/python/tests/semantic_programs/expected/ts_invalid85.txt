@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'r'
+[ERROR] Serve type mismatch: expected piece, got chars

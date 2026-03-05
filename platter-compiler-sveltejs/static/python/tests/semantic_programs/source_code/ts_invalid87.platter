@@ -1,0 +1,13 @@
+table of Student = [
+    chars of name;
+    piece of age;
+];
+
+Student of s = [
+    name = "Ana";
+    age = "twenty";
+];
+
+start(){
+    bill("done");
+}

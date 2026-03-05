@@ -1,0 +1,8 @@
+table of Data = [
+    chars of x;
+];
+
+start() {
+    piece of Data = 1; # Shadowing
+    Data = 2;
+}

@@ -1,0 +1,4 @@
+Semantic analysis failed with 1 error(s) and 2 warning(s)
+[WARNING] Unused ingredient 'cls'
+[WARNING] Unused ingredient 'a'
+[ERROR] Flavor 1 of recipe 'count': expected Table(Student)[], got piece

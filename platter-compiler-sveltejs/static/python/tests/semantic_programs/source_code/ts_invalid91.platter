@@ -1,0 +1,6 @@
+start(){
+    piece of x = 1;
+    piece[] of arr = [1, 2];
+    x = arr;
+    bill("done");
+}

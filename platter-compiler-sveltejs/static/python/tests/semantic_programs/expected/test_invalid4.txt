@@ -1,1 +1,2 @@
+Semantic analysis failed with 1 error(s) and 0 warning(s)
 [ERROR] [E201] Cannot index non-array type chars at line 3, column 14

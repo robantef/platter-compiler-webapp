@@ -1,0 +1,3 @@
+Semantic analysis failed with 2 error(s) and 0 warning(s)
+[ERROR] Field 'f' type mismatch: expected flag, got piece
+[ERROR] Serve type mismatch: expected Table(Data), got Table(anonymous_table)

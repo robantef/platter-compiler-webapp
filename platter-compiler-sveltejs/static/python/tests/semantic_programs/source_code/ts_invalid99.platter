@@ -1,0 +1,13 @@
+table of Student = [
+    chars of name;
+    piece of age;
+];
+
+prepare piece of getAge(Student of s){
+    serve s:age;
+}
+
+start(){
+    piece of a = getAge(1);
+    bill("done");
+}

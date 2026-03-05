@@ -35,7 +35,7 @@ class TypeChecker:
         
         # Check start_platter if present (navigate to its existing scope)
         if ast_root.start_platter:
-            if self.symbol_table.navigate_to_scope("start_platter_1"):
+            if self.symbol_table.navigate_to_scope("start_platter"):
                 self._check_platter(ast_root.start_platter)
                 self.symbol_table.exit_scope()
     
@@ -70,10 +70,28 @@ class TypeChecker:
                     # Empty array is compatible with any array type
                     return
             
-            init_type = self._get_expression_type(node.init_value)
+            # Create expected array type
+            dims = node.dimensions if node.dimensions is not None else 0
+            array_type = TypeInfo(node.data_type, dims)
+            
+            # Check if data_type is a valid type (primitive or table)
+            if node.data_type not in ["piece", "sip", "chars", "flag"]:
+                # It's a table type - check if it exists
+                table_type = self.symbol_table.lookup_table_type(node.data_type)
+                if not table_type:
+                    self.error_handler.add_error(
+                        f"Undefined table type '{node.data_type}'",
+                        node,
+                        ErrorCodes.UNDEFINED_TYPE
+                    )
+                    return
+                # Mark it as a table type and add table fields
+                array_type.is_table = True
+                array_type.table_fields = table_type.table_fields
+            
+            # Get init type with expected type context for validation
+            init_type = self._get_expression_type(node.init_value, array_type)
             if init_type:
-                dims = node.dimensions if node.dimensions is not None else 0
-                array_type = TypeInfo(node.data_type, dims)
                 if not array_type.is_exact_match(init_type):
                     self.error_handler.add_error(
                         f"Type mismatch in array '{node.identifier}' initialization: "
@@ -110,9 +128,9 @@ class TypeChecker:
                     
                     # Check if field value type matches expected type
                     expected_field_type = table_type.table_fields[field_name]
-                    actual_field_type = self._get_expression_type(value)
+                    actual_field_type = self._get_expression_type(value, expected_field_type)
                     
-                    if actual_field_type and not expected_field_type.is_compatible_with(actual_field_type):
+                    if actual_field_type and not expected_field_type.is_exact_match(actual_field_type):
                         self.error_handler.add_error(
                             f"Field '{field_name}' type mismatch: expected {expected_field_type}, got {actual_field_type}",
                             node,
@@ -191,6 +209,17 @@ class TypeChecker:
     
     def _check_assignment(self, node: Assignment):
         """Check assignment type compatibility"""
+        # Check if trying to assign to a recipe (which is not allowed)
+        if isinstance(node.target, Identifier):
+            symbol = self.symbol_table.lookup_symbol(node.target.name)
+            if symbol and symbol.kind == SymbolKind.FUNCTION:
+                self.error_handler.add_error(
+                    f"Cannot assign to recipe '{node.target.name}'. Recipes are not assignable.",
+                    node.target,
+                    ErrorCodes.INVALID_ASSIGNMENT_TARGET
+                )
+                return
+        
         target_type = self._get_expression_type(node.target)
         
         # Special case: empty array literals are compatible with any array type
@@ -199,7 +228,9 @@ class TypeChecker:
                 # Empty array is compatible with any array type
                 return
         
-        value_type = self._get_expression_type(node.value)
+        # Pass target type as expected type for context-aware inference
+        value_type = self._get_expression_type(node.value, target_type)
+        print(f"DEBUG ASSIGN LINE {node.line}: target={target_type.__repr__()}, value_node={type(node.value)}, value_type={value_type.__repr__() if value_type else 'None'}, expected target_type={target_type}")
         
         if target_type and value_type:
             if not target_type.is_exact_match(value_type):
@@ -236,7 +267,7 @@ class TypeChecker:
                         
                         # Check if field value type matches expected type
                         expected_field_type = table_type_symbol.table_fields[field_name]
-                        actual_field_type = self._get_expression_type(value)
+                        actual_field_type = self._get_expression_type(value, expected_field_type)
                         
                         if actual_field_type and not expected_field_type.is_compatible_with(actual_field_type):
                             self.error_handler.add_error(
@@ -281,12 +312,24 @@ class TypeChecker:
     
     def _check_check_statement(self, node: CheckStatement):
         """Check check statement (check/alt/instead)"""
-        # Check condition is flag-compatible
+        # Check condition must be a comparison expression (BinaryOp), not just a flag variable
+        from app.semantic_analyzer.ast.ast_nodes import BinaryOp, Identifier
+        
         cond_type = self._get_expression_type(node.condition)
-        if cond_type and cond_type.base_type not in ["flag", "piece", "sip"]:
-            self.error_handler.add_warning(
-                f"Condition should be flag type, got {cond_type}",
-                node.condition
+        
+        # First check if the type is not flag at all
+        if cond_type and cond_type.base_type != "flag":
+            self.error_handler.add_error(
+                f"Check condition must be flag type, got {cond_type}",
+                node.condition,
+                ErrorCodes.TYPE_MISMATCH
+            )
+        # If it is flag type but just an identifier (not an expression)
+        elif isinstance(node.condition, Identifier) and cond_type and cond_type.base_type == "flag":
+            self.error_handler.add_error(
+                f"Check condition must be flag bearing expression, not identifier",
+                node.condition,
+                ErrorCodes.TYPE_MISMATCH
             )
         
         # Check branches
@@ -302,17 +345,31 @@ class TypeChecker:
         # Get menu expression type
         menu_type = self._get_expression_type(node.expr)
         
+        # Track choice values to detect duplicates
+        seen_values = []
+        
         # Check choices
         for case in node.cases:
             # Check choice value type matches menu expression type
-            for value in case.values:
-                case_type = self._get_expression_type(value)
-                if menu_type and case_type and not menu_type.is_compatible_with(case_type):
+            case_type = self._get_expression_type(case.value)
+            if menu_type and case_type and not menu_type.is_compatible_with(case_type):
+                self.error_handler.add_error(
+                    f"Choice value type {case_type} does not match menu expression type {menu_type}",
+                    case.value,
+                    ErrorCodes.TYPE_MISMATCH
+                )
+            
+            # Check for duplicate choice values
+            if isinstance(case.value, Literal):
+                value_str = str(case.value.value)
+                if value_str in seen_values:
                     self.error_handler.add_error(
-                        f"Choice value type {case_type} does not match menu expression type {menu_type}",
-                        value,
-                        ErrorCodes.TYPE_MISMATCH
+                        f"Duplicate choice value: {value_str}",
+                        case.value,
+                        ErrorCodes.DUPLICATE_SYMBOL
                     )
+                else:
+                    seen_values.append(value_str)
             
             # Check choice statements
             for stmt in case.statements:
@@ -360,8 +417,13 @@ class TypeChecker:
                 self._check_assignment(node.update)
         self._check_platter(node.body)
     
-    def _get_expression_type(self, expr: ASTNode) -> Optional[TypeInfo]:
-        """Get the type of an expression"""
+    def _get_expression_type(self, expr: ASTNode, expected_type: Optional[TypeInfo] = None) -> Optional[TypeInfo]:
+        """Get the type of an expression
+        
+        Args:
+            expr: The expression to get the type of
+            expected_type: Optional expected type for context-aware inference
+        """
         if expr is None:
             return None
         
@@ -382,9 +444,9 @@ class TypeChecker:
         elif isinstance(expr, CastExpr):
             return self._get_cast_type(expr)
         elif isinstance(expr, ArrayLiteral):
-            return self._get_array_literal_type(expr)
+            return self._get_array_literal_type(expr, expected_type)
         elif isinstance(expr, TableLiteral):
-            return self._get_table_literal_type(expr)
+            return self._get_table_literal_type(expr, expected_type)
         
         return None
     
@@ -406,6 +468,23 @@ class TypeChecker:
         
         if not left_type or not right_type:
             return None
+        
+        # Check for division by zero
+        if node.operator in ['/', '%']:
+            if isinstance(node.right, Literal):
+                # Check if literal is zero
+                if node.right.value_type in ["piece", "sip"]:
+                    try:
+                        value = float(node.right.value) if node.right.value_type == "sip" else int(node.right.value)
+                        if value == 0:
+                            self.error_handler.add_error(
+                                f"Cannot divide by 0",
+                                node,
+                                ErrorCodes.DIVISION_BY_ZERO
+                            )
+                            return None
+                    except (ValueError, TypeError):
+                        pass  # If we can't parse the value, let other checks handle it
         
         # Determine result type based on operator
         if node.operator in ['+', '-', '*', '/', '%']:
@@ -529,6 +608,31 @@ class TypeChecker:
             )
             return None
         
+        # Bounds checking for constant indices
+        if isinstance(node.index, Literal) and node.index.value_type == "piece":
+            try:
+                index_value = int(node.index.value)
+                # Get the array size if available
+                if array_type.array_sizes and len(array_type.array_sizes) > 0:
+                    array_size = array_type.array_sizes[0]
+                    if index_value < 0 or index_value >= array_size:
+                        self.error_handler.add_error(
+                            f"Array index {index_value} out of bounds (array size: {array_size})",
+                            node.index,
+                            ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                        )
+                else:
+                    # Array has no size information - treat as uninitialized/empty array (size 0)
+                    # Any access to an uninitialized array is out of bounds
+                    self.error_handler.add_error(
+                        f"Array index {index_value} out of bounds (array is uninitialized/empty, size: 0)",
+                        node.index,
+                        ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                    )
+            except (ValueError, TypeError):
+                # If we can't convert to int, skip bounds checking
+                pass
+        
         # Return element type
         return array_type.get_element_type()
     
@@ -577,6 +681,8 @@ class TypeChecker:
             # Find matching overload
             builtin_overload = find_compatible_builtin_overload(node.name, arg_types)
             if builtin_overload:
+                # Validate built-in recipe constraints
+                self._validate_builtin_recipe_call(node)
                 return builtin_overload.get_return_type_info()
             else:
                 # No matching overload found - error will be caught elsewhere
@@ -588,6 +694,130 @@ class TypeChecker:
             return None
         
         return recipe_symbol.type_info
+    
+    def _validate_builtin_recipe_call(self, node: RecipeCall):
+        """Validate built-in recipe calls with strict parameter constraints"""
+        
+        # sqrt: argument must be non-negative
+        if node.name == "sqrt" and len(node.args) > 0:
+            arg = node.args[0]
+            if isinstance(arg, Literal):
+                try:
+                    value = float(arg.value)
+                    if value < 0:
+                        self.error_handler.add_error(
+                            f"sqrt() requires non-negative argument, got {value}",
+                            arg,
+                            ErrorCodes.INVALID_OPERATION
+                        )
+                except (ValueError, TypeError):
+                    pass
+        
+        # fact: argument must be non-negative piece
+        elif node.name == "fact" and len(node.args) > 0:
+            arg = node.args[0]
+            if isinstance(arg, Literal):
+                try:
+                    value = int(arg.value)
+                    if value < 0:
+                        self.error_handler.add_error(
+                            f"fact() requires non-negative piece argument, got {value}",
+                            arg,
+                            ErrorCodes.INVALID_OPERATION
+                        )
+                except (ValueError, TypeError):
+                    pass
+        
+        # cut: both arguments must be non-negative
+        elif node.name == "cut" and len(node.args) == 2:
+            for i, arg in enumerate(node.args):
+                if isinstance(arg, Literal):
+                    try:
+                        value = float(arg.value)
+                        if value < 0:
+                            self.error_handler.add_error(
+                                f"cut() requires non-negative arguments, got {value} at position {i+1}",
+                                arg,
+                                ErrorCodes.INVALID_OPERATION
+                            )
+                    except (ValueError, TypeError):
+                        pass
+        
+        # copy: start and end indices must be non-negative
+        elif node.name == "copy" and len(node.args) == 3:
+            for i in [1, 2]:  # Check 2nd and 3rd arguments (indices)
+                arg = node.args[i]
+                if isinstance(arg, Literal):
+                    try:
+                        value = int(arg.value)
+                        if value < 0:
+                            param_name = "start" if i == 1 else "end"
+                            self.error_handler.add_error(
+                                f"copy() requires non-negative {param_name} index, got {value}",
+                                arg,
+                                ErrorCodes.INVALID_OPERATION
+                            )
+                    except (ValueError, TypeError):
+                        pass
+        
+        # sort: must be 1-dimensional array
+        elif node.name == "sort" and len(node.args) > 0:
+            arg_type = self._get_expression_type(node.args[0])
+            if arg_type and arg_type.dimensions != 1:
+                self.error_handler.add_error(
+                    f"sort() requires 1-dimensional array, got {arg_type.dimensions}-dimensional array",
+                    node.args[0],
+                    ErrorCodes.INVALID_OPERATION
+                )
+        
+        # remove: index must be non-negative and less than array size
+        elif node.name == "remove" and len(node.args) == 2:
+            index_arg = node.args[1]
+            array_arg = node.args[0]
+            
+            # Check if index is non-negative
+            if isinstance(index_arg, Literal):
+                try:
+                    index_value = int(index_arg.value)
+                    if index_value < 0:
+                        self.error_handler.add_error(
+                            f"remove() requires non-negative index, got {index_value}",
+                            index_arg,
+                            ErrorCodes.INVALID_OPERATION
+                        )
+                    else:
+                        # Check bounds if we can determine array size
+                        array_type = self._get_expression_type(array_arg)
+                        if array_type and array_type.array_sizes and len(array_type.array_sizes) > 0:
+                            array_size = array_type.array_sizes[0]
+                            if index_value >= array_size:
+                                self.error_handler.add_error(
+                                    f"remove() index {index_value} out of bounds (array size: {array_size})",
+                                    index_arg,
+                                    ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                                )
+                except (ValueError, TypeError):
+                    pass
+        
+        # matches: both arguments must have same type and dimensions (any dimensions allowed)
+        elif node.name == "matches" and len(node.args) == 2:
+            arg1_type = self._get_expression_type(node.args[0])
+            arg2_type = self._get_expression_type(node.args[1])
+            
+            if arg1_type and arg2_type:
+                # Check if types match (base type and dimensions)
+                if arg1_type.base_type != arg2_type.base_type:
+                    self.error_handler.add_error(
+                        f"matches() requires both arguments to have same base type, got {arg1_type.base_type} and {arg2_type.base_type}",
+                        node,
+                        ErrorCodes.TYPE_MISMATCH
+                    )
+                elif arg1_type.dimensions != arg2_type.dimensions:
+                    self.error_handler.add_error(
+                        f"matches() requires both arguments to have same dimensions, got {arg1_type.dimensions}D and {arg2_type.dimensions}D",
+                        node,
+                        ErrorCodes.TYPE_MISMATCH
+                    )
     
     def _get_cast_type(self, node: CastExpr) -> TypeInfo:
         """Get type of cast expression"""
@@ -618,21 +848,31 @@ class TypeChecker:
         
         return target_type
     
-    def _get_array_literal_type(self, node: ArrayLiteral) -> Optional[TypeInfo]:
-        """Get type of array literal"""
+    def _get_array_literal_type(self, node: ArrayLiteral, expected_type: Optional[TypeInfo] = None) -> Optional[TypeInfo]:
+        """Get type of array literal
+        
+        Args:
+            node: The array literal node
+            expected_type: Optional expected array type for context-aware inference
+        """
         if not node.elements:
             # Empty array literal - treat as 1D array of unknown base type
             # This allows dimension checking for nested empty arrays like [[],[]]
             return TypeInfo("unknown", 1)
         
-        # Get type of first element
-        first_type = self._get_expression_type(node.elements[0])
+        # Determine expected element type if we have an expected array type
+        expected_element_type = None
+        if expected_type and expected_type.dimensions > 0:
+            expected_element_type = expected_type.get_element_type()
+        
+        # Get type of first element with expected type context
+        first_type = self._get_expression_type(node.elements[0], expected_element_type)
         if not first_type:
             return None
         
         # Check all elements have same type
         for elem in node.elements[1:]:
-            elem_type = self._get_expression_type(elem)
+            elem_type = self._get_expression_type(elem, expected_element_type)
             if elem_type and not first_type.is_compatible_with(elem_type):
                 self.error_handler.add_error(
                     f"Array literal has inconsistent element types: {first_type} and {elem_type}",
@@ -643,9 +883,34 @@ class TypeChecker:
         # Return array type with one more dimension
         return TypeInfo(first_type.base_type, first_type.dimensions + 1, first_type.table_fields if first_type.is_table else None)
     
-    def _get_table_literal_type(self, node: TableLiteral) -> Optional[TypeInfo]:
-        """Get type of table literal"""
-        # Build field types from literal
+    def _get_table_literal_type(self, node: TableLiteral, expected_type: Optional[TypeInfo] = None) -> Optional[TypeInfo]:
+        """Get type of table literal
+        
+        Args:
+            node: The table literal node
+            expected_type: Optional expected table type for context-aware inference
+        """
+        # If expected type is a table type, use it for inference
+        if expected_type and expected_type.is_table:
+            # Look up the table type definition
+            table_type_symbol = self.symbol_table.lookup_table_type(expected_type.base_type)
+            if table_type_symbol and table_type_symbol.table_fields:
+                # Validate literal fields against expected table type
+                for field_name, value, line, col in node.field_inits:
+                    expected_field_type = table_type_symbol.table_fields.get(field_name)
+                    if expected_field_type:
+                        # Get actual field type and validate
+                        field_type = self._get_expression_type(value, expected_field_type)
+                        if field_type and not expected_field_type.is_exact_match(field_type):
+                            self.error_handler.add_error(
+                                f"Type mismatch in table literal: field '{field_name}' expects {expected_field_type}, got {field_type}",
+                                node,
+                                ErrorCodes.TYPE_MISMATCH
+                            )
+                # Return the expected table type
+                return TypeInfo(expected_type.base_type, 0, table_type_symbol.table_fields)
+        
+        # Fallback: Build field types from literal
         field_types = {}
         for field_name, value, line, col in node.field_inits:
             field_type = self._get_expression_type(value)
@@ -653,5 +918,4 @@ class TypeChecker:
                 field_types[field_name] = field_type
         
         # Create synthetic table type
-        # Note: Should match against expected type from context
         return TypeInfo("anonymous_table", 0, field_types)

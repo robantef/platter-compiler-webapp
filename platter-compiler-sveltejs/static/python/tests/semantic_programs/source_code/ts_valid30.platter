@@ -1,0 +1,11 @@
+prepare flag of isEven(piece of a){
+    serve (a % 2) == 0;
+}
+
+start(){
+  piece of n = 4;
+
+  check(isEven(n) and not (n < 0)){
+      n += 1;
+  }
+}

@@ -1,0 +1,6 @@
+start(){
+piece of a = 8, b = 3, c = 2, d = 5;
+flag of result;
+result = ((((a % b) * (c + d)) - ((a / c) + (b * d))) >= 
+((a - b) * (c + 1))) and not (((a + b) % c) == 0);
+}

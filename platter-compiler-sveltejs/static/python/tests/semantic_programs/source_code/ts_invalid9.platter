@@ -1,0 +1,7 @@
+piece of y = 1;
+piece of z = 22;
+start() {
+    sip of y = 10.2;
+    chars of name = "Raphael";
+    piece of x = y + 3 % name * z / z;
+}

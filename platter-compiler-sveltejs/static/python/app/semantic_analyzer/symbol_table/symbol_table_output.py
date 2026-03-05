@@ -123,62 +123,8 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
         return scope_name
     
     def get_value_str(symbol: Symbol) -> str:
-        """Get initial value with verbose details"""
-        # For table prototypes, show field structure
-        if symbol.kind == SymbolKind.TABLE_TYPE and symbol.type_info.table_fields:
-            fields = []
-            for field_name, field_type in symbol.type_info.table_fields.items():
-                fields.append(f"{field_name}: {field_type}")
-            if len(fields) <= 2:
-                return "{ " + ", ".join(fields) + " }"
-            else:
-                # Show first 2 fields and count
-                return "{ " + ", ".join(fields[:2]) + f", ... ({len(fields)} fields) }}"
-        
-        if not symbol.declaration_node:
-            return "-"
-        
-        node = symbol.declaration_node
-        if hasattr(node, 'init_value') and node.init_value:
-            # Try to get literal value
-            if isinstance(node.init_value, Literal):
-                val = node.init_value.value
-                if isinstance(val, str):
-                    return f'"{val}"'
-                return str(val)
-            elif isinstance(node.init_value, ArrayLiteral):
-                # Show array element type if available
-                elem_type = symbol.type_info.get_element_type()
-                if elem_type:
-                    return f"[{len(node.init_value.elements)} × {elem_type}]"
-                return f"[{len(node.init_value.elements)} items]"
-            elif isinstance(node.init_value, TableLiteral):
-                # Show field values
-                fields = []
-                for field_name, value, line, col in node.init_value.field_inits:
-                    if isinstance(value, Literal):
-                        val = value.value
-                        if isinstance(val, str):
-                            val_str = f'"{val}"'
-                        else:
-                            val_str = str(val)
-                        fields.append(f"{field_name}: {val_str}")
-                    elif isinstance(value, Identifier):
-                        fields.append(f"{field_name}: @{value.name}")
-                    else:
-                        fields.append(f"{field_name}: <expr>")
-                
-                if len(fields) <= 2:
-                    return "{ " + ", ".join(fields) + " }"
-                else:
-                    # Show first 2 fields and count
-                    return "{ " + ", ".join(fields[:2]) + f", ... ({len(fields)} fields) }}"
-            elif isinstance(node.init_value, Identifier):
-                # Reference to another symbol
-                return f"@{node.init_value.name}"
-            else:
-                return "<expr>"
-        return "-"
+        """Get the computed default value from the symbol"""
+        return symbol.value if symbol.value is not None else "-"
     
     def get_position_str(symbol: Symbol) -> str:
         """Get declaration position if available"""
@@ -334,12 +280,15 @@ def format_symbol_table_compact(symbol_table: SymbolTable, error_handler=None) -
     # Add error details if any
     if error_handler and error_handler.has_errors():
         errors = error_handler.get_errors()
+        # Sort errors by severity: ERROR first, then WARNING, then INFO
+        from app.semantic_analyzer.semantic_passes.error_handler import ErrorSeverity
+        sorted_errors = sorted(errors, key=lambda e: 0 if e.severity == ErrorSeverity.ERROR else (1 if e.severity == ErrorSeverity.WARNING else 2))
         output.append("")
         output.append("╔════════════════════════════════════════════════════════════════════════╗")
         output.append("║                         SEMANTIC ISSUES                                ║")
         output.append("╠════════════════════════════════════════════════════════════════════════╣")
         
-        for i, error in enumerate(errors, 1):
+        for i, error in enumerate(sorted_errors, 1):
             severity_icon = "❌" if error.severity == "error" else "⚠️"
             output.append(f"║ {severity_icon} [{error.severity.name.upper():<7}] {error.message:<55} ║")
         
@@ -386,10 +335,19 @@ def format_symbol_table_for_console(symbol_table: SymbolTable) -> List[dict]:
             # Get the actual scope name where declared
             declared_scope_name = symbol.declared_scope.name if symbol.declared_scope else ""
             
+            # Format type display
+            type_display = symbol.type_info.base_type
+            if symbol.kind == SymbolKind.TABLE_TYPE:
+                # Show as table prototype
+                type_display = f"table<{symbol.type_info.base_type}>"
+            elif symbol.type_info.is_table:
+                # Show table instance with arrow
+                type_display = f"→{symbol.type_info.base_type}"
+            
             # Create dictionary with all symbol info
             symbol_dict = {
                 'ID': symbol.name,
-                'Type': symbol.type_info.base_type,
+                'Type': type_display,
                 'Dims': str(symbol.type_info.dimensions) if symbol.type_info.dimensions > 0 else "-",
                 'Declared': declared_scope_name if declared_scope_name else "-",
                 'Accessed': symbol.accessed_in_scopes if symbol.accessed_in_scopes else [],
@@ -525,8 +483,12 @@ def format_errors_only(error_handler) -> str:
     if not error_handler or not error_handler.has_errors():
         return "No errors or warnings"
     
+    # Sort errors by severity: ERROR first, then WARNING, then INFO
+    from app.semantic_analyzer.semantic_passes.error_handler import ErrorSeverity
+    sorted_errors = sorted(error_handler.get_errors(), key=lambda e: 0 if e.severity == ErrorSeverity.ERROR else (1 if e.severity == ErrorSeverity.WARNING else 2))
+    
     output = []
-    for error in error_handler.get_errors():
+    for error in sorted_errors:
         output.append(f"[{error.severity.name.upper()}] {error.message}")
     
     return "\n".join(output)

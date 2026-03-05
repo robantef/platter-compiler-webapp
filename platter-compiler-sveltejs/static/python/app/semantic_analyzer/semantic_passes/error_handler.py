@@ -112,8 +112,11 @@ class SemanticErrorHandler:
         if not self.errors:
             return "No errors"
         
+        # Sort errors by severity: ERROR first, then WARNING, then INFO
+        sorted_errors = sorted(self.errors, key=lambda e: 0 if e.severity == ErrorSeverity.ERROR else (1 if e.severity == ErrorSeverity.WARNING else 2))
+        
         lines = []
-        for error in self.errors:
+        for error in sorted_errors:
             if error.severity == ErrorSeverity.ERROR:
                 lines.append(str(error))
             elif error.severity == ErrorSeverity.WARNING and include_warnings:
@@ -152,37 +155,44 @@ class SemanticErrorHandler:
 # Error code constants for common semantic errors
 class ErrorCodes:
     """Standard error codes for semantic analysis"""
-    # Scope errors
+    # Scope/Symbol Table errors (E0XX)
     DUPLICATE_SYMBOL = "E001"
     UNDEFINED_SYMBOL = "E002"
     SHADOWING_SYMBOL = "W001"
     
-    # Type errors
+    # Type errors (E1XX)
     TYPE_MISMATCH = "E101"
     UNDEFINED_TYPE = "E102"
     INVALID_CAST = "E103"
     INCOMPATIBLE_TYPES = "E104"
     INVALID_OPERATION = "E105"
+    INVALID_ASSIGNMENT_TARGET = "E106"
+    DIVISION_BY_ZERO = "E107"
     
-    # Array/Table errors
+    # Array/Table errors (E2XX)
     INVALID_ARRAY_ACCESS = "E201"
     INVALID_TABLE_ACCESS = "E202"
     UNDEFINED_FIELD = "E203"
     INVALID_DIMENSION = "E204"
+    ARRAY_OUT_OF_BOUNDS = "E205"
+    DUPLICATE_FIELD = "E206"
+    RECURSIVE_TYPE = "E207"
+    FORWARD_REFERENCE = "E208"
     
-    # Recipe errors (functions)
+    # Recipe errors (E3XX)
     UNDEFINED_RECIPE = "E301"
     FLAVOR_COUNT_MISMATCH = "E302"  # argument count
     FLAVOR_TYPE_MISMATCH = "E303"  # argument type
     INVALID_SERVE_TYPE = "E304"  # return type
     MISSING_SERVE = "E305"  # missing return
+    REDEFINED_BUILTIN = "E306"  # redefining built-in recipe
     
-    # Control flow errors
+    # Control flow errors (E4XX)
     STOP_OUTSIDE_LOOP = "E401"  # break outside loop
     NEXT_OUTSIDE_LOOP = "E402"  # continue outside loop
     SERVE_OUTSIDE_RECIPE = "E403"  # return outside function
     UNREACHABLE_CODE = "E404"  # unreachable code
     
-    # Initialization errors
+    # Usage warnings (W1XX)
     UNINITIALIZED_INGREDIENT = "W101"  # uninitialized variable
     UNUSED_INGREDIENT = "W102"  # unused variable

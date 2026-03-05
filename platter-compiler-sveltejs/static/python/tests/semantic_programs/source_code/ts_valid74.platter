@@ -1,0 +1,13 @@
+start() {
+    piece of x = 5;
+
+    check (x > 3) {
+        piece of y = 1;
+    }
+    alt (x == 3) {
+        piece of y = 2;
+    }
+    instead {
+        piece of y = 0;
+    }
+}

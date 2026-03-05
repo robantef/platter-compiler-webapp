@@ -8,6 +8,7 @@ from app.semantic_analyzer.ast.ast_nodes import *
 from app.semantic_analyzer.symbol_table.types import Symbol, Scope, SymbolKind, TypeInfo
 from app.semantic_analyzer.symbol_table.symbol_table import SymbolTable
 from app.semantic_analyzer.builtin_recipes import BUILTIN_RECIPES
+from app.semantic_analyzer.semantic_passes.error_handler import ErrorCodes
 from typing import Optional
 
 
@@ -129,9 +130,45 @@ class SymbolTableBuilder:
     def _process_table_prototype(self, node: TablePrototype):
         """Process a table type definition"""
         field_types = {}
+        seen_fields = set()
+        
         for field in node.fields:
+            # Check for duplicate field names
+            if field.identifier in seen_fields:
+                if self.symbol_table.error_handler:
+                    self.symbol_table.error_handler.add_error(
+                        f"Duplicate field '{field.identifier}' in table prototype '{node.name}'",
+                        field,
+                        ErrorCodes.DUPLICATE_FIELD
+                    )
+                continue
+            seen_fields.add(field.identifier)
+            
             dims = field.dimensions if field.dimensions is not None else 0
             field_type_info = self._create_type_info(field.data_type, dims)
+            
+            # Check for recursive type (field type is same as table being defined)
+            if field.data_type == node.name:
+                if self.symbol_table.error_handler:
+                    self.symbol_table.error_handler.add_error(
+                        f"Recursive type not allowed: table prototype '{node.name}' cannot contain field of type '{field.data_type}'",
+                        field,
+                        ErrorCodes.RECURSIVE_TYPE
+                    )
+                continue
+            
+            # Check for forward reference (table type not yet defined)
+            # Only check if it's a table type (not primitive)
+            if field.data_type not in ["piece", "sip", "chars", "flag"]:
+                if not self.symbol_table.lookup_table_type(field.data_type):
+                    if self.symbol_table.error_handler:
+                        self.symbol_table.error_handler.add_error(
+                            f"Forward reference not allowed: table prototype '{field.data_type}' must be defined before use in '{node.name}'",
+                            field,
+                            ErrorCodes.FORWARD_REFERENCE
+                        )
+                    continue
+            
             field_types[field.identifier] = field_type_info
         
         table_type_info = TypeInfo(node.name, 0, field_types)
@@ -165,7 +202,8 @@ class SymbolTableBuilder:
             if self.symbol_table.error_handler:
                 self.symbol_table.error_handler.add_error(
                     f"Cannot redefine built-in recipe '{node.name}'", 
-                    node
+                    node,
+                    ErrorCodes.REDEFINED_BUILTIN
                 )
             return
         
@@ -180,6 +218,9 @@ class SymbolTableBuilder:
             node,
             self.symbol_table.current_scope
         )
+        
+        # Compute default value for symbol table display
+        recipe_symbol.compute_default_value(self.symbol_table.table_types)
         
         if not self.symbol_table.current_scope.define(recipe_symbol):
             if self.symbol_table.error_handler:
@@ -229,14 +270,35 @@ class SymbolTableBuilder:
         if node.init_value:
             self._track_expression_usage(node.init_value)
     
+    def _calculate_array_sizes(self, node, dimensions: int) -> list:
+        """Calculate array sizes from ArrayLiteral initialization"""
+        sizes = []
+        current = node
+        
+        for dim in range(dimensions):
+            if isinstance(current, ArrayLiteral) and current.elements:
+                sizes.append(len(current.elements))
+                # Go deeper for next dimension
+                if current.elements:
+                    current = current.elements[0]
+            else:
+                break
+        
+        return sizes
+    
     def _process_array_decl(self, node: ArrayDecl):
         """Process an array declaration"""
         dims = node.dimensions if node.dimensions is not None else 0
         type_info = self._create_type_info(node.data_type, dims)
         
+        # Calculate array sizes from initialization if present
+        if node.init_value and isinstance(node.init_value, ArrayLiteral):
+            type_info.array_sizes = self._calculate_array_sizes(node.init_value, dims)
+        
         # Add default value if not initialized
         if not node.init_value:
             node.init_value = self._create_default_value(node.data_type, dims)
+
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -292,6 +354,8 @@ class SymbolTableBuilder:
                 self._process_array_decl(decl)
             elif isinstance(decl, TableDecl):
                 self._process_table_decl(decl)
+            else:
+                self._process_statement(decl)
         
         for stmt in node.statements:
             self._process_statement(stmt)

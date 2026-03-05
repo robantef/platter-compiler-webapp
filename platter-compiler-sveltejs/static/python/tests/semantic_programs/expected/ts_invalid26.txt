@@ -1,0 +1,3 @@
+Semantic analysis failed with 2 error(s) and 0 warning(s)
+[ERROR] Undefined ingredient 'unknown' in 'start_platter_1'
+[ERROR] Undefined ingredient 'a' in 'start_platter_1'

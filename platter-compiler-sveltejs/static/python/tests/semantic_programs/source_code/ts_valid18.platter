@@ -1,0 +1,7 @@
+prepare piece of plus(piece of a,piece of b){
+ serve (a+b);
+}
+
+start(){
+ piece of x = plus((1+(2)),((3+4)));
+}

@@ -1,0 +1,8 @@
+prepare piece of bad(){
+    serve "x";
+}
+
+start(){
+    piece of r = bad();
+    bill("done");
+}

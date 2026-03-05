@@ -1,0 +1,6 @@
+start(){
+    piece of x = 1;
+    check(x){
+        bill("ok");
+    }
+}

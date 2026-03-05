@@ -1,0 +1,4 @@
+start() {
+    piece[] of nums = [1,2,3];
+    nums[0] = 1.1;
+}

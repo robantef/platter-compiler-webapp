@@ -1,0 +1,12 @@
+prepare flag of isPos(piece of n){
+    check(n > 0){
+        serve up;
+    } instead {
+        serve down;
+    }
+}
+
+start(){
+    flag of r = isPos(1);
+    bill(tochars(r));
+}

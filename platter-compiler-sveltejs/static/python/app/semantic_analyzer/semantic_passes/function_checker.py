@@ -35,7 +35,7 @@ class FunctionChecker:
         
         # Check start_platter if present (navigate to its existing scope)
         if ast_root.start_platter:
-            if self.symbol_table.navigate_to_scope("start_platter_1"):
+            if self.symbol_table.navigate_to_scope("start_platter"):
                 self._check_platter(ast_root.start_platter)
                 self.symbol_table.exit_scope()
     
@@ -82,8 +82,7 @@ class FunctionChecker:
         elif isinstance(node, MenuStatement):
             self._check_expression(node.expr)
             for case in node.cases:
-                for value in case.values:
-                    self._check_expression(value)
+                self._check_expression(case.value)
                 for stmt in case.statements:
                     self._check_statement(stmt)
             if node.default:
@@ -201,7 +200,7 @@ class FunctionChecker:
             arg_type = self._get_expression_type(arg)
             spice_type = spice.type_info
             
-            if arg_type and not spice_type.is_compatible_with(arg_type):
+            if arg_type and not spice_type.is_exact_match(arg_type):
                 self.error_handler.add_error(
                     f"Flavor {i+1} of recipe '{node.name}': "
                     f"expected {spice_type}, got {arg_type}",

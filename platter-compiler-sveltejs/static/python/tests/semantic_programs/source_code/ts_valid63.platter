@@ -1,0 +1,4 @@
+table of Class = [ chars of blk_name; ]; 
+Class of blk1 = [ blk_name = "Mahusay"; ];
+
+start() { }

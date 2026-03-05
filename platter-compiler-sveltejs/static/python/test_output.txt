@@ -1,0 +1,225 @@
+test_all_files (ga_lexer.TestPlatterLexerStrings.test_all_files) ... ok
+test_strings (ga_lexer.TestPlatterLexerStrings.test_strings) ... ok
+test_syntax_scripts (ga_parser.TestParser.test_syntax_scripts) ... ok
+test_all_valid_programs (ga_parser_ast_valid.TestASTValidPrograms.test_all_valid_programs)
+Test all .platter files in valid_tests directory. ... ok
+test_all_invalid_programs (ga_parser_invalid.TestParserInvalidPrograms.test_all_invalid_programs)
+Test all .platter files in invalid_tests directory. ... ok
+test_all_valid_programs (ga_parser_valid.TestParserValidPrograms.test_all_valid_programs)
+Test all .platter files in valid_tests directory. ... ok
+test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs)
+Test all .platter files in semantic_programs directory. ... 
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid1.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid2.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid3.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid41.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid42.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid43.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid44.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid45.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid46.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid50.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid51.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid52.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+  test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid53.platter')
+Test all .platter files in semantic_programs directory. ... ERROR
+tearDownClass (ga_semantic_analyzer.TestSemanticAnalyzer) ... ERROR
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid1.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid2.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid3.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid41.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid42.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid43.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid44.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid45.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid46.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid50.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid51.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid52.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_all_semantic_programs (ga_semantic_analyzer.TestSemanticAnalyzer.test_all_semantic_programs) (file='ts_valid53.platter')
+Test all .platter files in semantic_programs directory.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 105, in test_all_semantic_programs
+    expected_output = f.read().strip()
+                      ~~~~~~^^
+  File "<frozen codecs>", line 325, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: tearDownClass (ga_semantic_analyzer.TestSemanticAnalyzer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\ga_semantic_analyzer.py", line 203, in tearDownClass
+    print("\u2713 All semantic analysis tests passed!")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Applications\Programming\Python\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2713' in position 0: character maps to <undefined>
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.228s
+
+FAILED (errors=14)
+
+======================================================================
+TEST SUMMARY: 139/139 tests passed
+======================================================================
+Detailed results written to: D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\syntax_programs\tests_results.txt
+
+======================================================================
+AST GENERATION TEST SUMMARY: 26/26 tests passed
+======================================================================
+
+Detailed results written to: D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\syntax_programs\tests_ast_valid_results.txt
+
+======================================================================
+INVALID PARSER TEST SUMMARY: 77/77 tests passed
+======================================================================
+
+Detailed results written to: D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\syntax_programs\tests_invalid_results.txt
+
+======================================================================
+VALID PARSER TEST SUMMARY: 26/26 tests passed
+======================================================================
+
+Detailed results written to: D:\Repositories\platter-compiler-webapp\platter-compiler-sveltejs\static\python\tests\syntax_programs\tests_valid_results.txt
+
+======================================================================
+SEMANTIC ANALYSIS TEST SUMMARY: 32/45 tests passed
+======================================================================

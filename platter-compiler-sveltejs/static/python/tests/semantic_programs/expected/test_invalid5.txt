@@ -1,1 +1,2 @@
+Semantic analysis failed with 1 error(s) and 0 warning(s)
 [ERROR] [E101] Type mismatch in assignment: cannot assign piece to chars at line 3, column 14

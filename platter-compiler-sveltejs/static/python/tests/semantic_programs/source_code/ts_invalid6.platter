@@ -1,0 +1,4 @@
+piece of x;
+start() {
+    x = 10.1;
+}

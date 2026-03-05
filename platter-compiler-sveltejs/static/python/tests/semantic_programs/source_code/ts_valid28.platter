@@ -1,0 +1,8 @@
+start(){
+   piece of i;
+   flag of cond;
+
+  pass(i = 5; i -= 1; ((i > 0) and ((i * 2) != 4))){
+      cond = ((i % 2) == 1);
+  }
+}

@@ -153,6 +153,11 @@ BUILTIN_RECIPES = {
             [("piece", 0)],
             "Calculate square root of piece -> sip"
         ),
+        BuiltinRecipeSignature(
+            "sqrt", "sip", 0,
+            [("sip", 0)],
+            "Calculate square root of sip -> sip"
+        ),
     ],
     
     "fact": [
@@ -317,7 +322,7 @@ BUILTIN_RECIPES = {
     ],
     
     "matches": [
-        # Arrays
+        # Arrays - 1D
         BuiltinRecipeSignature(
             "matches", "flag", 0,
             [("piece", 1), ("piece", 1)],
@@ -337,6 +342,48 @@ BUILTIN_RECIPES = {
             "matches", "flag", 0,
             [("flag", 1), ("flag", 1)],
             "Check if two flag arrays have the same elements"
+        ),
+        # Arrays - 2D
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("piece", 2), ("piece", 2)],
+            "Check if two 2D piece arrays have the same elements"
+        ),
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("sip", 2), ("sip", 2)],
+            "Check if two 2D sip arrays have the same elements"
+        ),
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("chars", 2), ("chars", 2)],
+            "Check if two 2D chars arrays have the same elements"
+        ),
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("flag", 2), ("flag", 2)],
+            "Check if two 2D flag arrays have the same elements"
+        ),
+        # Arrays - 3D
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("piece", 3), ("piece", 3)],
+            "Check if two 3D piece arrays have the same elements"
+        ),
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("sip", 3), ("sip", 3)],
+            "Check if two 3D sip arrays have the same elements"
+        ),
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("chars", 3), ("chars", 3)],
+            "Check if two 3D chars arrays have the same elements"
+        ),
+        BuiltinRecipeSignature(
+            "matches", "flag", 0,
+            [("flag", 3), ("flag", 3)],
+            "Check if two 3D flag arrays have the same elements"
         ),
         # Tables/Structs (assuming type name is 'table' or 'struct')
         BuiltinRecipeSignature(

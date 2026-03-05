@@ -1,0 +1,5 @@
+start(){
+	piece[] of a, b;
+    
+    b = ["a"];
+}

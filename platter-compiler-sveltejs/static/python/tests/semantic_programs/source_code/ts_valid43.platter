@@ -1,0 +1,30 @@
+table of Nested1 = [
+    piece of x;
+];
+table of Nested2 = [
+    Nested1 of n;
+];
+table of Data = [
+    Nested2 of y;
+    piece of z;
+];
+
+start() {
+    Data of a = [
+        y = [
+            n = [
+                x = 1;
+            ];
+        ];
+    ];
+    a:z = 0;
+    a:y = [
+        n = [
+            x = 1;
+        ];
+    ];
+    a:y:n = [
+        x = 1;
+    ];
+    a:y:n:x = 1;
+}

@@ -1,0 +1,5 @@
+piece of cook;
+prepare piece of cook(){
+    serve 1;
+}
+start() {}

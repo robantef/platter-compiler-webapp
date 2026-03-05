@@ -1,0 +1,5 @@
+start(){
+    flag of ready = up;
+    flag of done = ready and down;
+    bill(tochars(done));
+}

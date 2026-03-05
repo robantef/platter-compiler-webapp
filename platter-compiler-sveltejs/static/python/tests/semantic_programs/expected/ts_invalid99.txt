@@ -1,0 +1,3 @@
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[WARNING] Unused ingredient 'a'
+[ERROR] Flavor 1 of recipe 'getAge': expected Table(Student), got piece

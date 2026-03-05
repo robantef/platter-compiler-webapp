@@ -1,0 +1,8 @@
+prepare piece of test(){
+    chars of x = take();
+    check (x == "Raphael") {
+        serve 1;
+    }
+    # if not raphael, wala siyang serve dito
+}
+start(){}

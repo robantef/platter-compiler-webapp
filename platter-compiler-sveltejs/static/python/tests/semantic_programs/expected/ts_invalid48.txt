@@ -1,0 +1,4 @@
+Semantic analysis failed with 2 error(s) and 1 warning(s)
+[ERROR] Undefined table type 'Data'
+[WARNING] Unused ingredient 'x'
+[ERROR] Undefined table type 'Data'
