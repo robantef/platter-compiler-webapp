@@ -1,7 +1,7 @@
-start() {
-    piece of x = 0;
-
-    order {
-        x += 1;
-    } repeat (x < 3);
+start() {
+    piece of x = 0;
+
+    order {
+        x += 1;
+    } repeat (x < 3);
 }

@@ -1,5 +1,5 @@
-piece[] of nums = [1,2,3];
-
-start() {
-    append(nums, 4);
+piece[] of nums = [1,2,3];
+
+start() {
+    append(nums, 4);
 }

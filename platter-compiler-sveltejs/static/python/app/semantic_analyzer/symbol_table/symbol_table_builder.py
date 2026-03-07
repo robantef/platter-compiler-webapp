@@ -336,6 +336,10 @@ class SymbolTableBuilder:
         
         dims = node.dimensions if node.dimensions is not None else 0
         
+        # Mark this table type as "in use" in current scope
+        # This prevents declaring variables with the same name as the table type
+        self.symbol_table.current_scope.table_types_in_use.add(node.table_type)
+        
         if table_type:
             type_info = TypeInfo(
                 node.table_type,

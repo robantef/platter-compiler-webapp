@@ -1,5 +1,5 @@
-piece[][] of matrix = [[1,2],[3,4]];
-
-start() {
-    piece of x = matrix[0][1];
+piece[][] of matrix = [[1,2],[3,4]];
+
+start() {
+    piece of x = matrix[0][1];
 }

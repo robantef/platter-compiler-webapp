@@ -1,4 +1,4 @@
 Semantic analysis failed with 1 error(s) and 2 warning(s)
 [ERROR] [E002] Undefined ingredient 'c' in 'start_platter' (used before declaration)
-[WARNING] [W102] Unused ingredient 'a' at line 2, column 14
+[WARNING] [W102] Unused ingredient 'a' at line 2, column 18
 [WARNING] [W102] Unused ingredient 'b' at line 3, column 14

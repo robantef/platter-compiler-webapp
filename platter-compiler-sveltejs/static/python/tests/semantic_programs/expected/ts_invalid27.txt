@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] [E101] Choice value type piece does not match menu expression type flag at line 13, column 10
+[ERROR] [E101] Choice value type piece does not match menu expression type flag at line 7, column 10

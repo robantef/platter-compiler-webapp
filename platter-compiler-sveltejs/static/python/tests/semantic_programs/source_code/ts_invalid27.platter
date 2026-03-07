@@ -1,9 +1,9 @@
-prepare flag of test(){
- serve up;
-}
-
-start(){
- menu(test()){
-  choice 1: serve test; 
-  }
+prepare flag of test(){
+ serve up;
+}
+
+start(){
+ menu(test()){
+  choice 1: serve test; 
+  }
 }

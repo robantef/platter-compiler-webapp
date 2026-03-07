@@ -1,4 +1,4 @@
 Semantic analysis failed with 1 error(s) and 2 warning(s)
 [ERROR] [E003] Symbol 'c' shadows declaration from 'global' at line 6, column 14
-[WARNING] [W102] Unused ingredient 'a' at line 4, column 14
+[WARNING] [W102] Unused ingredient 'a' at line 4, column 18
 [WARNING] [W102] Unused ingredient 'b' at line 5, column 14

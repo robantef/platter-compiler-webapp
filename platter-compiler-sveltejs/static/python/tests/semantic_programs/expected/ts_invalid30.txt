@@ -1,4 +1,4 @@
 Semantic analysis failed with 2 error(s) and 1 warning(s)
-[ERROR] [E101] Loop condition must be flag type, got piece at line 9, column 29
-[ERROR] [E101] Type mismatch in assignment: cannot assign flag to piece at line 9, column 17
-[WARNING] [W102] Unused ingredient 'x' at line 11, column 18
+[ERROR] [E101] Loop condition must be flag type, got piece at line 5, column 29
+[ERROR] [E101] Type mismatch in assignment: cannot assign flag to piece at line 5, column 17
+[WARNING] [W102] Unused ingredient 'x' at line 6, column 18

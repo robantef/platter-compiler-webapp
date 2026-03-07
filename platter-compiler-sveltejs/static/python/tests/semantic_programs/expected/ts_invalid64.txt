@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] Symbol 'x' already defined in scope 'global' at line 1, column 10
+[ERROR] [E208] Identifier 'x' conflicts with table prototype of the same name at line 1, column 10

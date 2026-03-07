@@ -67,6 +67,42 @@ class SymbolTable:
                      declaration_node: ASTNode = None) -> bool:
         """Define a symbol in current scope"""
         
+        # Check for conflicts between table prototypes and identifiers
+        # Only check within the same scope (global scope for table prototypes)
+        if kind == SymbolKind.TABLE_TYPE:
+            # Defining a table prototype (always in global scope) - check if an identifier with same name exists in global scope
+            existing_symbol = self.global_scope.lookup_local(name)
+            if existing_symbol and existing_symbol.kind != SymbolKind.TABLE_TYPE:
+                if self.error_handler:
+                    self.error_handler.add_error(
+                        f"Identifier '{name}' conflicts with table prototype of the same name",
+                        declaration_node,
+                        "E208"  # FORWARD_REFERENCE
+                    )
+                return False
+        elif self.current_scope.level == 0:  # Only check in global scope
+            # Defining an identifier in global scope - check if a table prototype with same name exists
+            table_type = self.lookup_table_type(name)
+            if table_type:
+                if self.error_handler:
+                    self.error_handler.add_error(
+                        f"Identifier '{name}' conflicts with table prototype of the same name",
+                        declaration_node,
+                        "E208"  # FORWARD_REFERENCE
+                    )
+                return False
+        else:
+            # In local scopes, check if this table type is already in use in current scope
+            # This prevents "Data of x; piece of Data;" where Data is used as both type and variable
+            if name in self.current_scope.table_types_in_use:
+                if self.error_handler:
+                    self.error_handler.add_error(
+                        f"Identifier '{name}' conflicts with table prototype of the same name",
+                        declaration_node,
+                        "E208"  # FORWARD_REFERENCE
+                    )
+                return False
+        
         # Check for shadowing + forward reference:
         # If a parent scope has this symbol AND it was accessed in current scope,
         # then we're both shadowing and using before local declaration

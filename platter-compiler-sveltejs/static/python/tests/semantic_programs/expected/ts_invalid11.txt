@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] [E304] Serve type mismatch: expected piece, got chars at line 3, column 5
+[ERROR] [E304] Serve type mismatch: expected piece, got chars at line 2, column 5

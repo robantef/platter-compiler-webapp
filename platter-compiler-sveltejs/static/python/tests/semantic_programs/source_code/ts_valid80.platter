@@ -1,11 +1,11 @@
-prepare piece of square(piece of x) {
-    serve x * x;
-}
-
-prepare piece of sumSquares(piece of a, piece of b) {
-    serve square(a) + square(b);
-}
-
-start() {
-    piece of result = sumSquares(2,3);
+prepare piece of square(piece of x) {
+    serve x * x;
+}
+
+prepare piece of sumSquares(piece of a, piece of b) {
+    serve square(a) + square(b);
+}
+
+start() {
+    piece of result = sumSquares(2,3);
 }

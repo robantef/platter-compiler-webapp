@@ -1,5 +1,13 @@
 import csv
 import os
+import re
+
+def normalize_code(code):
+    """Normalize line endings to Unix-style (LF only) while preserving blank lines"""
+    # Only normalize line endings: remove all \r and use only \n
+    # Do NOT collapse blank lines - they are intentional in the test cases
+    normalized = code.replace('\r\n', '\n').replace('\r', '\n')
+    return normalized.strip()
 
 # Make sure the directories exist
 os.makedirs("expected", exist_ok=True)
@@ -16,18 +24,18 @@ with open("Platter - Test Scripts - Semantics - Invalid.csv", newline='', encodi
         if not test_num or not code:
             continue
         filename = os.path.join("expected", f"ts_invalid{test_num}.txt")
-        with open(filename, "w", encoding="utf-8") as f:
+        with open(filename, "w", encoding="utf-8", newline='\n') as f:
             f.write(code)
         print(f"Created {filename}")
 
     # Write invalid source code
     for row in reader1:
         test_num = row["x1"].strip()
-        code = row["Test Case/Test Scenario"].strip()
+        code = normalize_code(row["Test Case/Test Scenario"])
         if not test_num or not code:
             continue
         filename = os.path.join("source_code", f"ts_invalid{test_num}.platter")
-        with open(filename, "w", encoding="utf-8") as f:
+        with open(filename, "w", encoding="utf-8", newline='\n') as f:
             f.write(code)
         print(f"Created {filename}")
 
@@ -36,10 +44,10 @@ with open("Platter - Test Scripts - Semantics - Valid.csv", newline='', encoding
     reader2 = csv.DictReader(csvfile2)
     for row in reader2:
         test_num = row["x1"].strip()
-        code = row["Test Case/Test Scenario"].strip()
+        code = normalize_code(row["Test Case/Test Scenario"])
         if not test_num or not code:
             continue
         filename = os.path.join("source_code", f"ts_valid{test_num}.platter")
-        with open(filename, "w", encoding="utf-8") as f:
+        with open(filename, "w", encoding="utf-8", newline='\n') as f:
             f.write(code)
         print(f"Created {filename}")

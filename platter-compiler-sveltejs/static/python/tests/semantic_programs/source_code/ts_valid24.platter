@@ -1,5 +1,5 @@
-start(){
-piece of x = 5;
-flag of result;
-result = (((((((x + 1) * 2) - 3) + 4) % 5) * 2) >= 6);
+start(){
+piece of x = 5;
+flag of result;
+result = (((((((x + 1) * 2) - 3) + 4) % 5) * 2) >= 6);
 }

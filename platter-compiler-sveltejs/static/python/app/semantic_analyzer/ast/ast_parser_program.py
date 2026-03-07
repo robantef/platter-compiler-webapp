@@ -5908,11 +5908,11 @@ class ASTParser:
             # Manual code
             return lambda left: BinaryOp(BinaryOp(left, "%", node_1), node_2, node_3)
 
-            """    424 <flag_cont_any>	=>	<rel_op>	<any_expr>	<flag_eq_tail>    """
+            """    424 <flag_cont_any>	=>	<rel_op>	<any_no_rel_expr>	<flag_eq_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<flag_cont_any>_5"]:
             rel_op_token = self.tokens[self.pos]
             node_0 = self.rel_op()
-            node_1 = self.any_expr()
+            node_1 = self.any_no_rel_expr()
             node_2 = self.flag_eq_tail()
 
             # Build binary operation chain
@@ -6248,6 +6248,81 @@ class ASTParser:
 
         log.info("Exit: " + self.tokens[self.pos].type)
 
+    def any_no_rel_expr(self):
+        self.appendF(FIRST_SET["<any_no_rel_expr>"])
+        log.info("Enter: " + self.tokens[self.pos].type)
+        log.info("STACK: " + str(self.error_arr))
+
+        """    <any_no_rel_expr>	=>	<ret_piece>	<cont_piece>    """
+        if self.tokens[self.pos].type in PREDICT_SET["<any_no_rel_expr>"]:
+            node_0 = self.ret_piece()
+            node_1 = self.cont_piece()
+
+            # Build binary operation: combine left with right tail
+            if node_1:
+                return node_1(node_0)
+            else:
+                return node_0
+
+            """    <any_no_rel_expr>	=>	<ret_sip>	<cont_sip>    """
+        elif self.tokens[self.pos].type in PREDICT_SET["<any_no_rel_expr>_1"]:
+            node_0 = self.ret_sip()
+            node_1 = self.cont_sip()
+
+            # Build binary operation: combine left with right tail
+            if node_1:
+                return node_1(node_0)
+            else:
+                return node_0
+
+            """    <any_no_rel_expr>	=>	<ret_chars>	<cont_chars>    """
+        elif self.tokens[self.pos].type in PREDICT_SET["<any_no_rel_expr>_2"]:
+            node_0 = self.ret_chars()
+            node_1 = self.cont_chars()
+
+            # Build binary operation: combine left with right tail
+            if node_1:
+                return node_1(node_0)
+            else:
+                return node_0
+
+            """    <any_no_rel_expr>	=>	<id>	<cps_cont_any>    """
+        elif self.tokens[self.pos].type in PREDICT_SET["<any_no_rel_expr>_3"]:
+            node_0 = self.id_()
+            node_1 = self.cps_cont_any()
+
+            # Build binary operation: combine left with right tail
+            if node_1:
+                return node_1(node_0)
+            else:
+                return node_0
+
+            """    <any_no_rel_expr>	=>	(	<any_expr>	)	<cps_cont_any>    """
+        elif self.tokens[self.pos].type in PREDICT_SET["<any_no_rel_expr>_4"]:
+            token_0 = self.tokens[self.pos]
+            self.parse_token("(")
+            node_1 = self.any_expr()
+            token_2 = self.tokens[self.pos]
+            self.parse_token(")")
+            node_3 = self.cps_cont_any()
+
+            # Build binary operation: combine left with right tail
+            if node_3:
+                return node_3(node_1)
+            else:
+                return node_1
+
+            """    <any_no_rel_expr>	=>	<ret_flag>    """
+        elif self.tokens[self.pos].type in PREDICT_SET["<any_no_rel_expr>_5"]:
+            node_0 = self.ret_flag()
+
+            # Just return the flag node
+            return node_0
+
+        else: self.parse_token(self.error_arr)
+
+        log.info("Exit: " + self.tokens[self.pos].type)
+
     def any_expr(self):
         self.appendF(FIRST_SET["<any_expr>"])
         log.info("Enter: " + self.tokens[self.pos].type)
@@ -6423,11 +6498,11 @@ class ASTParser:
                 return node
             return build_op
 
-            """    459 <any_cont_any>	=>	<rel_op>	<any_expr>	<flag_op_tail>    """
+            """    459 <any_cont_any>	=>	<rel_op>	<any_no_rel_expr>	<flag_op_tail>    """
         elif self.tokens[self.pos].type in PREDICT_SET["<any_cont_any>_5"]:
             rel_op_token = self.tokens[self.pos]
             node_0 = self.rel_op()
-            node_1 = self.any_expr()
+            node_1 = self.any_no_rel_expr()
             node_2 = self.flag_op_tail()
 
             # Build binary operation chain

@@ -1,5 +1,5 @@
 No semantic errors with 4 warning(s)
-[WARNING] [W102] Unused ingredient 'z' at line 3, column 8
-[WARNING] [W102] Unused ingredient 'f' at line 5, column 9
-[WARNING] [W102] Unused ingredient 'name' at line 7, column 10
-[WARNING] [W102] Unused ingredient 'a' at line 13, column 14
+[WARNING] [W102] Unused ingredient 'z' at line 2, column 8
+[WARNING] [W102] Unused ingredient 'f' at line 3, column 9
+[WARNING] [W102] Unused ingredient 'name' at line 4, column 10
+[WARNING] [W102] Unused ingredient 'a' at line 7, column 14

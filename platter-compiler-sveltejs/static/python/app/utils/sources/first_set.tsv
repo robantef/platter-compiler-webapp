@@ -169,6 +169,7 @@
 <cont_sip>	{ +, -, *, /, λ }
 <cont_piece>	{ %, +, -, *, /, λ }
 <cont_chars>	{ +, λ }
+<any_no_rel_expr>	{ topiece, size, search, fact, pow, piece_lit, sqrt, rand, tosip, sip_lit, bill, take, copy, cut, tochars, chars_lit, id, (, matches, flag_lit }
 <strict_flag_expr>	{ topiece, size, search, fact, pow, piece_lit, sqrt, rand, tosip, sip_lit, matches, flag_lit, bill, take, copy, cut, tochars, chars_lit, not, id, ( }
 <flag_expr_tail>	{ and, or, λ }
 <simple_flag>	{ (, matches, flag_lit, id }

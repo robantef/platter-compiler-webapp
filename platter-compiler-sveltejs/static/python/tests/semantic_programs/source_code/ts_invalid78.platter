@@ -1,4 +1,4 @@
-start(){
-    piece of a = 1;
-    bill(a);
+start(){
+    piece of a = 1;
+    bill(a);
 }

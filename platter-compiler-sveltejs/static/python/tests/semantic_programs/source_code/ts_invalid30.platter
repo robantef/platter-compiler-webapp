@@ -1,8 +1,8 @@
-start() {
-    piece of i;
-    flag of done = down;
-
-    pass(i = 1; i -= done; i+1+1 >= i) {
-        piece of x = i;
-}
+start() {
+    piece of i;
+    flag of done = down;
+
+    pass(i = 1; i -= done; i+1+1 >= i) {
+        piece of x = i;
+}
 }
