@@ -54,6 +54,15 @@ class LexerProtocol(Protocol):
     op2_dlm: list[str]
     paren_dlm: list[str]
     term_dlm: list[str]
+    dlm_1: list[str]
+    dlm_2: list[str]
+    dlm_3: list[str]
+    dlm_4: list[str]
+    dlm_5: list[str]
+    dlm_6: list[str]
+    dlm_7: list[str]
+    dlm_8: list[str]
+    dlm_9: list[str]
     
     # Methods
     def advance(self) -> None: ...
@@ -63,5 +72,5 @@ class LexerProtocol(Protocol):
     def get_lexeme(self) -> str: ...
     def _match_delimiter(self, delimiters: list[str]) -> bool: ...
 
-    def s298(self) -> Token: ...
-    def s300(self) -> Token: ...
+    def s309(self) -> Token: ...
+    def s307(self) -> Token: ...

@@ -25,8 +25,8 @@ class LexerOperators(LexerProtocol):
         self.advance()
         if self._match_delimiter(self.op2_dlm): return self.s206()
         if self.current == "=": return self.s207()
-        if self.current == "0": return self.s298()
-        if self.current in self.numeric: return self.s300()
+        if self.current == "0": return self.s307()
+        if self.current in self.numeric: return self.s309()
         return [Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)]
 
     def s206(self):  # - (Accepting State 206)
@@ -168,38 +168,74 @@ class LexerOperators(LexerProtocol):
         self.advance()
         return Token("newline", "newline", self.start_line, self.start_col)
 
-    def s239(self):  # : (Accepting State 239)
+    def s239(self): 
         self.advance()
-        return Token(":", ":", self.start_line, self.start_col)
+        if self._match_delimiter(self.dlm_1): return self.s240()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
 
-    def s240(self):  # { (Accepting State 240)
-        self.advance()
-        return Token("{", "{", self.start_line, self.start_col)
-
-    def s241(self):  # } (Accepting State 241)
-        self.advance()
-        return Token("}", "}", self.start_line, self.start_col)
-
-    def s242(self):  # ( (Accepting State 242)
-        self.advance()
-        return Token("(", "(", self.start_line, self.start_col)
-
-    def s243(self):  # ) (Accepting State 243)
-        self.advance()
-        return Token(")", ")", self.start_line, self.start_col)
-
-    def s244(self):  # [ (Accepting State 244)
-        self.advance()
-        return Token("[", "[", self.start_line, self.start_col)
-
-    def s245(self):  # ] (Accepting State 245)
-        self.advance()
-        return Token("]", "]", self.start_line, self.start_col)
-
-    def s246(self):  # , (Accepting State 246)
-        self.advance()
+    def s240(self): 
         return Token(",", ",", self.start_line, self.start_col)
 
-    def s247(self):  # ; (Accepting State 247)
+    def s241(self): 
         self.advance()
+        if self._match_delimiter(self.dlm_2): return self.s242()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s242(self): 
+        return Token(":", ":", self.start_line, self.start_col)
+
+    def s243(self): 
+        self.advance()
+        if self._match_delimiter(self.dlm_3): return self.s244()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s244(self): 
         return Token(";", ";", self.start_line, self.start_col)
+
+    def s245(self):  
+        self.advance()
+        if self._match_delimiter(self.dlm_4): return self.s246()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s246(self):
+        return Token("(", "(", self.start_line, self.start_col)
+
+    def s247(self): 
+        self.advance()
+        if self._match_delimiter(self.dlm_5): return self.s248()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s248(self): 
+        return Token(")", ")", self.start_line, self.start_col)
+
+    def s249(self): 
+        self.advance()
+        if self._match_delimiter(self.dlm_6): return self.s250()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s250(self): 
+        return Token("[", "[", self.start_line, self.start_col)
+
+    def s251(self): 
+        self.advance()
+        if self._match_delimiter(self.dlm_7): return self.s252()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s252(self): 
+        return Token("]", "]", self.start_line, self.start_col)
+
+    def s253(self):  
+        self.advance()
+        if self._match_delimiter(self.dlm_8): return self.s254()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s254(self):
+        return Token("{", "{", self.start_line, self.start_col)
+
+    def s255(self): 
+        self.advance()
+        if self._match_delimiter(self.dlm_9): return self.s256()
+        return Token(Token.InvalidLexeme, self.get_lexeme(), self.start_line, self.start_col)
+
+    def s256(self):  
+        return Token("}", "}", self.start_line, self.start_col)

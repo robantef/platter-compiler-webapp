@@ -52,6 +52,16 @@ class LexerBase:
         self.paren_dlm = self.whitespace + ['(']
         self.term_dlm = self.whitespace + [';']
 
+        self.dlm_1 = self.whitespace + self.alphanumeric + ['(', '[', '-', '_', '"', '#']
+        self.dlm_2 = self.whitespace + self.alpha + ['_', '}', '#']
+        self.dlm_3 = self.whitespace + self.alphanumeric + ['(', ']', '-', '}', '_', '"', '#']
+        self.dlm_4 = self.whitespace + self.alphanumeric + ['(', ')', '[', '-', '_', '"', '#']
+        self.dlm_5 = self.whitespace + [')', ';', '+', '-', '*', '/', '%', '!', '<', '>', ',', '{', '#', '=']
+        self.dlm_6 = self.whitespace + self.alphanumeric + ['[', ']', '-', '_', '"', '#']
+        self.dlm_7 = self.whitespace + [')', '[', ']', ';', '=', '+', '-', '*', '/', '%', '!', '<', '>', ',', ':', '#']
+        self.dlm_8 = self.whitespace + self.alpha + ['}', '#', '_']
+        self.dlm_9 = self.whitespace + self.alpha + ['_', '#', '}', None]
+
     def advance(self):
         """Moves to the next character, updating line and column."""
         if self.current == "\n":

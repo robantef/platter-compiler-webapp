@@ -46,21 +46,21 @@ class Lexer(LexerBase, LexerKeywords, LexerOperators, LexerIdentifier, LexerChar
         if self.current == " " and (tok := self.s236()): return tok
         if self.current == "\t" and (tok := self.s237()): return tok
         if self.current == "\n" and (tok := self.s238()): return tok
-        if self.current == ":" and (tok := self.s239()): return tok
-        if self.current == "{" and (tok := self.s240()): return tok
-        if self.current == "}" and (tok := self.s241()): return tok
-        if self.current == "(" and (tok := self.s242()): return tok
-        if self.current == ")" and (tok := self.s243()): return tok
-        if self.current == "[" and (tok := self.s244()): return tok
-        if self.current == "]" and (tok := self.s245()): return tok
-        if self.current == "," and (tok := self.s246()): return tok
-        if self.current == ";" and (tok := self.s247()): return tok
+        if self.current == "," and (tok := self.s239()): return tok
+        if self.current == ":" and (tok := self.s241()): return tok
+        if self.current == ";" and (tok := self.s243()): return tok
+        if self.current == "(" and (tok := self.s245()): return tok
+        if self.current == ")" and (tok := self.s247()): return tok
+        if self.current == "[" and (tok := self.s249()): return tok
+        if self.current == "]" and (tok := self.s251()): return tok
+        if self.current == "{" and (tok := self.s253()): return tok
+        if self.current == "}" and (tok := self.s255()): return tok
 
-        if self.current in (self.alpha + self.underscore) and (tok := self.s248()): return tok
-        if self.current == "0" and (tok := self.s298()): return tok
-        if self.current in self.digit and (tok := self.s300()): return tok
-        if self.current == '"' and (tok := self.s345()): return tok
-        if self.current == '#' and (tok := self.s348()): return tok
+        if self.current in (self.alpha + self.underscore) and (tok := self.s257()): return tok
+        if self.current == "0" and (tok := self.s307()): return tok
+        if self.current in self.digit and (tok := self.s309()): return tok
+        if self.current == '"' and (tok := self.s354()): return tok
+        if self.current == '#' and (tok := self.s357()): return tok
 
         tok = Token(Token.InvalidCharacter, self.current, self.start_line, self.start_col)
         self.advance()
