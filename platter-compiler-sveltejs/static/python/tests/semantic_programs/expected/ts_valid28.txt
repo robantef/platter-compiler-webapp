@@ -1,2 +1,1 @@
-No semantic errors with 1 warning(s)
-[WARNING] [W102] Unused ingredient 'cond' at line 3, column 12
+No semantic errors
