@@ -1,4 +1,4 @@
 Semantic analysis failed with 1 error(s) and 2 warning(s)
 [ERROR] [E305] Recipe 'f' must have a guaranteed serve statement in all code paths at line 1, column 1
 [WARNING] [W102] Unused ingredient 'a' at line 1, column 26
-[WARNING] [W102] Unused ingredient 'x' at line 7, column 11
+[WARNING] [W102] Unused ingredient 'x' at line 4, column 11

@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] [E105] Type mismatch in binary operation: flag > piece at line 5, column 8
+[ERROR] [E105] Type mismatch in binary operation: flag + piece at line 3, column 17

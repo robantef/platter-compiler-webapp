@@ -1,13 +1,13 @@
-start(){
- piece of x = 2;
- 
- menu(x) {
-
- choice 1: 
- 	bill(tochars(x));
-    stop;
-    
- choice 2:
- 	bill(tochars(x));
- }
+start(){
+ piece of x = 2;
+ 
+ menu(x) {
+
+ choice 1: 
+ 	bill(tochars(x));
+    stop;
+    
+ choice 2:
+ 	bill(tochars(x));
+ }
 }

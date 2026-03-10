@@ -1,10 +1,10 @@
-table of Person = [
-    piece of age;
-    chars of name;
-];
-
-Person of p = [ age = 25; name = "John"; ];
-
-start() {
-    piece of a = p:age;
+table of Person = [
+    piece of age;
+    chars of name;
+];
+
+Person of p = [ age = 25; name = "John"; ];
+
+start() {
+    piece of a = p:age;
 }

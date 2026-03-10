@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] [E304] Serve type mismatch: expected piece, got flag at line 3, column 2
+[ERROR] [E304] Serve type mismatch: expected piece, got flag at line 2, column 2

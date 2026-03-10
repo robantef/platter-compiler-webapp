@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] [E303] No matching overload for built-in recipe 'bill' with argument types: [('piece', 0)] at line 13, column 6
+[ERROR] [E303] No matching overload for built-in recipe 'bill' with argument types: [('piece', 0)] at line 7, column 6

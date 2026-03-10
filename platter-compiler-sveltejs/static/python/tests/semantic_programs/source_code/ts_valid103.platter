@@ -1,19 +1,19 @@
-start(){
-
-	piece of x = 18;
-	flag of hasID = up;
-	
-    check(x >= 18){
-    	check(up){
-        	bill("okay");
-        }
-        
-    instead{
-        	bill ("noo");
-    }
-        
-    
-    }
-	
-
+start(){
+
+	piece of x = 18;
+	flag of hasID = up;
+	
+    check(x >= 18){
+    	check(up){
+        	bill("okay");
+        }
+        
+    instead{
+        	bill ("noo");
+    }
+        
+    
+    }
+	
+
 }

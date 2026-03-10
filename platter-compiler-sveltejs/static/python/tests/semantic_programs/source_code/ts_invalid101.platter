@@ -1,12 +1,12 @@
-start(){
-	piece of x = 10;
-    
-    check(x>=20){
-    	bill ("proceed");
-    } alt(x < 10){
-    	bill (x);
-    } instead {
-    	bill("don't proceed");
-    }
-
+start(){
+	piece of x = 10;
+    
+    check(x>=20){
+    	bill ("proceed");
+    } alt(x < 10){
+    	bill (x);
+    } instead {
+    	bill("don't proceed");
+    }
+
 }

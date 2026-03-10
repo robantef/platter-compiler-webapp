@@ -1,7 +1,7 @@
-prepare piece of add(piece of a){
- serve a+1;
-}
-
-start(){
- piece of x=add(up);
+prepare piece of add(piece of a){
+ serve a+1;
+}
+
+start(){
+ piece of x=add(up);
 }

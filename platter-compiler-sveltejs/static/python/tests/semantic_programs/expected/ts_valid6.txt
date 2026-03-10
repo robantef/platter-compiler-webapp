@@ -1,2 +1,2 @@
 No semantic errors with 1 warning(s)
-[WARNING] [W102] Unused ingredient 'y' at line 5, column 13
+[WARNING] [W102] Unused ingredient 'y' at line 3, column 13

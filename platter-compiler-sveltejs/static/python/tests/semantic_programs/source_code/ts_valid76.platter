@@ -1,10 +1,10 @@
-start() {
-    piece of a = 5;
-    piece of b = 10;
-
-    flag of result = (a * 2 > b) and not (b < 5);
-
-    check (result) {
-        piece of x = pow(a, 2);
-    }
+start() {
+    piece of a = 5;
+    piece of b = 10;
+
+    flag of result = (a * 2 > b) and not (b < 5);
+
+    check (result) {
+        piece of x = pow(a, 2);
+    }
 }

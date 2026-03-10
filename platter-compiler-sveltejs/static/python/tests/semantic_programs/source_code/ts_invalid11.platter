@@ -1,4 +1,4 @@
-prepare piece of add(){
-    serve "invalid type";
-}
+prepare piece of add(){
+    serve "invalid type";
+}
 start() {}

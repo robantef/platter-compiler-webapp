@@ -1,12 +1,12 @@
-prepare piece of factRec(piece of n) {
-    check (n == 0) {
-        serve 1;
-    }
-    instead {
-        serve n * factRec(n - 1);
-    }
-}
-
-start() {
-    piece of x = factRec(5);
+prepare piece of factRec(piece of n) {
+    check (n == 0) {
+        serve 1;
+    }
+    instead {
+        serve n * factRec(n - 1);
+    }
+}
+
+start() {
+    piece of x = factRec(5);
 }

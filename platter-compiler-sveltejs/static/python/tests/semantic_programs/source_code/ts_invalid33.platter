@@ -1,6 +1,6 @@
-piece of a = 4, b = 2;
-
-start(){
-    flag of result;
-    result = (((a + b) * 2) and (not down));
+piece of a = 4, b = 2;
+
+start(){
+    flag of result;
+    result = (((a + b) * 2) and (not down));
 }

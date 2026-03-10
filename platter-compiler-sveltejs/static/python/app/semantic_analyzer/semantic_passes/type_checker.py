@@ -223,6 +223,20 @@ class TypeChecker:
         
         target_type = self._get_expression_type(node.target)
         
+        # Workaround for parser bug: Skip assignments where target identifier was stolen from a
+        # LATER line (identifier node reuse). target.line > assignment.line indicates the parser
+        # used an identifier node from a future statement as this assignment's target.
+        if isinstance(node.target, Identifier) and hasattr(node.target, 'line'):
+            if (node.target.line is not None and node.line is not None
+                    and node.target.line > node.line):
+                # Target line is after the assignment line - likely a parser bug (identifier node reuse)
+                # Still attempt to update array sizes for append/remove calls using the first argument
+                # (the actual source array) as both source and target, since the parser stole the real target identifier.
+                if isinstance(node.value, RecipeCall) and node.value.name in ("append", "remove"):
+                    if node.value.args and isinstance(node.value.args[0], Identifier):
+                        self._update_symbol_array_size(node.value.args[0], node.value)
+                return
+        
         # Special case: empty array literals are compatible with any array type
         if isinstance(node.value, ArrayLiteral) and not node.value.elements:
             if target_type and target_type.dimensions > 0:
@@ -239,6 +253,10 @@ class TypeChecker:
                     node.target,  # Use target node for better error location
                     ErrorCodes.TYPE_MISMATCH
                 )
+        
+        # Update array size tracking after assignment (no error = proceed with size update)
+        if isinstance(node.target, Identifier):
+            self._update_symbol_array_size(node.target, node.value)
     
     def _check_serve_statement(self, node: ServeStatement):
         """Check serve statement type compatibility"""
@@ -484,6 +502,18 @@ class TypeChecker:
                             return None
                     except (ValueError, TypeError):
                         pass  # If we can't parse the value, let other checks handle it
+            else:
+                # Evaluate non-literal divisors ONLY when they contain size() calls.
+                # This avoids false-positives from Identifier variables that default to 0.
+                if self._contains_size_call(node.right):
+                    right_const = self._evaluate_constant_expr(node.right)
+                    if right_const is not None and right_const == 0:
+                        self.error_handler.add_error(
+                            f"Cannot divide by 0",
+                            node,
+                            ErrorCodes.DIVISION_BY_ZERO
+                        )
+                        return None
         
         # Determine result type based on operator
         if node.operator in ['+', '-', '*', '/', '%']:
@@ -582,6 +612,159 @@ class TypeChecker:
         
         return operand_type
     
+    def _contains_size_call(self, expr: ASTNode) -> bool:
+        """Return True if the expression contains at least one size() RecipeCall.
+        
+        Used to gate non-literal divisor evaluation to only size()-based expressions,
+        avoiding false-positive divide-by-zero errors from regular variable identifiers.
+        """
+        if isinstance(expr, RecipeCall):
+            return expr.name == "size"
+        elif isinstance(expr, BinaryOp):
+            return self._contains_size_call(expr.left) or self._contains_size_call(expr.right)
+        elif isinstance(expr, UnaryOp):
+            return self._contains_size_call(expr.operand)
+        return False
+    
+    def _evaluate_constant_expr(self, expr: ASTNode) -> Optional[int]:
+        """Evaluate constant expressions to integer values.
+        
+        Returns:
+            Integer value if expression is constant, None otherwise
+        """
+        if isinstance(expr, Literal) and expr.value_type == "piece":
+            try:
+                return int(expr.value)
+            except (ValueError, TypeError):
+                return None
+        
+        elif isinstance(expr, UnaryOp):
+            # Handle unary operators
+            operand_value = self._evaluate_constant_expr(expr.operand)
+            if operand_value is None:
+                return None
+            
+            if expr.operator == "-":
+                return -operand_value
+            elif expr.operator == "not":
+                return None  # "not" is for boolean, not integer
+            else:
+                return None
+        
+        elif isinstance(expr, Identifier):
+            # Look up the symbol and check if it has a constant initialization
+            symbol = self.symbol_table.lookup_symbol(expr.name)
+            if symbol and symbol.declaration_node:
+                # Check if it's a variable with an initialization value
+                if hasattr(symbol.declaration_node, 'init_value') and symbol.declaration_node.init_value:
+                    # Recursively evaluate the initialization expression
+                    return self._evaluate_constant_expr(symbol.declaration_node.init_value)
+            return None
+        
+        # NOTE: Identifier resolution is intentionally excluded to prevent false-positives
+        # from scoping issues (e.g., global default-zero shadows inner initialized var).
+        
+        elif isinstance(expr, RecipeCall):
+            # Evaluate size(arr) calls using tracked array_sizes
+            if expr.name == "size" and len(expr.args) == 1:
+                arg = expr.args[0]
+                if isinstance(arg, Identifier):
+                    symbol = self.symbol_table.lookup_symbol(arg.name)
+                    if symbol and symbol.type_info.array_sizes and len(symbol.type_info.array_sizes) > 0:
+                        return symbol.type_info.array_sizes[0]
+            return None
+        
+        elif isinstance(expr, BinaryOp):
+            # Handle binary operators for completeness
+            left_value = self._evaluate_constant_expr(expr.left)
+            right_value = self._evaluate_constant_expr(expr.right)
+            
+            if left_value is None or right_value is None:
+                return None
+            
+            # Perform the operation
+            if expr.operator == "+":
+                return left_value + right_value
+            elif expr.operator == "-":
+                return left_value - right_value
+            elif expr.operator == "*":
+                return left_value * right_value
+            elif expr.operator == "/":
+                if right_value == 0:
+                    return None
+                return left_value // right_value  # Integer division
+            elif expr.operator == "%":
+                if right_value == 0:
+                    return None
+                return left_value % right_value
+            else:
+                return None
+        
+        return None
+    
+    def _update_symbol_array_size(self, target: ASTNode, value: ASTNode):
+        """Update a symbol's array_sizes after an assignment.
+        
+        Handles three cases:
+        - Array literal assignment: set size from literal element count
+        - append() result assignment: increment size of first dimension by 1
+        - remove() result assignment: decrement size of first dimension by 1 (floor 0)
+        """
+        if not isinstance(target, Identifier):
+            return
+        
+        symbol = self.symbol_table.lookup_symbol(target.name)
+        if not symbol or symbol.type_info.dimensions == 0:
+            return  # Only track sizes for arrays
+        
+        if isinstance(value, ArrayLiteral):
+            # Direct array literal assignment — update size from element count
+            new_size = len(value.elements)
+            if symbol.type_info.array_sizes:
+                symbol.type_info.array_sizes[0] = new_size
+            else:
+                symbol.type_info.array_sizes = [new_size]
+        
+        elif isinstance(value, RecipeCall):
+            if value.name == "append" and len(value.args) >= 1:
+                # append(arr, elem) returns array with one more element
+                # The first argument should be the array being appended to
+                arg0 = value.args[0]
+                if isinstance(arg0, Identifier):
+                    src_symbol = self.symbol_table.lookup_symbol(arg0.name)
+                    if src_symbol and src_symbol.type_info.array_sizes:
+                        new_size = src_symbol.type_info.array_sizes[0] + 1
+                    elif src_symbol and not src_symbol.type_info.array_sizes:
+                        new_size = 1  # Unknown size, assume at least 1 after append
+                    else:
+                        new_size = None
+                else:
+                    new_size = None
+                
+                if new_size is not None:
+                    if symbol.type_info.array_sizes:
+                        symbol.type_info.array_sizes[0] = new_size
+                    else:
+                        symbol.type_info.array_sizes = [new_size]
+            
+            elif value.name == "remove" and len(value.args) >= 1:
+                # remove(arr, idx) returns array with one fewer element
+                arg0 = value.args[0]
+                if isinstance(arg0, Identifier):
+                    src_symbol = self.symbol_table.lookup_symbol(arg0.name)
+                    if src_symbol and src_symbol.type_info.array_sizes:
+                        new_size = max(0, src_symbol.type_info.array_sizes[0] - 1)
+                    else:
+                        new_size = None
+                else:
+                    new_size = None
+                
+                if new_size is not None:
+                    if symbol.type_info.array_sizes:
+                        symbol.type_info.array_sizes[0] = new_size
+                    else:
+                        symbol.type_info.array_sizes = [new_size]
+    
     def _get_array_access_type(self, node: ArrayAccess) -> Optional[TypeInfo]:
         """Get type of array access"""
         array_type = self._get_expression_type(node.array)
@@ -608,24 +791,26 @@ class TypeChecker:
             return None
         
         # Bounds checking for constant indices
-        # Only check bounds when we have explicit size information
-        if isinstance(node.index, Literal) and node.index.value_type == "piece":
-            try:
-                index_value = int(node.index.value)
-                # Get the array size if available
-                if array_type.array_sizes and len(array_type.array_sizes) > 0:
-                    array_size = array_type.array_sizes[0]
-                    if index_value < 0 or index_value >= array_size:
-                        self.error_handler.add_error(
-                            f"Array index {index_value} out of bounds (array size: {array_size})",
-                            node.index,
-                            ErrorCodes.ARRAY_OUT_OF_BOUNDS
-                        )
-                # If no size information, skip bounds checking
-                # Arrays can be initialized at various points (literals, table instantiation, etc.)
-            except (ValueError, TypeError):
-                # If we can't convert to int, skip bounds checking
-                pass
+        # Try to evaluate the index as a constant expression
+        index_value = self._evaluate_constant_expr(node.index)
+        
+        if index_value is not None:
+            # Check for negative index (always invalid)
+            if index_value < 0:
+                self.error_handler.add_error(
+                    f"Array index cannot be negative: {index_value}",
+                    node.index,
+                    ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                )
+            # Check for out of bounds if we have size information
+            elif array_type.array_sizes and len(array_type.array_sizes) > 0:
+                array_size = array_type.array_sizes[0]
+                if index_value >= array_size:
+                    self.error_handler.add_error(
+                        f"Array index {index_value} out of bounds (array size: {array_size})",
+                        node.index,
+                        ErrorCodes.ARRAY_OUT_OF_BOUNDS
+                    )
         
         # Return element type
         return array_type.get_element_type()

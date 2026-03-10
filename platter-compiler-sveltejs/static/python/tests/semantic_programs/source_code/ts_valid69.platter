@@ -1,5 +1,5 @@
-start(){
-	piece[] of a, b;
-    
-    b = ["a"];
+start(){
+	piece[] of a, b;
+    
+    b = ["a"];
 }

@@ -395,17 +395,23 @@
 <flag_eq_tail>	{ != }
 <flag_eq_tail>	{ and, or, ,, ;, ), ==, != }
 <flag_op_tail>	{ ==, !=, and, or, ,, ), ; }
-<flag_op_tail>	{ ,, ), ==, !=, and, or, ; }
+<flag_op_tail>	{ ,, ), ; }
 <cont_sip>	{ +, -, *, / }
 <cont_sip>	{ ==, !=, >=, <=, <, >, ,, ), and, or, ; }
 <cont_piece>	{ %, +, -, *, / }
 <cont_piece>	{ ==, !=, >=, <=, <, >, ,, ), and, or, ; }
 <cont_chars>	{ + }
 <cont_chars>	{ ==, !=, >=, <=, <, >, ,, ), and, or, ; }
+<any_no_rel_expr>	{ topiece, size, search, fact, pow, piece_lit }
+<any_no_rel_expr>	{ sqrt, rand, tosip, sip_lit }
+<any_no_rel_expr>	{ bill, take, copy, cut, tochars, chars_lit }
+<any_no_rel_expr>	{ id }
+<any_no_rel_expr>	{ ( }
+<any_no_rel_expr>	{ matches, flag_lit }
 <strict_flag_expr>	{ topiece, size, search, fact, pow, piece_lit, sqrt, rand, tosip, sip_lit, matches, flag_lit, bill, take, copy, cut, tochars, chars_lit, not, id, ( }
 <flag_expr_tail>	{ and }
 <flag_expr_tail>	{ or }
-<flag_expr_tail>	{ ,, ;, ), ==, !=, and, or }
+<flag_expr_tail>	{ ,, ;, ) }
 <simple_flag>	{ ( }
 <simple_flag>	{ matches, flag_lit }
 <simple_flag>	{ id }
@@ -457,18 +463,18 @@
 <any_cont_any>	{ / }
 <any_cont_any>	{ % }
 <any_cont_any>	{ ==, !=, >=, <=, <, > }
-<any_cont_any>	{ and, or, ,, ), ==, !=, ; }
-<any_cont_any>	{ ,, ), ==, !=, and, or, ; }
+<any_cont_any>	{ and, or, ,, ), ; }
+<any_cont_any>	{ ,, ), ; }
 <any_cont_cps_flag_tail>	{ ==, !=, >=, <=, <, > }
-<any_cont_cps_flag_tail>	{ ,, ), ==, !=, and, or, ; }
+<any_cont_cps_flag_tail>	{ ,, ), ; }
 <any_cont_ps_flag_tail>	{ ==, !=, >=, <=, <, > }
-<any_cont_ps_flag_tail>	{ ,, ), ==, !=, and, or, ; }
+<any_cont_ps_flag_tail>	{ ,, ), ; }
 <any_cont_p_flag_tail>	{ ==, !=, >=, <=, <, > }
-<any_cont_p_flag_tail>	{ ,, ), ==, !=, and, or, ; }
+<any_cont_p_flag_tail>	{ ,, ), ; }
 <any_cont_s_flag_tail>	{ ==, !=, >=, <=, <, > }
-<any_cont_s_flag_tail>	{ ,, ), ==, !=, and, or, ; }
+<any_cont_s_flag_tail>	{ ,, ), ; }
 <any_cont_c_flag_tail>	{ ==, !=, >=, <=, <, > }
-<any_cont_c_flag_tail>	{ ,, ), ==, !=, and, or, ; }
+<any_cont_c_flag_tail>	{ ,, ), ; }
 <strict_cps_expr>	{ topiece, size, search, fact, pow, piece_lit }
 <strict_cps_expr>	{ sqrt, rand, tosip, sip_lit }
 <strict_cps_expr>	{ bill, take, copy, cut, tochars, chars_lit }

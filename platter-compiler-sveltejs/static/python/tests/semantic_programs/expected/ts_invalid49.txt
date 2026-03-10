@@ -1,3 +1,3 @@
-No semantic errors with 2 warning(s)
+Semantic analysis failed with 1 error(s) and 1 warning(s)
+[ERROR] [E208] Identifier 'Data' conflicts with table prototype of the same name at line 7, column 14
 [WARNING] [W102] Unused ingredient 'x'
-[WARNING] [W102] Unused ingredient 'Data' at line 7, column 14

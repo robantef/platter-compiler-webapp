@@ -191,16 +191,24 @@ class SymbolTableBuilder:
                 self._process_table_decl(decl)
     
     def _process_function_declarations(self, program: Program):
-        """Process function declarations"""
+        """Process function declarations in two passes:
+        Pass 1: Register all function signatures
+        Pass 2: Process function bodies
+        """
+        # Pass 1: Register all function signatures
         for recipe in program.recipe_decl:
-            self._process_recipe_decl(recipe)
+            self._register_recipe_signature(recipe)
+        
+        # Pass 2: Process function bodies
+        for recipe in program.recipe_decl:
+            self._process_recipe_body(recipe)
     
-    def _process_recipe_decl(self, node: RecipeDecl):
-        """Process a recipe declaration"""
+    def _register_recipe_signature(self, node: RecipeDecl):
+        """Register recipe signature without processing body (Pass 1)"""
         # Prevent user-defined recipes from shadowing built-ins
         if self.symbol_table.is_builtin_recipe(node.name):
             if self.symbol_table.error_handler:
-                self.symbol_table.error_handler.add_error(
+                self.error_handler.add_error(
                     f"Cannot redefine built-in recipe '{node.name}'", 
                     node,
                     ErrorCodes.REDEFINED_BUILTIN
@@ -216,26 +224,36 @@ class SymbolTableBuilder:
             serve_type,
             0,
             node,
-            self.symbol_table.current_scope
+            self.symbol_table.global_scope  # Always register recipes in global scope
         )
         
         # Compute default value for symbol table display
         recipe_symbol.compute_default_value(self.symbol_table.table_types)
         
-        if not self.symbol_table.current_scope.define(recipe_symbol):
+        if not self.symbol_table.global_scope.define(recipe_symbol):
             if self.symbol_table.error_handler:
                 self.symbol_table.error_handler.add_error(f"Recipe '{node.name}' already defined", node)
+    
+    def _process_recipe_body(self, node: RecipeDecl):
+        """Process recipe body and parameters (Pass 2)"""
+        # Skip if recipe was not registered (e.g., due to redefinition error)
+        recipe_symbol = self.symbol_table.lookup_symbol(node.name)
+        if not recipe_symbol:
             return
         
+        # Enter recipe scope
         self.symbol_table.enter_scope(f"recipe_{node.name}")
         self.symbol_table.current_function = recipe_symbol
         
+        # Process parameters
         for spice in node.params:
             self._process_param_decl(spice)
         
+        # Process body
         if node.body:
             self._process_platter(node.body)
         
+        # Exit recipe scope
         self.symbol_table.current_function = None
         self.symbol_table.exit_scope()
     
@@ -258,7 +276,7 @@ class SymbolTableBuilder:
         # Track usage in initial value BEFORE defining the symbol
         # This ensures forward references are caught
         if node.init_value:
-            self._track_expression_usage(node.init_value)
+            self._track_expression_usage(node.init_value, node.identifier)
         
         # Add default value if not initialized
         if not node.init_value:
@@ -299,7 +317,7 @@ class SymbolTableBuilder:
         # Track usage in initial value BEFORE defining the symbol
         # This ensures forward references are caught
         if node.init_value:
-            self._track_expression_usage(node.init_value)
+            self._track_expression_usage(node.init_value, node.identifier)
         
         # Add default value if not initialized
         if not node.init_value:
@@ -318,6 +336,10 @@ class SymbolTableBuilder:
         
         dims = node.dimensions if node.dimensions is not None else 0
         
+        # Mark this table type as "in use" in current scope
+        # This prevents declaring variables with the same name as the table type
+        self.symbol_table.current_scope.table_types_in_use.add(node.table_type)
+        
         if table_type:
             type_info = TypeInfo(
                 node.table_type,
@@ -332,7 +354,7 @@ class SymbolTableBuilder:
             # Track usage in initial value BEFORE defining the symbol
             # This ensures forward references are caught
             if node.init_value:
-                self._track_expression_usage(node.init_value)
+                self._track_expression_usage(node.init_value, node.identifier)
             
             # Add default value if not initialized (only for non-array table instances)
             if not node.init_value and dims == 0:
@@ -341,7 +363,7 @@ class SymbolTableBuilder:
             type_info = TypeInfo(node.table_type, dims)
             # Track usage even if table type is not found
             if node.init_value:
-                self._track_expression_usage(node.init_value)
+                self._track_expression_usage(node.init_value, node.identifier)
         
         self.symbol_table.define_symbol(
             node.identifier,
@@ -484,8 +506,13 @@ class SymbolTableBuilder:
         
         return TypeInfo(base_type, dims)
     
-    def _track_expression_usage(self, expr: ASTNode):
-        """Track symbol usage in expressions"""
+    def _track_expression_usage(self, expr: ASTNode, declaring_symbol_name: str = None):
+        """Track symbol usage in expressions
+        
+        Args:
+            expr: The expression to track
+            declaring_symbol_name: Name of symbol being declared (to exclude from shadowing detection)
+        """
         if expr is None:
             return
         
@@ -495,8 +522,9 @@ class SymbolTableBuilder:
             if symbol:  # Find the scope where this symbol is declared
                 declared_scope = self._find_declaring_scope(symbol.name)
                 if declared_scope:
-                    # Record usage with both current scope and declaring scope
-                    symbol.add_usage(self.symbol_table.current_scope.name, declared_scope.name)
+                    # Record usage, but skip if this is the symbol being declared (initialization expression)
+                    if expr.name != declaring_symbol_name:
+                        symbol.add_usage(self.symbol_table.current_scope.name, declared_scope.name)
             else:
                 # Symbol not declared - track as undeclared but accessed
                 if expr.name not in self.symbol_table.undeclared_symbols:
@@ -519,18 +547,18 @@ class SymbolTableBuilder:
                     undeclared_symbol.accessed_in_scopes.append(current_scope_name)
         
         elif isinstance(expr, BinaryOp):
-            self._track_expression_usage(expr.left)
-            self._track_expression_usage(expr.right)
+            self._track_expression_usage(expr.left, declaring_symbol_name)
+            self._track_expression_usage(expr.right, declaring_symbol_name)
         
         elif isinstance(expr, UnaryOp):
-            self._track_expression_usage(expr.operand)
+            self._track_expression_usage(expr.operand, declaring_symbol_name)
         
         elif isinstance(expr, ArrayAccess):
-            self._track_expression_usage(expr.array)
-            self._track_expression_usage(expr.index)
+            self._track_expression_usage(expr.array, declaring_symbol_name)
+            self._track_expression_usage(expr.index, declaring_symbol_name)
         
         elif isinstance(expr, TableAccess):
-            self._track_expression_usage(expr.table)
+            self._track_expression_usage(expr.table, declaring_symbol_name)
         
         elif isinstance(expr, RecipeCall):
             # Track recipe name usage
@@ -538,7 +566,9 @@ class SymbolTableBuilder:
             if symbol:
                 declared_scope = self._find_declaring_scope(symbol.name)
                 if declared_scope:
-                    symbol.add_usage(self.symbol_table.current_scope.name, declared_scope.name)
+                    # Record usage, but skip if this is the symbol being declared (initialization expression)
+                    if expr.name != declaring_symbol_name:
+                        symbol.add_usage(self.symbol_table.current_scope.name, declared_scope.name)
             elif not is_builtin_recipe(expr.name):
                 # Recipe not declared and not built-in - track as undeclared but accessed
                 if expr.name not in self.symbol_table.undeclared_symbols:
@@ -560,10 +590,10 @@ class SymbolTableBuilder:
                     undeclared_symbol.accessed_in_scopes.append(current_scope_name)
             # Track flavors (arguments)
             for arg in expr.args:
-                self._track_expression_usage(arg)
+                self._track_expression_usage(arg, declaring_symbol_name)
         
         elif isinstance(expr, CastExpr):
-            self._track_expression_usage(expr.expr)
+            self._track_expression_usage(expr.expr, declaring_symbol_name)
         
         elif isinstance(expr, ArrayLiteral):
             for elem in expr.elements:

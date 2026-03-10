@@ -1,0 +1,9 @@
+piece[] of x =[1,2];
+sip[] of y = [1.0,2.0];
+start(){
+	x = append(x,3);
+    bill(tochars(x[2])); # should display 3
+    
+    y = [1.0,2.0,3.0];
+    bill(tochars(y[2])); # should display 3.0 
+}

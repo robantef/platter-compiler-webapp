@@ -1,5 +1,5 @@
-start() {
-    piece of x = fact(5);
-    sip of y = sqrt(25);
-    chars of s = tochars(100);
+start() {
+    piece of x = fact(5);
+    sip of y = sqrt(25);
+    chars of s = tochars(100);
 }

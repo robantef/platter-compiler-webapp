@@ -253,6 +253,7 @@ class Scope:
         self.symbols: Dict[str, Symbol] = {}
         self.children: List['Scope'] = []
         self.declaring_scope = None  # The scope where this scope's symbols are declared
+        self.table_types_in_use: set = set()  # Track table type names used in this scope
     
     def define(self, symbol: Symbol) -> bool:
         """Define a symbol in this scope"""

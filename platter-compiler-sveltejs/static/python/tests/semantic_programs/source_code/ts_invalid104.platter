@@ -1,8 +1,8 @@
-start(){
- chars of x = "passed";
- 
- repeat(x ("paased")){
- 	bill(x);
-    x+=1;
- }
+start(){
+ chars of x = "passed";
+ 
+ repeat(x ("paased")){
+ 	bill(x);
+    x+=1;
+ }
 }

@@ -1,4 +1,4 @@
-flag of a = up;
-flag of b = down;
-flag of c = a and b;
+flag of a = up;
+flag of b = down;
+flag of c = a and b;
 start() {}

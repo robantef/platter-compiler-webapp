@@ -1,2 +1,2 @@
 Semantic analysis failed with 1 error(s) and 0 warning(s)
-[ERROR] [E105] Logical operators require flag operands: piece and flag at line 9, column 29
+[ERROR] [E105] Logical operators require flag operands: piece and flag at line 5, column 29

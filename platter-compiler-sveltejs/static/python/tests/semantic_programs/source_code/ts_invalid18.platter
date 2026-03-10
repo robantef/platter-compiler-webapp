@@ -1,6 +1,6 @@
-prepare piece of concat(piece of a, chars of b){
-    serve a + topiece(b);
-}
-start() {
-    piece of x = concat(1, 1);
+prepare piece of concat(piece of a, chars of b){
+    serve a + topiece(b);
+}
+start() {
+    piece of x = concat(1, 1);
 }

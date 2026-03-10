@@ -1,0 +1,65 @@
+prepare piece[] of mergeSort(piece[] of arr) {
+    piece of n;
+    piece of mid;
+    piece of i;
+    piece[] of left;
+    piece[] of right;
+    piece[] of sortedLeft;
+    piece[] of sortedRight;
+    piece[] of result;
+
+    n = size(arr);
+
+    check(n <= (1)) {
+        serve arr;
+    }
+
+    mid = n / (2);
+    left = [];
+    right = [];
+
+    # copy left half
+    pass(i=0; i+=1; i<mid) {
+        append(left, arr[i]);
+    }
+
+    # copy right half
+    pass(i=mid; i+=1; i<n) {
+        append(right, arr[i]);
+    }
+
+    sortedLeft = mergeSort(left);
+    sortedRight = mergeSort(right);
+
+    result = merge(sortedLeft, sortedRight);
+    serve result;
+}
+
+prepare piece[] of merge(piece[] of left, piece[] of right) {
+    piece of i,j,k;
+    piece[] of merged;
+
+    i = (0);
+    j = (0);
+    merged = [];
+
+    pass(k=0; k+=1; k<size(left)+size(right)) {
+        check(i < size(left) and (j >= size(right) or left[i] <= right[j])) {
+            append(merged, left[i]);
+            i += (1);
+        }
+        alt(j < size(right)) {
+            append(merged, right[j]);
+            j += (1);
+        }
+    }
+    serve merged;
+}
+
+start() {
+    piece[] of arr;
+    piece[] of sorted;
+
+    arr = [38,27,43,3,9,82,10];
+    sorted = mergeSort(arr);
+}
