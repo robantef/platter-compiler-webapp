@@ -1,11 +1,11 @@
-<svg width="1130" height="510" viewBox="0 0 1130 510" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M189 6H189.5" stroke="#EDEDED" stroke-width="5"/>
-<path d="M134.5 6H16C10.4772 6 6 10.4772 6 16V489C6 494.523 10.4772 499 16 499H1113C1118.52 499 1123 494.523 1123 489V16C1123 10.4772 1118.52 6 1113 6H478" stroke="#EDEDED" stroke-width="5"/>
-<path d="M114.224 27H32C26.4772 27 22 31.4772 22 37V470C22 475.523 26.4771 480 32 480H1095C1100.52 480 1105 475.523 1105 470V37C1105 31.4772 1100.52 27 1095 27H504.789" stroke="#EDEDED" stroke-width="5" stroke-linecap="round"/>
-<path d="M391 6H423.5" stroke="#EDEDED" stroke-width="5"/>
-<path d="M189.5 6H336.5" stroke="#EDEDED" stroke-width="5"/>
-<path d="M191.5 8C190.543 21.949 177.997 33 162 33C146.318 33 133.402 21.5598 132 8" stroke="#EDEDED" stroke-width="5"/>
-<path d="M393.5 8C392.543 21.949 379.997 33 364 33C348.318 33 335.402 21.5598 334 8" stroke="#EDEDED" stroke-width="5"/>
-<path d="M480.5 8C479.543 21.949 466.997 33 451 33C435.318 33 422.402 21.5598 421 8" stroke="#EDEDED" stroke-width="5"/>
-<line x1="206.5" y1="26.5" x2="318.503" y2="26.5" stroke="#EDEDED" stroke-width="5" stroke-linecap="round"/>
+<svg viewBox="0 0 1140 852" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M187.291 2.5H187.796" stroke="#EDEDED" stroke-width="5"/>
+<path d="M133.071 2.5H12.5C6.97715 2.5 2.5 6.97715 2.5 12.5V839.5C2.5 845.023 6.97716 849.5 12.5 849.5H1127.5C1133.02 849.5 1137.5 845.023 1137.5 839.5V12.5C1137.5 6.97715 1133.02 2.5 1127.5 2.5H482.106" stroke="#EDEDED" stroke-width="5"/>
+<path d="M112.571 19.3213H28.5703C23.0475 19.3213 18.5703 23.7984 18.5703 29.3213V823.668C18.5703 829.191 23.0474 833.668 28.5703 833.668H1112.43C1117.96 833.668 1122.43 829.191 1122.43 823.668V29.3213C1122.43 23.7984 1117.96 19.3213 1112.43 19.3213H510.66" stroke="#EDEDED" stroke-width="5" stroke-linecap="round"/>
+<path d="M391.268 2.5H424.086" stroke="#EDEDED" stroke-width="5"/>
+<path d="M187.797 2.5H336.235" stroke="#EDEDED" stroke-width="5"/>
+<path d="M189.815 4.12573C188.849 15.4643 176.18 24.4472 160.026 24.4472C144.19 24.4472 131.148 15.1479 129.732 4.12573" stroke="#EDEDED" stroke-width="5"/>
+<path d="M393.791 4.12573C392.825 15.4643 380.156 24.4472 364.003 24.4472C348.167 24.4472 335.125 15.1479 333.709 4.12573" stroke="#EDEDED" stroke-width="5"/>
+<path d="M481.643 4.12573C480.677 15.4643 468.008 24.4472 451.854 24.4472C436.018 24.4472 422.976 15.1479 421.561 4.12573" stroke="#EDEDED" stroke-width="5"/>
+<line x1="204.938" y1="18.6956" x2="318.086" y2="18.6956" stroke="#EDEDED" stroke-width="5" stroke-linecap="round"/>
 </svg>

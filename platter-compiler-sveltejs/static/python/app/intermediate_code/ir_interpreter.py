@@ -26,6 +26,12 @@ class ReturnSignal(Exception):
         self.value = value
 
 
+class InputPauseSignal(Exception):
+    """Raised when take() needs more user input than currently provided."""
+    def __init__(self, message: str):
+        self.message = message
+
+
 class Frame:
     """A single call-stack frame with its own variable store."""
     def __init__(self, func_name: str, parent: "Frame | None" = None):
@@ -152,16 +158,30 @@ class TACInterpreter:
             self._execute()
         except ReturnSignal:
             pass
+        except InputPauseSignal as p:
+            return {
+                "success": False,
+                "paused": True,
+                "error": p.message,
+                "output": "\n".join(self.output_lines),
+                "stdin_consumed": self._stdin_idx,
+                "globals": {k: v for k, v in self.global_frame.vars.items()
+                            if not k.startswith("t")},
+            }
         except InterpreterError as e:
             return {
                 "success": False,
+                "paused": False,
                 "error": str(e),
                 "output": "\n".join(self.output_lines),
+                "stdin_consumed": self._stdin_idx,
             }
 
         return {
             "success": True,
+            "paused": False,
             "output": "\n".join(self.output_lines),
+            "stdin_consumed": self._stdin_idx,
             "globals": {k: v for k, v in self.global_frame.vars.items()
                         if not k.startswith("t")},  # hide temps
         }
@@ -331,7 +351,9 @@ class TACInterpreter:
                 self._stdin_idx += 1
                 return val
             else:
-                return input()
+                raise InputPauseSignal(
+                    "Execution paused at take(): provide more runtime input lines and run again."
+                )
 
         # ── Math/Formatting ──────────────────────────────────────────────
         elif name == "fact":
