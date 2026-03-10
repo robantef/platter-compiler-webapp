@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head>
+<title>Platter IR - Intermediate Representation</title>
+<style>
+body { font-family: 'Courier New', monospace; margin: 20px; }
+h1 { color: #333; }
+h2 { color: #666; margin-top: 30px; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #4CAF50; color: white; }
+tr:nth-child(even) { background-color: #f2f2f2; }
+.tac-instruction { background-color: #fff3cd; }
+</style>
+</head><body>
+<h1>Platter Intermediate Representation</h1>
+<h2>Three Address Code (TAC)</h2>
+<table>
+<tr><th>Index</th><th>Instruction</th></tr>
+<tr><td>0</td><td># === Platter Program IR ===</td></tr>
+<tr><td>1</td><td># Main Program (start)</td></tr>
+<tr><td>2</td><td>begin_func start</td></tr>
+<tr><td>3</td><td>x = 5</td></tr>
+<tr><td>4</td><td>y = 10</td></tr>
+<tr><td>5</td><td>sum = 0</td></tr>
+<tr><td>6</td><td>i = 0</td></tr>
+<tr><td>7</td><td>t0 = x + y</td></tr>
+<tr><td>8</td><td>t1 = t0</td></tr>
+<tr><td>9</td><td>t2 = sum > 10</td></tr>
+<tr><td>10</td><td>ifFalse t2 goto else0</td></tr>
+<tr><td>11</td><td>t3 = x + 1</td></tr>
+<tr><td>12</td><td>t4 = t3</td></tr>
+<tr><td>13</td><td>goto endif1</td></tr>
+<tr><td>14</td><td>else0:</td></tr>
+<tr><td>15</td><td>endif1:</td></tr>
+<tr><td>16</td><td>while_start2:</td></tr>
+<tr><td>17</td><td>t5 = i < 5</td></tr>
+<tr><td>18</td><td>ifFalse t5 goto while_end3</td></tr>
+<tr><td>19</td><td>goto while_start2</td></tr>
+<tr><td>20</td><td>while_end3:</td></tr>
+<tr><td>21</td><td>return sum</td></tr>
+<tr><td>22</td><td>end_func start</td></tr>
+</table>
+<h2>Quadruples</h2>
+<table>
+<tr><th>Index</th><th>Operator</th><th>Arg1</th><th>Arg2</th><th>Result</th><th>Readable</th></tr>
+<tr><td>0</td><td>comment</td><td>=== Platter Program IR ===</td><td>-</td><td>-</td><td># === Platter Program IR ===</td></tr>
+<tr><td>1</td><td>comment</td><td>Main Program (start)</td><td>-</td><td>-</td><td># Main Program (start)</td></tr>
+<tr><td>2</td><td>begin_func</td><td>start</td><td>-</td><td>-</td><td>begin_func start</td></tr>
+<tr><td>3</td><td>=</td><td>5</td><td>-</td><td>x</td><td>x = 5</td></tr>
+<tr><td>4</td><td>=</td><td>10</td><td>-</td><td>y</td><td>y = 10</td></tr>
+<tr><td>5</td><td>=</td><td>0</td><td>-</td><td>sum</td><td>sum = 0</td></tr>
+<tr><td>6</td><td>=</td><td>0</td><td>-</td><td>i</td><td>i = 0</td></tr>
+<tr><td>7</td><td>+</td><td>x</td><td>y</td><td>t0</td><td>t0 = x + y</td></tr>
+<tr><td>8</td><td>=</td><td>t0</td><td>-</td><td>t1</td><td>t1 = t0</td></tr>
+<tr><td>9</td><td>></td><td>sum</td><td>10</td><td>t2</td><td>t2 = sum > 10</td></tr>
+<tr><td>10</td><td>ifFalse</td><td>t2</td><td>-</td><td>else0</td><td>ifFalse t2 goto else0</td></tr>
+<tr><td>11</td><td>+</td><td>x</td><td>1</td><td>t3</td><td>t3 = x + 1</td></tr>
+<tr><td>12</td><td>=</td><td>t3</td><td>-</td><td>t4</td><td>t4 = t3</td></tr>
+<tr><td>13</td><td>goto</td><td>-</td><td>-</td><td>endif1</td><td>goto endif1</td></tr>
+<tr><td>14</td><td>label</td><td>else0</td><td>-</td><td>-</td><td>else0:</td></tr>
+<tr><td>15</td><td>label</td><td>endif1</td><td>-</td><td>-</td><td>endif1:</td></tr>
+<tr><td>16</td><td>label</td><td>while_start2</td><td>-</td><td>-</td><td>while_start2:</td></tr>
+<tr><td>17</td><td><</td><td>i</td><td>5</td><td>t5</td><td>t5 = i < 5</td></tr>
+<tr><td>18</td><td>ifFalse</td><td>t5</td><td>-</td><td>while_end3</td><td>ifFalse t5 goto while_end3</td></tr>
+<tr><td>19</td><td>goto</td><td>-</td><td>-</td><td>while_start2</td><td>goto while_start2</td></tr>
+<tr><td>20</td><td>label</td><td>while_end3</td><td>-</td><td>-</td><td>while_end3:</td></tr>
+<tr><td>21</td><td>return</td><td>sum</td><td>-</td><td>-</td><td>return sum</td></tr>
+<tr><td>22</td><td>end_func</td><td>start</td><td>-</td><td>-</td><td>end_func start</td></tr>
+</table>
+</body></html>

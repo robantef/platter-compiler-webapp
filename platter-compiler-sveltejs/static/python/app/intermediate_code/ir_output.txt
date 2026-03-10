@@ -1,0 +1,61 @@
+============================================================
+THREE ADDRESS CODE (TAC)
+============================================================
+
+   0: # === Platter Program IR ===
+   1: # Main Program (start)
+   2: begin_func start
+   3: x = 5
+   4: y = 10
+   5: sum = 0
+   6: i = 0
+   7: t0 = x + y
+   8: t1 = t0
+   9: t2 = sum > 10
+  10: ifFalse t2 goto else0
+  11: t3 = x + 1
+  12: t4 = t3
+  13: goto endif1
+  14: else0:
+  15: endif1:
+  16: while_start2:
+  17: t5 = i < 5
+  18: ifFalse t5 goto while_end3
+  19: goto while_start2
+  20: while_end3:
+  21: return sum
+  22: end_func start
+
+Total instructions: 23
+============================================================
+
+============================================================
+QUADRUPLES (Readable Format)
+============================================================
+
+   0: # === Platter Program IR ===
+   1: # Main Program (start)
+   2: begin_func start
+   3: x = 5
+   4: y = 10
+   5: sum = 0
+   6: i = 0
+   7: t0 = x + y
+   8: t1 = t0
+   9: t2 = sum > 10
+  10: ifFalse t2 goto else0
+  11: t3 = x + 1
+  12: t4 = t3
+  13: goto endif1
+  14: else0:
+  15: endif1:
+  16: while_start2:
+  17: t5 = i < 5
+  18: ifFalse t5 goto while_end3
+  19: goto while_start2
+  20: while_end3:
+  21: return sum
+  22: end_func start
+
+Total quadruples: 23
+============================================================

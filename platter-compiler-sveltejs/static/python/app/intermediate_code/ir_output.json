@@ -1,0 +1,343 @@
+{
+  "intermediate_representation": {
+    "three_address_code": [
+      {
+        "index": 0,
+        "type": "COMMENT",
+        "instruction": "# === Platter Program IR ==="
+      },
+      {
+        "index": 1,
+        "type": "COMMENT",
+        "instruction": "# Main Program (start)"
+      },
+      {
+        "index": 2,
+        "type": "FUNC_BEGIN",
+        "instruction": "begin_func start"
+      },
+      {
+        "index": 3,
+        "type": "ASSIGN",
+        "instruction": "x = 5",
+        "result": "x",
+        "arg1": "5"
+      },
+      {
+        "index": 4,
+        "type": "ASSIGN",
+        "instruction": "y = 10",
+        "result": "y",
+        "arg1": "10"
+      },
+      {
+        "index": 5,
+        "type": "ASSIGN",
+        "instruction": "sum = 0",
+        "result": "sum",
+        "arg1": "0"
+      },
+      {
+        "index": 6,
+        "type": "ASSIGN",
+        "instruction": "i = 0",
+        "result": "i",
+        "arg1": "0"
+      },
+      {
+        "index": 7,
+        "type": "BINOP",
+        "instruction": "t0 = x + y",
+        "result": "t0",
+        "arg1": "x",
+        "arg2": "y",
+        "operator": "+"
+      },
+      {
+        "index": 8,
+        "type": "ASSIGN",
+        "instruction": "t1 = t0",
+        "result": "t1",
+        "arg1": "t0"
+      },
+      {
+        "index": 9,
+        "type": "BINOP",
+        "instruction": "t2 = sum > 10",
+        "result": "t2",
+        "arg1": "sum",
+        "arg2": "10",
+        "operator": ">"
+      },
+      {
+        "index": 10,
+        "type": "IF_GOTO",
+        "instruction": "ifFalse t2 goto else0",
+        "label": "else0"
+      },
+      {
+        "index": 11,
+        "type": "BINOP",
+        "instruction": "t3 = x + 1",
+        "result": "t3",
+        "arg1": "x",
+        "arg2": "1",
+        "operator": "+"
+      },
+      {
+        "index": 12,
+        "type": "ASSIGN",
+        "instruction": "t4 = t3",
+        "result": "t4",
+        "arg1": "t3"
+      },
+      {
+        "index": 13,
+        "type": "GOTO",
+        "instruction": "goto endif1",
+        "label": "endif1"
+      },
+      {
+        "index": 14,
+        "type": "LABEL",
+        "instruction": "else0:",
+        "label": "else0"
+      },
+      {
+        "index": 15,
+        "type": "LABEL",
+        "instruction": "endif1:",
+        "label": "endif1"
+      },
+      {
+        "index": 16,
+        "type": "LABEL",
+        "instruction": "while_start2:",
+        "label": "while_start2"
+      },
+      {
+        "index": 17,
+        "type": "BINOP",
+        "instruction": "t5 = i < 5",
+        "result": "t5",
+        "arg1": "i",
+        "arg2": "5",
+        "operator": "<"
+      },
+      {
+        "index": 18,
+        "type": "IF_GOTO",
+        "instruction": "ifFalse t5 goto while_end3",
+        "label": "while_end3"
+      },
+      {
+        "index": 19,
+        "type": "GOTO",
+        "instruction": "goto while_start2",
+        "label": "while_start2"
+      },
+      {
+        "index": 20,
+        "type": "LABEL",
+        "instruction": "while_end3:",
+        "label": "while_end3"
+      },
+      {
+        "index": 21,
+        "type": "RETURN",
+        "instruction": "return sum"
+      },
+      {
+        "index": 22,
+        "type": "FUNC_END",
+        "instruction": "end_func start"
+      }
+    ],
+    "quadruples": [
+      {
+        "index": 0,
+        "operator": "comment",
+        "arg1": "=== Platter Program IR ===",
+        "arg2": null,
+        "result": null,
+        "readable": "# === Platter Program IR ==="
+      },
+      {
+        "index": 1,
+        "operator": "comment",
+        "arg1": "Main Program (start)",
+        "arg2": null,
+        "result": null,
+        "readable": "# Main Program (start)"
+      },
+      {
+        "index": 2,
+        "operator": "begin_func",
+        "arg1": "start",
+        "arg2": null,
+        "result": null,
+        "readable": "begin_func start"
+      },
+      {
+        "index": 3,
+        "operator": "=",
+        "arg1": "5",
+        "arg2": null,
+        "result": "x",
+        "readable": "x = 5"
+      },
+      {
+        "index": 4,
+        "operator": "=",
+        "arg1": "10",
+        "arg2": null,
+        "result": "y",
+        "readable": "y = 10"
+      },
+      {
+        "index": 5,
+        "operator": "=",
+        "arg1": "0",
+        "arg2": null,
+        "result": "sum",
+        "readable": "sum = 0"
+      },
+      {
+        "index": 6,
+        "operator": "=",
+        "arg1": "0",
+        "arg2": null,
+        "result": "i",
+        "readable": "i = 0"
+      },
+      {
+        "index": 7,
+        "operator": "+",
+        "arg1": "x",
+        "arg2": "y",
+        "result": "t0",
+        "readable": "t0 = x + y"
+      },
+      {
+        "index": 8,
+        "operator": "=",
+        "arg1": "t0",
+        "arg2": null,
+        "result": "t1",
+        "readable": "t1 = t0"
+      },
+      {
+        "index": 9,
+        "operator": ">",
+        "arg1": "sum",
+        "arg2": "10",
+        "result": "t2",
+        "readable": "t2 = sum > 10"
+      },
+      {
+        "index": 10,
+        "operator": "ifFalse",
+        "arg1": "t2",
+        "arg2": null,
+        "result": "else0",
+        "readable": "ifFalse t2 goto else0"
+      },
+      {
+        "index": 11,
+        "operator": "+",
+        "arg1": "x",
+        "arg2": "1",
+        "result": "t3",
+        "readable": "t3 = x + 1"
+      },
+      {
+        "index": 12,
+        "operator": "=",
+        "arg1": "t3",
+        "arg2": null,
+        "result": "t4",
+        "readable": "t4 = t3"
+      },
+      {
+        "index": 13,
+        "operator": "goto",
+        "arg1": null,
+        "arg2": null,
+        "result": "endif1",
+        "readable": "goto endif1"
+      },
+      {
+        "index": 14,
+        "operator": "label",
+        "arg1": "else0",
+        "arg2": null,
+        "result": null,
+        "readable": "else0:"
+      },
+      {
+        "index": 15,
+        "operator": "label",
+        "arg1": "endif1",
+        "arg2": null,
+        "result": null,
+        "readable": "endif1:"
+      },
+      {
+        "index": 16,
+        "operator": "label",
+        "arg1": "while_start2",
+        "arg2": null,
+        "result": null,
+        "readable": "while_start2:"
+      },
+      {
+        "index": 17,
+        "operator": "<",
+        "arg1": "i",
+        "arg2": "5",
+        "result": "t5",
+        "readable": "t5 = i < 5"
+      },
+      {
+        "index": 18,
+        "operator": "ifFalse",
+        "arg1": "t5",
+        "arg2": null,
+        "result": "while_end3",
+        "readable": "ifFalse t5 goto while_end3"
+      },
+      {
+        "index": 19,
+        "operator": "goto",
+        "arg1": null,
+        "arg2": null,
+        "result": "while_start2",
+        "readable": "goto while_start2"
+      },
+      {
+        "index": 20,
+        "operator": "label",
+        "arg1": "while_end3",
+        "arg2": null,
+        "result": null,
+        "readable": "while_end3:"
+      },
+      {
+        "index": 21,
+        "operator": "return",
+        "arg1": "sum",
+        "arg2": null,
+        "result": null,
+        "readable": "return sum"
+      },
+      {
+        "index": 22,
+        "operator": "end_func",
+        "arg1": "start",
+        "arg2": null,
+        "result": null,
+        "readable": "end_func start"
+      }
+    ]
+  }
+}

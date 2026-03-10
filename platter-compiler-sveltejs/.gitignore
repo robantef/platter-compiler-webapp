@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 
 # Test fixtures
 /static/python/tests/syntax_programs/tsv/Platter - Test Scripts - Syntax.tsv
+
+/documentation

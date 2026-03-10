@@ -49,3 +49,5 @@ platter-compiler-sveltejs/static/python/app/utils/sources/productions.py
 /static/python/tests/syntax_programs/tsv/Platter - Test Scripts - Syntax.tsv
 platter-compiler-sveltejs/static/python/tests/test.platter
 **/tests_*.txt
+
+/documentation
